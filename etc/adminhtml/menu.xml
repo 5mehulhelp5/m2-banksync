@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Ibertrand_BankSync::main_menu" title="BankSync" module="Ibertrand_BankSync" sortOrder="9999" parent="Magento_Sales::sales" resource="Ibertrand_BankSync::main_menu" dependsOnConfig="banksync/general/enabled"/>
+        <add id="Ibertrand_BankSync::temp_transaction" title="New Transactions" module="Ibertrand_BankSync" sortOrder="0" action="banksync/temptransaction/index" resource="Ibertrand_BankSync::temp_transaction" parent="Ibertrand_BankSync::main_menu" dependsOnConfig="banksync/general/enabled"/>
+        <add id="Ibertrand_BankSync::transaction" title="Booked Transactions" module="Ibertrand_BankSync" sortOrder="1" action="banksync/transaction/index" resource="Ibertrand_BankSync::transaction" parent="Ibertrand_BankSync::main_menu" dependsOnConfig="banksync/general/enabled"/>
+    </menu>
+</config>

@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="banksync" translate="label,comment" type="text" sortOrder="1000" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>BankSync</label>
+            <tab>sales</tab>
+            <resource>Ibertrand_BankSync::config_banksync</resource>
+            <group id="general" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General Configuration</label>
+                <field id="enabled" translate="label,comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="async_matching" translate="label,comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Async Matching</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If you have a lot of transactions and invoices to match and importing the files takes too long, enable this.</comment>
+                </field>
+            </group>
+            <group id="matching" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Matching</label>
+                <comment>Details about how the transactions will be matched with documents</comment>
+                <group id="filter" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Document selection</label>
+                    <field id="amount" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Amount Threshold</label>
+                        <comment>If the difference is bigger than the threshold, the transaction will not be matched at all. The smaller the difference, the higher the confidence.</comment>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="date" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Date Threshold</label>
+                        <comment>How many days can the transaction be prior to the creation of the document and still be matched?</comment>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="payment_methods" translate="label,comment" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Payment Methods</label>
+                        <source_model>Ibertrand\BankSync\Model\Config\Source\PaymentMethods</source_model>
+                        <comment>Which payment methods should be considered when matching?</comment>
+                    </field>
+                    <field id="start_date" translate="label,comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Start Date</label>
+                        <comment>Only documents after this date will be considered</comment>
+                    </field>
+                </group>
+                <group id="weights" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Weights</label>
+                    <comment>Any number. The higher the weight, the more important the field is.</comment>
+                    <field id="payer_name" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Payer Name</label>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="purpose" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Purpose</label>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="amount" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Amount</label>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                </group>
+                <group id="patterns" translate="label,comment" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Patterns for purpose matching</label>
+                    <comment>Regular expressions.{{value}} will be replaced with the actual increment_id.</comment>
+                    <field id="document_increment_id" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Document Increment ID</label>
+                    </field>
+                    <field id="order_increment_id" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Order Increment ID</label>
+                    </field>
+                    <field id="customer_increment_id" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Customer Increment ID</label>
+                    </field>
+                </group>
+                <group id="confidence_thresholds" translate="label,comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Match confidence thresholds</label>
+                    <field id="acceptance" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Acceptance Threshold</label>
+                        <comment>Matches with this confidence or higher can be booked automatically</comment>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="mininum" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Minimum Threshold</label>
+                        <comment>Matches with less than this confidence will not be displayed in the match list at all</comment>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                </group>
+            </group>
+            <group id="csv_settings" translate="label,comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>CSV Settings</label>
+                <group id="general" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>General Configuration</label>
+                    <field id="delimiter" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Delimiter</label>
+                    </field>
+                    <field id="enclosure" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Enclosure</label>
+                    </field>
+                    <field id="thousand_separator" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Thousand Separator</label>
+                    </field>
+                    <field id="decimal_separator" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Decimal Separator</label>
+                    </field>
+                </group>
+                <group id="fields" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Fields</label>
+                    <comment>The headers of the CSV file.</comment>
+                    <field id="payer_name" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Payer Name</label>
+                    </field>
+                    <field id="transaction_date" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Payment date</label>
+                    </field>
+                    <field id="purpose" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Payment purpose</label>
+                    </field>
+                    <field id="amount" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Amount</label>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

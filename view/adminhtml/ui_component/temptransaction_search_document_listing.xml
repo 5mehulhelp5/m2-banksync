@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">temptransaction_search_document_listing.temptransaction_search_document_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>temptransaction_search_document_listing.temptransaction_search_document_listing_data_source</dep>
+        </deps>
+        <spinner>temptransaction_details_columns</spinner>
+        <buttons>
+            <button name="back">
+                <label translate="true">Back</label>
+                <url path="*/*/index"/>
+                <class>secondary back</class>
+            </button>
+        </buttons>
+    </settings>
+    <dataSource name="temptransaction_search_document_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\TempTransactionSearchDocumentListing</argument>
+            <argument name="name" xsi:type="string">temptransaction_search_document_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">entity_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <paging name="listing_paging"/>
+        <filters name="listing_filters"/>
+        <bookmark name="bookmarks"/>
+    </listingToolbar>
+    <columns name="temptransaction_details_columns">
+        <settings>
+            <childDefaults>
+                <param name="sortable" xsi:type="boolean">false</param>
+            </childDefaults>
+        </settings>
+        <column name="transaction_date" sortOrder="20">
+            <settings>
+                <label translate="true">Transaction Date</label>
+            </settings>
+        </column>
+        <column name="created_at" sortOrder="30">
+            <settings>
+                <filter>date_range</filter>
+                <label translate="true">Document Date</label>
+            </settings>
+        </column>
+        <column name="transaction_payer_name" sortOrder="40">
+            <settings>
+                <label translate="true">Payer Name</label>
+            </settings>
+        </column>
+        <column name="customer_name" sortOrder="50">
+            <settings>
+                <label translate="true">Order Customer Name</label>
+            </settings>
+        </column>
+        <column name="transaction_purpose" sortOrder="60">
+            <settings>
+                <label translate="true">Purpose</label>
+            </settings>
+        </column>
+        <column name="increment_id" sortOrder="70">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Document Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="order_increment_id" sortOrder="80">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Order Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="transaction_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
+            <settings>
+                <label translate="true">Amount</label>
+            </settings>
+        </column>
+        <column name="grand_total" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Document Amount</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\TempTransactionDetails\Actions" sortOrder="120">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+
+</listing>

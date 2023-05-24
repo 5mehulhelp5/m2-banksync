@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <banksync>
+            <general>
+                <enabled>1</enabled>
+                <async_matching>1</async_matching>
+            </general>
+            <matching>
+                <confidence_thresholds>
+                    <minimum>10</minimum>
+                    <acceptance>80</acceptance>
+                </confidence_thresholds>
+                <filter>
+                    <amount>5</amount>
+                    <date>14</date>
+                </filter>
+                <patterns>
+                    <document_increment_id><![CDATA[/(\b|<?=bill|invoice|credit ?memo|refund|nr\.?){{value}}\b/i]]></document_increment_id>
+                    <order_increment_id><![CDATA[/(\b|<?=order|nr\.?){{value}}\b/i]]></order_increment_id>
+                    <customer_increment_id><![CDATA[/(\b|<?=customer|nr\.?){{value}}\b/i]]></customer_increment_id>
+                </patterns>
+                <weights>
+                    <payer_name>20</payer_name>
+                    <purpose>40</purpose>
+                    <amount>40</amount>
+                </weights>
+            </matching>
+            <csv_settings>
+                <general>
+                    <delimiter>;</delimiter>
+                    <enclosure>"</enclosure>
+                    <thousand_separator>.</thousand_separator>
+                    <decimal_separator>,</decimal_separator>
+                </general>
+                <fields>
+                    <payer_name>payer_name</payer_name>
+                    <transaction_date>transaction_date</transaction_date>
+                    <purpose>purpose</purpose>
+                    <amount>amount</amount>
+                </fields>
+            </csv_settings>
+        </banksync>
+    </default>
+</config>

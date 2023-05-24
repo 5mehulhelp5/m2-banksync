@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">transaction_listing.transaction_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>transaction_listing.transaction_listing_data_source</dep>
+        </deps>
+        <spinner>transaction_columns</spinner>
+    </settings>
+    <dataSource name="transaction_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\TransactionListing</argument>
+            <argument name="name" xsi:type="string">transaction_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">entity_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <paging name="listing_paging"/>
+        <filters name="listing_filters"/>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+            <action name="mass_book">
+                <settings>
+                    <url path="banksync/transaction/unbook"/>
+                    <type>mass_book</type>
+                    <label translate="true">Unbook</label>
+                    <confirm>
+                        <title translate="true">Unbook</title>
+                        <message translate="true">Are you sure to unbook selected transactions?</message>
+                    </confirm>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+    <columns name="transaction_columns">
+        <selectionsColumn name="ids" sortOrder="0">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <draggable>false</draggable>
+            </settings>
+        </selectionsColumn>
+        <column name="transaction_date" sortOrder="10">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Transaction Date</label>
+            </settings>
+        </column>
+        <column name="document_date" sortOrder="20">
+            <settings>
+                <sortable>false</sortable>
+                <label translate="true">Document Date</label>
+            </settings>
+        </column>
+        <column name="created_at" sortOrder="30">
+            <settings>
+                <sortable>false</sortable>
+                <label translate="true">Booking Date</label>
+            </settings>
+        </column>
+        <column name="payer_name" sortOrder="40">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Payer Name</label>
+            </settings>
+        </column>
+        <column name="document_name" sortOrder="50">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Order Customer Name</label>
+            </settings>
+        </column>
+        <column name="purpose" sortOrder="60">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Purpose</label>
+            </settings>
+        </column>
+        <column name="document" sortOrder="70">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Document Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="order_increment_id" sortOrder="80">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Order Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Amount</label>
+            </settings>
+        </column>
+        <column name="document_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Document Amount</label>
+            </settings>
+        </column>
+        <column name="match_confidence" sortOrder="110">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Confidence</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Transaction\Actions" sortOrder="120">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+                <draggable>false</draggable>
+            </settings>
+        </actionsColumn>
+    </columns>
+
+</listing>

@@ -1,0 +1,14 @@
+tr.data-row:has(div.banksync-confidence-high) {
+    background-color: #00ff00;
+}
+
+div.banksync-confidence-high {
+    background-color: #00ff00;
+    color: #000000;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+div.banksync-confidence-low {
+}
+

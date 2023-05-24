@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="banksync_temp_transaction" resource="default" engine="innodb" comment="BankSync Temporary Transactions">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="timestamp" name="transaction_date" nullable="false" comment="Transaction Date"/>
+        <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
+        <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
+        <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
+        <column xsi:type="float" name="match_confidence" nullable="true" comment="Match Confidence"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="banksync_transaction" resource="default" engine="innodb" comment="BankSync Transactions">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="timestamp" name="transaction_date" nullable="false" comment="Transaction Date"/>
+        <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
+        <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
+        <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
+        <column xsi:type="text" name="document_type" nullable="false" comment="Document Type"/>
+        <column xsi:type="int" name="document_id" nullable="false" comment="Document ID"/>
+        <column xsi:type="float" name="match_confidence" nullable="true" comment="Document ID"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="banksync_temptransaction_confidence" resource="default" engine="innodb" comment="BankSync Transaction Confidence">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="temp_transaction_id" unsigned="true" nullable="false" comment="TempTransaction ID"/>
+        <column xsi:type="int" name="document_id" unsigned="true" nullable="false" comment="Document Id"/>
+        <column xsi:type="float" name="confidence" nullable="false" comment="Match Confidence"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign"
+                    referenceId="BNKSNC_TMPTRNSCTN_CONFIDENCE_TMPTRNSCTN_ID_TMPTRNSCTN_ENTT_ID"
+                    table="banksync_temptransaction_confidence"
+                    column="temp_transaction_id"
+                    referenceTable="banksync_temp_transaction"
+                    referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_TMPTRNSCTN_ID_DOCUMENT_ID">
+            <column name="temp_transaction_id"/>
+            <column name="document_id"/>
+        </constraint>
+    </table>
+</schema>

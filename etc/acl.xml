@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Sales::sales">
+                    <resource id="Ibertrand_BankSync::main_menu" title="BankSync">
+                        <resource id="Ibertrand_BankSync::temp_transaction" title="New Transactions"/>
+                        <resource id="Ibertrand_BankSync::transaction" title="Matched Transactions"/>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>
