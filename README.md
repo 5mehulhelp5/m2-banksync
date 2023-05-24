@@ -6,8 +6,8 @@ with invoices and credit memos.
 ### Installation
 
 ```bash
-composer require --no-update m2-banksync
-composer update m2-banksync
+composer require --no-update ibertrand/banksync
+composer update ibertrand/banksync
 bin/magento module:enable Ibertrand_BankSync
 bin/magento setup:upgrade
 bin/magento setup:di:compile
