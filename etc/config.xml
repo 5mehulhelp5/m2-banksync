@@ -16,9 +16,9 @@
                     <date>14</date>
                 </filter>
                 <patterns>
-                    <document_increment_id><![CDATA[/(\b|<?=bill|invoice|credit ?memo|refund|nr\.?){{value}}\b/i]]></document_increment_id>
-                    <order_increment_id><![CDATA[/(\b|<?=order|nr\.?){{value}}\b/i]]></order_increment_id>
-                    <customer_increment_id><![CDATA[/(\b|<?=customer|nr\.?){{value}}\b/i]]></customer_increment_id>
+                    <document_increment_id><![CDATA[/(?<=\b|bill|invoice|creditmemo|refund|nr)\.?{{value}}\b/i]]></document_increment_id>
+                    <order_increment_id><![CDATA[/(?<=\b|order|nr)\.?{{value}}\b/i]]></order_increment_id>
+                    <customer_increment_id><![CDATA[/(?<=\b|customer|nr)\.?{{value}}\b/i]]></customer_increment_id>
                 </patterns>
                 <weights>
                     <payer_name>20</payer_name>
