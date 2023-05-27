@@ -42,7 +42,7 @@ class RunMatching
         }
 
         try {
-            $this->matcher->matchNewTransactions();
+            $schedule->setMessages($this->matcher->matchNewTransactions());
         } catch (Exception $e) {
             $this->logger->error($e);
         }
