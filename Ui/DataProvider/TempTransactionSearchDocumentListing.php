@@ -2,12 +2,16 @@
 
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
+use Ibertrand\BankSync\Helper\Data;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
+use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
+use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\Request\Http;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
@@ -27,8 +31,10 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
     protected TempTransactionRepository $tempTransactionRepository;
     protected Http $request;
     protected OrderCollectionFactory $orderCollectionFactory;
-    private CustomerResource $customerResource;
-    private CustomerFactory $customerFactory;
+    protected CustomerResource $customerResource;
+    protected CustomerFactory $customerFactory;
+    protected Data $helper;
+    protected CustomerCollectionFactory $customerCollectionFactory;
 
     /**
      * @param string                      $name
@@ -60,6 +66,8 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         CustomerFactory $customerFactory,
         CustomerResource $customerResource,
         Http $request,
+        Data $helper,
+        CustomerCollectionFactory $customerCollectionFactory,
         array $meta = [],
         array $data = []
     ) {
@@ -70,6 +78,8 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->customerFactory = $customerFactory;
         $this->customerResource = $customerResource;
+        $this->helper = $helper;
+        $this->customerCollectionFactory = $customerCollectionFactory;
 
         $this->request = $request;
 
@@ -120,6 +130,23 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         return $document;
     }
 
+    protected function getObjectLink(DataObject $object, array $matchedTexts): string
+    {
+        if ($object instanceof Invoice) {
+            $url = $this->urlBuilder->getUrl('sales/invoice/view', ['invoice_id' => $object->getId()]);
+        } elseif ($object instanceof Creditmemo) {
+            $url = $this->urlBuilder->getUrl('sales/creditmemo/view', ['creditmemo_id' => $object->getId()]);
+        } elseif ($object instanceof Order) {
+            $url = $this->urlBuilder->getUrl('sales/order/view', ['order_id' => $object->getId()]);
+        } elseif ($object instanceof Customer) {
+            $url = $this->urlBuilder->getUrl('customer/index/edit', ['id' => $object->getId()]);
+        } else {
+            return '';
+        }
+        $class = in_array($object->getIncrementId(), array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        return "<a class='$class' href='$url'>{$object->getIncrementId()}</a>";
+    }
+
     /**
      * @return array
      * @throws LocalizedException
@@ -133,6 +160,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
 
         foreach ($data['items'] as &$item) {
             $document = $this->getDocument($item['entity_id']);
+            $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
 
             $item['document_type'] = $tempTransaction->getDocumentType();
             $item['customer_name'] = $document->getOrder()->getCustomerName();
@@ -140,34 +168,24 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             $item['transaction_date'] = $tempTransaction->getTransactionDate();
             $item['transaction_amount'] = $tempTransaction->getAmount();
             $item['transaction_payer_name'] = $tempTransaction->getPayerName();
-            $item['transaction_purpose'] = $tempTransaction->getPurpose();
             $item['transaction_id'] = $tempTransaction->getId();
-
-            $orderUrl = $this->urlBuilder->getUrl(
-                'sales/order/view',
-                ['order_id' => $document->getOrder()->getId()]
-            );
-            $item['order_increment_id'] = "<a href='$orderUrl'>{$document->getOrder()->getIncrementId()}</a>";
+            $item['increment_id'] = $this->getObjectLink($document, $purposeMatches);
+            $item['order_increment_id'] = $this->getObjectLink($document->getOrder(), $purposeMatches);
 
             $customerId = $document->getOrder()->getCustomerId();
             if ($customerId) {
                 $customer = $this->customerFactory->create();
                 $this->customerResource->load($customer, $customerId);
-                $customerUrl = $this->urlBuilder->getUrl(
-                    'customer/index/edit',
-                    ['id' => $customerId]
-                );
-                /** @noinspection PhpUndefinedMethodInspection */
-                $item['customer_increment_id'] = "<a href='{$customerUrl}'>{$customer->getIncrementId()}</a>";
+                $item['customer_increment_id'] = $this->getObjectLink($customer, $purposeMatches);
             } else {
                 $item['customer_increment_id'] = "-";
             }
 
-            $documentUrl = $this->urlBuilder->getUrl(
-                "sales/{$tempTransaction->getDocumentType()}/view",
-                [$tempTransaction->getDocumentType() . '_id' => $document->getId()]
-            );
-            $item['increment_id'] = "<a href='$documentUrl'>{$document->getIncrementId()}</a>";
+            $purpose = $tempTransaction->getPurpose();
+            foreach ($purposeMatches as $match => $score) {
+                $purpose = str_replace($match, "<span class='banksync-matched-text'>$match</span>", $purpose);
+            }
+            $item['transaction_purpose'] = $purpose;
         }
 
         return $data;
@@ -184,11 +202,22 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             /** @var Order $order */
 
             $order = $this->orderCollectionFactory->create()
-                ->addFieldToFilter('increment_id', [$filter->getConditionType()=> $filter->getValue()])
+                ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
                 ->getFirstItem();
 
             $filter->setField('order_id')
                 ->setValue($order->getId());
+        }
+
+        if ($filter->getField() === 'customer_increment_id') {
+            /** @var Customer $customer */
+
+            $customer = $this->customerCollectionFactory->create()
+                ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
+                ->getFirstItem();
+
+            $filter->setField('customer_id')
+                ->setValue($customer->getId());
         }
 
         parent::addFilter($filter);

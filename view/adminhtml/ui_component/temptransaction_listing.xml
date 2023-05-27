@@ -111,6 +111,7 @@
         <column name="purpose" sortOrder="50">
             <settings>
                 <filter>text</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Purpose</label>
             </settings>
         </column>

@@ -10,7 +10,9 @@ use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
 use Magento\Framework\UrlInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\CreditmemoRepository;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Psr\Log\LoggerInterface;
@@ -72,6 +74,24 @@ class TempTransactionListing extends AbstractDataProvider
         return $customer;
     }
 
+    protected function getObjectLink($object, $matchedTexts)
+    {
+        if ($object instanceof Invoice) {
+            $url = $this->urlBuilder->getUrl('sales/invoice/view', ['invoice_id' => $object->getId()]);
+        } elseif ($object instanceof Creditmemo) {
+            $url = $this->urlBuilder->getUrl('sales/creditmemo/view', ['creditmemo_id' => $object->getId()]);
+        } elseif ($object instanceof Order) {
+            $url = $this->urlBuilder->getUrl('sales/order/view', ['order_id' => $object->getId()]);
+        } elseif ($object instanceof Customer) {
+            $url = $this->urlBuilder->getUrl('customer/index/edit', ['id' => $object->getId()]);
+        } else {
+            return '';
+        }
+        $class = in_array($object->getIncrementId(), array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        return "<a class='$class' href='$url'>{$object->getIncrementId()}</a>";
+
+    }
+
     public function getData()
     {
         $data = parent::getData();
@@ -83,8 +103,12 @@ class TempTransactionListing extends AbstractDataProvider
             ->addFieldToFilter('temp_transaction_id', ['in' => array_column($data['items'], 'entity_id')]);
 
         foreach ($data['items'] as &$item) {
+            $tempTransaction = $this->collection->getItemById($item['entity_id']);
             $matches = $allConfidences->getItemsByColumnValue('temp_transaction_id', $item['entity_id']);
             usort($matches, fn ($b, $a) => $a->getConfidence() <=> $b->getConfidence());
+
+            $confidentMatches = array_filter($matches, fn ($m) => $m->getConfidence() >= $acceptanceThreshold);
+            $absoluteMatches = array_filter($matches, fn ($m) => $m->getConfidence() >= $absoluteThreshold);
 
             $item['document_type'] = $item['amount'] > 0 ? 'invoice' : 'creditmemo';
             $matchCount = count($matches);
@@ -93,36 +117,35 @@ class TempTransactionListing extends AbstractDataProvider
                 try {
                     // Add 'document' field
                     $documentId = $matches[0]->getDocumentId();
-                    $url = $this->urlBuilder->getUrl(
-                        'sales/' . $item['document_type'] . '/view',
-                        [$item['document_type'] . '_id' => $documentId]
-                    );
                     $document = $item['document_type'] == 'invoice'
                         ? $this->invoiceRepository->get($documentId)
                         : $this->creditmemoRepository->get($documentId);
 
-                    $item['document'] = "<a href='$url'>" . $document->getIncrementId() . "</a>";
+                    if (count($matches) == 1 || count($confidentMatches) == 1 || count($absoluteMatches) == 1) {
+                        $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
+                        $purpose = $tempTransaction->getPurpose();
+                        foreach ($purposeMatches as $match => $score) {
+                            $purpose = str_replace($match, "<span class='banksync-matched-text'>$match</span>", $purpose);
+                        }
+                        $item['purpose'] = $purpose;
+                    } else {
+                        $purposeMatches = [];
+                    }
+
                     $item['document_name'] = $document->getOrder()->getCustomerName();
                     $item['document_amount'] = $document->getGrandTotal();
                     $item['document_date'] = $document->getCreatedAt();
-                    $orderUrl = $this->urlBuilder->getUrl(
-                        'sales/order/view',
-                        ['order_id' => $document->getOrder()->getId()]
-                    );
-                    $item['order_increment_id'] = "<a href='$orderUrl'>{$document->getOrder()->getIncrementId()}</a>";
+                    $item['document'] = $this->getObjectLink($document, $purposeMatches);
+                    $item['order_increment_id'] = $this->getObjectLink($document->getOrder(), $purposeMatches);
 
                     $customerId = $document->getOrder()->getCustomerId();
                     if ($customerId) {
                         $customer = $this->loadCustomer($customerId);
-
-                        /** @noinspection PhpUndefinedMethodInspection */
-                        $customerIncrementId = $customer->getIncrementId();
-                        $customerUrl = $this->urlBuilder->getUrl(
-                            'customer/index/edit',
-                            ['id' => $customerId]
-                        );
-                        $item['customer_increment_id'] = "<a href='{$customerUrl}'>$customerIncrementId</a>";
+                        $item['customer_increment_id'] = $this->getObjectLink($customer, $purposeMatches);
+                    } else {
+                        $item['customer_increment_id'] = '-';
                     }
+
                 } catch (Exception $e) {
                     $this->logger->error($e);
                     $item['document'] = "[Not found]";
@@ -134,8 +157,6 @@ class TempTransactionListing extends AbstractDataProvider
                 ? max(array_map(fn ($match) => $match->getConfidence(), $matches))
                 : null;
 
-            $confidentMatches = array_filter($matches, fn ($m) => $m->getConfidence() >= $acceptanceThreshold);
-            $absoluteConfidentMatches = array_filter($matches, fn ($m) => $m->getConfidence() >= $absoluteThreshold);
 
             if ($confidence === null) {
                 $text = '-';
@@ -144,7 +165,7 @@ class TempTransactionListing extends AbstractDataProvider
                 $text = $confidence;
 
                 $class = $confidence >= $acceptanceThreshold
-                && (count($confidentMatches) == 1 || count($absoluteConfidentMatches) == 1)
+                && (count($confidentMatches) == 1 || count($absoluteMatches) == 1)
                     ? 'high'
                     : 'low';
             }

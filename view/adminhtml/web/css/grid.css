@@ -12,3 +12,14 @@ div.banksync-confidence-high {
 div.banksync-confidence-low {
 }
 
+.banksync-matched-text {
+    background: #91ff91;
+    display: inline-block;
+    border-radius: 4px;
+    padding: 1px 4px;
+    color: #303030;
+}
+
+.banksync-matched-text .banksync-matched-text {
+    padding: 0;
+}

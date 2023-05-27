@@ -72,6 +72,7 @@
         </column>
         <column name="transaction_purpose" sortOrder="60">
             <settings>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Purpose</label>
             </settings>
         </column>
@@ -86,6 +87,13 @@
             <settings>
                 <filter>text</filter>
                 <label translate="true">Order Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="customer_increment_id" sortOrder="90">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Increment Id</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>

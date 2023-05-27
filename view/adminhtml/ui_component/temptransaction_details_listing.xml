@@ -44,11 +44,6 @@
         <bookmark name="bookmarks"/>
     </listingToolbar>
     <columns name="temptransaction_details_columns">
-        <settings>
-            <childDefaults>
-                <param name="sortable" xsi:type="boolean">false</param>
-            </childDefaults>
-        </settings>
         <selectionsColumn name="id" sortOrder="0">
             <settings>
                 <indexField>entity_id</indexField>
@@ -59,6 +54,7 @@
             <settings>
                 <filter>text</filter>
                 <label translate="true">Transaction Date</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="created_at" sortOrder="30">
@@ -70,18 +66,22 @@
             <settings>
                 <filter>text</filter>
                 <label translate="true">Payer Name</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="customer_name" sortOrder="50">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Order Customer Name</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="transaction_purpose" sortOrder="60">
             <settings>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <filter>text</filter>
                 <label translate="true">Purpose</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="increment_id" sortOrder="70">
@@ -98,10 +98,18 @@
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
+        <column name="customer_increment_id" sortOrder="90">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
         <column name="transaction_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Amount</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="grand_total" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
@@ -115,6 +123,7 @@
                 <filter>textRange</filter>
                 <label translate="true">Confidence</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sorting>desc</sorting>
             </settings>
         </column>
         <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\TempTransactionDetails\Actions" sortOrder="120">

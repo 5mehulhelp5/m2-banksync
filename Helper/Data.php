@@ -116,14 +116,9 @@ class Data extends AbstractHelper
         return 0;
     }
 
-    /**
-     * @param string $incrementId
-     *
-     * @return string
-     */
-    private function getDocumentIncrementIdPattern(string $incrementId): string
+    private function getIncrementIdPattern(string $type, string $incrementId): string
     {
-        $template = $this->scopeConfig->getValue('banksync/general/patterns/document_increment_id');
+        $template = $this->scopeConfig->getValue("banksync/matching/patterns/{$type}_increment_id") ?? "";
         return str_replace('{{value}}', $incrementId, $template);
     }
 
@@ -132,29 +127,29 @@ class Data extends AbstractHelper
      *
      * @return string
      */
-    private function getOrderIncrementIdPattern(string $incrementId): string
+    private function getCustomerIncrementIdPattern(string $incrementId): string
     {
-        $template = $this->scopeConfig->getValue('banksync/general/patterns/order_increment_id');
+        $template = $this->scopeConfig->getValue('banksync/matching/patterns/customer_increment_id');
         return str_replace('{{value}}', $incrementId, $template);
     }
 
-    private function getPurposeMatches(TempTransaction $tempTransaction, Invoice|Creditmemo $document): array
+    public function getPurposeMatches(TempTransaction $tempTransaction, Invoice|Creditmemo $document): array
     {
         $purpose = trim($tempTransaction->getPurpose() ?? "");
         if (empty($purpose)) {
             return [];
         }
 
-        $documentIncrementId = $document->getIncrementId();
-        $pattern = $this->getDocumentIncrementIdPattern($documentIncrementId);
-        if (preg_match($pattern, $purpose)) {
-            return [$documentIncrementId => 1];
-        }
-
         $results = [];
 
+        $documentIncrementId = $document->getIncrementId();
+        $pattern = $this->getIncrementIdPattern("document", $documentIncrementId);
+        if (preg_match($pattern, $purpose)) {
+            $results[$documentIncrementId] = 1;
+        }
+
         $orderIncrementId = $document->getOrder()->getIncrementId();
-        $pattern = $this->getOrderIncrementIdPattern($orderIncrementId);
+        $pattern = $this->getIncrementIdPattern("order", $orderIncrementId);
         if (preg_match($pattern, $purpose)) {
             $results[$orderIncrementId] = 0.5;
         }
@@ -181,11 +176,11 @@ class Data extends AbstractHelper
             /** @noinspection PhpUndefinedMethodInspection */
             $customerIncrementId = $customer->getIncrementId();
             if (!empty($customerIncrementId)) {
-                $pattern = '/\b' . $customerIncrementId . '\b/';
+                $pattern = $this->getIncrementIdPattern("customer", $customerIncrementId);
                 if (preg_match($pattern, $purpose)) {
                     $results[$customerIncrementId] = 0.5;
                 }
-                $pattern = '/\b' . trim($customerIncrementId, '0') . '\b/';
+                $pattern = $this->getIncrementIdPattern("customer", trim($customerIncrementId, '0'));
                 if (preg_match($pattern, $purpose)) {
                     $results[trim($customerIncrementId, '0')] = 0.25;
                 }
@@ -273,7 +268,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param TempTransaction    $tempTransaction
+     * @param TempTransaction $tempTransaction
      * @param Invoice|Creditmemo $document
      *
      * @return float
