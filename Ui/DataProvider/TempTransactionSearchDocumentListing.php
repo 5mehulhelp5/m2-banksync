@@ -39,42 +39,44 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
     private PriceHelper $priceHelper;
 
     /**
-     * @param string $name
-     * @param string $primaryFieldName
-     * @param string $requestFieldName
-     * @param UrlInterface $urlBuilder
-     * @param InvoiceCollectionFactory $invoiceCollectionFactory
+     * @param string                      $name
+     * @param string                      $primaryFieldName
+     * @param string                      $requestFieldName
+     * @param UrlInterface                $urlBuilder
+     * @param InvoiceCollectionFactory    $invoiceCollectionFactory
      * @param CreditmemoCollectionFactory $creditmemoCollectionFactory
-     * @param TempTransactionRepository $tempTransactionRepository
-     * @param OrderCollectionFactory $orderCollectionFactory
-     * @param CustomerFactory $customerFactory
-     * @param CustomerResource $customerResource
-     * @param Http $request
-     * @param array $meta
-     * @param array $data
+     * @param TempTransactionRepository   $tempTransactionRepository
+     * @param OrderCollectionFactory      $orderCollectionFactory
+     * @param CustomerFactory             $customerFactory
+     * @param CustomerResource            $customerResource
+     * @param Http                        $request
+     * @param BankSyncHelper              $helper
+     * @param CustomerCollectionFactory   $customerCollectionFactory
+     * @param PriceHelper                 $priceHelper
+     * @param array                       $meta
+     * @param array                       $data
      *
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
     public function __construct(
         $name,
-                                    $primaryFieldName,
-                                    $requestFieldName,
-        UrlInterface                $urlBuilder,
-        InvoiceCollectionFactory    $invoiceCollectionFactory,
+        $primaryFieldName,
+        $requestFieldName,
+        UrlInterface $urlBuilder,
+        InvoiceCollectionFactory $invoiceCollectionFactory,
         CreditmemoCollectionFactory $creditmemoCollectionFactory,
-        TempTransactionRepository   $tempTransactionRepository,
-        OrderCollectionFactory      $orderCollectionFactory,
-        CustomerFactory             $customerFactory,
-        CustomerResource            $customerResource,
-        Http                        $request,
-        BankSyncHelper              $helper,
-        CustomerCollectionFactory   $customerCollectionFactory,
-        PriceHelper                 $priceHelper,
-        array                       $meta = [],
-        array                       $data = []
-    )
-    {
+        TempTransactionRepository $tempTransactionRepository,
+        OrderCollectionFactory $orderCollectionFactory,
+        CustomerFactory $customerFactory,
+        CustomerResource $customerResource,
+        Http $request,
+        BankSyncHelper $helper,
+        CustomerCollectionFactory $customerCollectionFactory,
+        PriceHelper $priceHelper,
+        array $meta = [],
+        array $data = [],
+    ) {
         $this->urlBuilder = $urlBuilder;
         $this->invoiceCollectionFactory = $invoiceCollectionFactory;
         $this->creditmemoCollectionFactory = $creditmemoCollectionFactory;
@@ -95,7 +97,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             $primaryFieldName,
             $requestFieldName,
             $meta,
-            $data
+            $data,
         );
     }
 

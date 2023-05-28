@@ -13,7 +13,7 @@ class PaymentMethods implements OptionSourceInterface
     /**
      * PaymentMethods constructor.
      *
-     * @param Config               $paymentModelConfig
+     * @param Config $paymentModelConfig
      */
     public function __construct(
         Config $paymentModelConfig

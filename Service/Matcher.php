@@ -207,7 +207,7 @@ class Matcher
             ->getColumnValues('temp_transaction_id');
 
         if ($alreadyMatched) {
-            $alreadyMatched= array_unique($alreadyMatched);
+            $alreadyMatched = array_unique($alreadyMatched);
             $tempTransactions->addFieldToFilter('entity_id', ['nin' => $alreadyMatched]);
         }
 
@@ -235,7 +235,7 @@ class Matcher
 
     /**
      * @param TempTransaction $tempTransaction
-     * @param array $documentIds
+     * @param array           $documentIds
      *
      * @return void
      * @throws CouldNotSaveException

@@ -27,7 +27,7 @@ class TransactionListing extends AbstractDataProvider
         CreditmemoRepository $creditmemoRepository,
         LoggerInterface $logger,
         array $meta = [],
-        array $data = []
+        array $data = [],
     ) {
         $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
@@ -56,8 +56,8 @@ class TransactionListing extends AbstractDataProvider
                 );
                 $document = (
                     $item['document_type'] == 'invoice'
-                        ? $this->invoiceRepository
-                        : $this->creditmemoRepository
+                    ? $this->invoiceRepository
+                    : $this->creditmemoRepository
                 )->get($item['document_id']);
 
                 $item['document'] = "<a href='$url'>" . $document->getIncrementId() . "</a>";

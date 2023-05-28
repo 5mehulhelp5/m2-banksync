@@ -24,24 +24,24 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
     private MatchConfidence $matchConfidenceResource;
 
     /**
-     * @param string $name
-     * @param string $primaryFieldName
-     * @param string $requestFieldName
-     * @param UrlInterface $urlBuilder
-     * @param InvoiceCollectionFactory $invoiceCollectionFactory
-     * @param CreditmemoCollectionFactory $creditmemoCollectionFactory
-     * @param TempTransactionRepository $tempTransactionRepository
-     * @param OrderCollectionFactory $orderCollectionFactory
-     * @param CustomerFactory $customerFactory
-     * @param CustomerResource $customerResource
-     * @param Http $request
-     * @param BankSyncHelper $helper
-     * @param CustomerCollectionFactory $customerCollectionFactory
-     * @param PriceHelper $priceHelper
+     * @param string                           $name
+     * @param string                           $primaryFieldName
+     * @param string                           $requestFieldName
+     * @param UrlInterface                     $urlBuilder
+     * @param InvoiceCollectionFactory         $invoiceCollectionFactory
+     * @param CreditmemoCollectionFactory      $creditmemoCollectionFactory
+     * @param TempTransactionRepository        $tempTransactionRepository
+     * @param OrderCollectionFactory           $orderCollectionFactory
+     * @param CustomerFactory                  $customerFactory
+     * @param CustomerResource                 $customerResource
+     * @param Http                             $request
+     * @param BankSyncHelper                   $helper
+     * @param CustomerCollectionFactory        $customerCollectionFactory
+     * @param PriceHelper                      $priceHelper
      * @param MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory
-     * @param MatchConfidence $matchConfidenceResource
-     * @param array $meta
-     * @param array $data
+     * @param MatchConfidence                  $matchConfidenceResource
+     * @param array                            $meta
+     * @param array                            $data
      *
      * @throws LocalizedException
      * @throws NoSuchEntityException
@@ -64,7 +64,7 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
         MatchConfidence $matchConfidenceResource,
         array $meta = [],
-        array $data = []
+        array $data = [],
     ) {
         $this->matchConfidenceCollectionFactory = $matchConfidenceCollectionFactory;
         $this->matchConfidenceResource = $matchConfidenceResource;
@@ -139,8 +139,9 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
 
     public function addOrder($field, $direction)
     {
-        if ($field === 'match_confidence_text')
+        if ($field === 'match_confidence_text') {
             $field = 'match_confidence';
+        }
         parent::addOrder($field, $direction);
     }
 }

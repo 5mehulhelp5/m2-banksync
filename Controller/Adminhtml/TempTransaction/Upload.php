@@ -18,7 +18,7 @@ class Upload extends Action
     public function __construct(
         Action\Context  $context,
         Filesystem      $filesystem,
-        UploaderFactory $fileUploaderFactory
+        UploaderFactory $fileUploaderFactory,
     ) {
         $this->varDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
         $this->fileUploaderFactory = $fileUploaderFactory;

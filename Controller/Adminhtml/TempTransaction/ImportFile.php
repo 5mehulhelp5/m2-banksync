@@ -30,15 +30,15 @@ class ImportFile extends Action
     private TempTransactionRepository $tempTransactionRepository;
 
     public function __construct(
-        Action\Context          $context,
-        NamedCsv                $csvProcessor,
-        TempTransactionFactory  $tempTransactionFactory,
-        TempTransactionResource $tempTransactionResource,
+        Action\Context            $context,
+        NamedCsv                  $csvProcessor,
+        TempTransactionFactory    $tempTransactionFactory,
+        TempTransactionResource   $tempTransactionResource,
         TempTransactionRepository $tempTransactionRepository,
-        LoggerInterface         $logger,
-        ScopeConfigInterface    $scopeConfig,
-        Helper                  $helper,
-        Matcher                 $matcher,
+        LoggerInterface           $logger,
+        ScopeConfigInterface      $scopeConfig,
+        Helper                    $helper,
+        Matcher                   $matcher,
     ) {
         parent::__construct($context);
         $this->csvProcessor = $csvProcessor;

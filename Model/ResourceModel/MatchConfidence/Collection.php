@@ -14,7 +14,7 @@ class Collection extends AbstractCollection
     {
         $this->_init(
             MatchConfidenceModel::class,
-            MatchConfidenceResource::class
+            MatchConfidenceResource::class,
         );
     }
 }

@@ -16,13 +16,13 @@ class TempTransactionRepository extends AbstractRepository
      * TempTransactionRepository constructor.
      *
      * @param TempTransactionFactory $objectFactory
-     * @param ObjectResourceModel         $objectResourceModel
-     * @param CollectionFactory           $collectionFactory
+     * @param ObjectResourceModel    $objectResourceModel
+     * @param CollectionFactory      $collectionFactory
      */
     public function __construct(
         TempTransactionFactory $objectFactory,
-        ObjectResourceModel         $objectResourceModel,
-        CollectionFactory           $collectionFactory,
+        ObjectResourceModel    $objectResourceModel,
+        CollectionFactory      $collectionFactory,
     ) {
         $this->objectFactory = $objectFactory;
         $this->objectResourceModel = $objectResourceModel;

@@ -17,7 +17,7 @@ class Book extends Action
     public function __construct(
         Context         $context,
         Booker          $booker,
-        LoggerInterface $logger
+        LoggerInterface $logger,
     ) {
         $this->booker = $booker;
         $this->logger = $logger;

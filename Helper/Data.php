@@ -111,7 +111,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param TempTransaction $tempTransaction
+     * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      *
      * @return float
@@ -262,7 +262,7 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @param TempTransaction $tempTransaction
+     * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      *
      * @return float

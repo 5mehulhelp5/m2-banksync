@@ -39,14 +39,14 @@ use Magento\Sales\Model\Order\InvoiceRepository;
 class TempTransaction extends AbstractModel
 {
     public function __construct(
-        Context              $context,
-        Registry             $registry,
-        InvoiceRepository    $invoiceRepository,
-        CreditmemoRepository $creditmemoRepository,
+        Context                          $context,
+        Registry                         $registry,
+        InvoiceRepository                $invoiceRepository,
+        CreditmemoRepository             $creditmemoRepository,
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
-        AbstractResource     $resource = null,
-        AbstractDb           $resourceCollection = null,
-        array                $data = []
+        AbstractResource                 $resource = null,
+        AbstractDb                       $resourceCollection = null,
+        array                            $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->invoiceRepository = $invoiceRepository;
@@ -70,7 +70,7 @@ class TempTransaction extends AbstractModel
     /**
      * @return MatchConfidenceCollection
      */
-    public function getMatchCollection():MatchConfidenceCollection
+    public function getMatchCollection(): MatchConfidenceCollection
     {
         return $this->matchConfidenceCollectionFactory->create()
             ->addFieldToFilter('temp_transaction_id', $this->getId());
