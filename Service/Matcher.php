@@ -172,7 +172,7 @@ class Matcher
         $foundDocuments = 0;
         $processed = 0;
 
-        if (empty($tempTransactions)) {
+        if (count($tempTransactions) == 0) {
             return __('No transactions to match');
         }
 
@@ -201,12 +201,15 @@ class Matcher
      */
     public function matchNewTransactions(): string
     {
+        $tempTransactions = $this->tempTransactionCollectionFactory->create();
+
         $alreadyMatched = $this->matchConfidenceCollectionFactory->create()
-            ->distinct(true)
             ->getColumnValues('temp_transaction_id');
 
-        $tempTransactions = $this->tempTransactionCollectionFactory->create()
-            ->addFieldToFilter('entity_id', ['nin' => $alreadyMatched]);
+        if ($alreadyMatched) {
+            $alreadyMatched= array_unique($alreadyMatched);
+            $tempTransactions->addFieldToFilter('entity_id', ['nin' => $alreadyMatched]);
+        }
 
         return $this->matchTransactions($tempTransactions);
     }
@@ -225,13 +228,14 @@ class Matcher
             $tempTransaction->setDocumentCount(0);
             $this->tempTransactionResource->save($tempTransaction);
         }
+        $this->deleteAllConfidences();
 
         return $this->matchTransactions($tempTransactions);
     }
 
     /**
      * @param TempTransaction $tempTransaction
-     * @param array           $documentIds
+     * @param array $documentIds
      *
      * @return void
      * @throws CouldNotSaveException
@@ -258,6 +262,19 @@ class Matcher
     {
         $existingItems = $this->matchConfidenceCollectionFactory->create()
             ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
+
+        foreach ($existingItems as $existingItem) {
+            $this->matchConfidenceRepository->delete($existingItem);
+        }
+    }
+
+    /**
+     * @return void
+     * @throws CouldNotDeleteExceptionAlias
+     */
+    private function deleteAllConfidences()
+    {
+        $existingItems = $this->matchConfidenceCollectionFactory->create();
 
         foreach ($existingItems as $existingItem) {
             $this->matchConfidenceRepository->delete($existingItem);
