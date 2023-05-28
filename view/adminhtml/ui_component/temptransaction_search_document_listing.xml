@@ -63,11 +63,13 @@
         <column name="transaction_payer_name" sortOrder="40">
             <settings>
                 <label translate="true">Payer Name</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <column name="customer_name" sortOrder="50">
             <settings>
                 <label translate="true">Order Customer Name</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <column name="transaction_purpose" sortOrder="60">
@@ -97,15 +99,17 @@
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
-        <column name="transaction_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
+        <column name="transaction_amount" sortOrder="100">
             <settings>
                 <label translate="true">Amount</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
-        <column name="grand_total" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
+        <column name="grand_total" sortOrder="110">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Document Amount</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\TempTransactionDetails\Actions" sortOrder="120">

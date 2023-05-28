@@ -6,11 +6,14 @@ use Exception;
 use Ibertrand\BankSync\Helper\Data;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory;
+use Ibertrand\BankSync\Model\TempTransaction;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
+use Magento\Framework\DataObject;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
@@ -27,6 +30,7 @@ class TempTransactionListing extends AbstractDataProvider
     private Data $helper;
     private CustomerFactory $customerFactory;
     private CustomerResource $customerResource;
+    private \Magento\Framework\Pricing\Helper\Data $priceHelper;
 
     public function __construct(
         $name,
@@ -41,9 +45,11 @@ class TempTransactionListing extends AbstractDataProvider
         CustomerResource $customerResource,
         Data $helper,
         LoggerInterface $logger,
+        \Magento\Framework\Pricing\Helper\Data $priceHelper,
         array $meta = [],
         array $data = []
-    ) {
+    )
+    {
         $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
         $this->invoiceRepository = $invoiceRepository;
@@ -53,6 +59,7 @@ class TempTransactionListing extends AbstractDataProvider
         $this->customerResource = $customerResource;
         $this->helper = $helper;
         $this->logger = $logger;
+        $this->priceHelper = $priceHelper;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -74,7 +81,7 @@ class TempTransactionListing extends AbstractDataProvider
         return $customer;
     }
 
-    protected function getObjectLink($object, $matchedTexts)
+    protected function getObjectLink(DataObject $object, array $matchedTexts): string
     {
         if ($object instanceof Invoice) {
             $url = $this->urlBuilder->getUrl('sales/invoice/view', ['invoice_id' => $object->getId()]);
@@ -87,9 +94,13 @@ class TempTransactionListing extends AbstractDataProvider
         } else {
             return '';
         }
-        $class = in_array($object->getIncrementId(), array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        $incrementId = $object->getIncrementId();
+        $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        if ($class == '' && str_ends_with($incrementId, '00')) {
+            $incrementId = substr($incrementId, 0, -2);
+            $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        }
         return "<a class='$class' href='$url'>{$object->getIncrementId()}</a>";
-
     }
 
     public function getData()
@@ -103,17 +114,20 @@ class TempTransactionListing extends AbstractDataProvider
             ->addFieldToFilter('temp_transaction_id', ['in' => array_column($data['items'], 'entity_id')]);
 
         foreach ($data['items'] as &$item) {
+            /** @var TempTransaction $tempTransaction */
             $tempTransaction = $this->collection->getItemById($item['entity_id']);
             $matches = $allConfidences->getItemsByColumnValue('temp_transaction_id', $item['entity_id']);
-            usort($matches, fn ($b, $a) => $a->getConfidence() <=> $b->getConfidence());
+            usort($matches, fn($b, $a) => $a->getConfidence() <=> $b->getConfidence());
 
-            $confidentMatches = array_filter($matches, fn ($m) => $m->getConfidence() >= $acceptanceThreshold);
-            $absoluteMatches = array_filter($matches, fn ($m) => $m->getConfidence() >= $absoluteThreshold);
+            $confidentMatches = array_filter($matches, fn($m) => $m->getConfidence() >= $acceptanceThreshold);
+            $absoluteMatches = array_filter($matches, fn($m) => $m->getConfidence() >= $absoluteThreshold);
 
             $item['document_type'] = $item['amount'] > 0 ? 'invoice' : 'creditmemo';
             $matchCount = count($matches);
             $item['document_count'] = $matchCount;
-            if ($matchCount > 0) {
+            if ($matchCount <= 0) {
+                $item['amount'] = $this->priceHelper->currency($tempTransaction->getAmount());
+            } else {
                 try {
                     // Add 'document' field
                     $documentId = $matches[0]->getDocumentId();
@@ -121,22 +135,49 @@ class TempTransactionListing extends AbstractDataProvider
                         ? $this->invoiceRepository->get($documentId)
                         : $this->creditmemoRepository->get($documentId);
 
+                    $payerName = $tempTransaction->getPayerName();
+
+                    $order = $document->getOrder();
+                    $names = array_filter(array_unique([
+                        trim($order->getCustomerName() ?? ""),
+                        trim(($order->getBillingAddress()->getFirstname() ?? "") . ' ' . ($order->getBillingAddress()->getLastname() ?? "")),
+                        trim($order->getBillingAddress()->getCompany() ?? ""),
+                        trim(($order->getShippingAddress()->getFirstname() ?? "") . ' ' . ($order->getShippingAddress()->getLastname() ?? "")),
+                        trim($order->getShippingAddress()->getCompany() ?? ""),
+                    ]));
+                    $documentName = implode("<br>", $names);
+
                     if (count($matches) == 1 || count($confidentMatches) == 1 || count($absoluteMatches) == 1) {
                         $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
                         $purpose = $tempTransaction->getPurpose();
                         foreach ($purposeMatches as $match => $score) {
                             $purpose = str_replace($match, "<span class='banksync-matched-text'>$match</span>", $purpose);
+                            $documentName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $documentName);
                         }
                         $item['purpose'] = $purpose;
+
+                        $nameMatches = $this->helper->getNameMatches($tempTransaction, $document);
+
+                        $payerName = $tempTransaction->getPayerName();
+                        foreach (array_keys($nameMatches) as $match) {
+                            $payerName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $payerName);
+                            $documentName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $documentName);
+                        }
+                        $amountIsMatched = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal()) < 0.01;
+                        $amountClass = $amountIsMatched ? 'banksync-matched-text' : '';
                     } else {
                         $purposeMatches = [];
+                        $amountClass = "";
                     }
 
-                    $item['document_name'] = $document->getOrder()->getCustomerName();
-                    $item['document_amount'] = $document->getGrandTotal();
+                    $item['amount'] = "<span class='$amountClass'>{$this->priceHelper->currency($tempTransaction->getAmount())}</span>";
+                    $item['document_amount'] = "<span class='$amountClass'>{$this->priceHelper->currency($document->getGrandTotal())}</span>";
+
                     $item['document_date'] = $document->getCreatedAt();
                     $item['document'] = $this->getObjectLink($document, $purposeMatches);
                     $item['order_increment_id'] = $this->getObjectLink($document->getOrder(), $purposeMatches);
+                    $item['payer_name'] = $payerName;
+                    $item['document_name'] = $documentName;
 
                     $customerId = $document->getOrder()->getCustomerId();
                     if ($customerId) {
@@ -145,7 +186,6 @@ class TempTransactionListing extends AbstractDataProvider
                     } else {
                         $item['customer_increment_id'] = '-';
                     }
-
                 } catch (Exception $e) {
                     $this->logger->error($e);
                     $item['document'] = "[Not found]";
@@ -154,7 +194,7 @@ class TempTransactionListing extends AbstractDataProvider
 
             // Add 'confidence' field with color
             $confidence = count($matches) > 0
-                ? max(array_map(fn ($match) => $match->getConfidence(), $matches))
+                ? max(array_map(fn($match) => $match->getConfidence(), $matches))
                 : null;
 
 

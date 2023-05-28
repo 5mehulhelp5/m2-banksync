@@ -67,6 +67,7 @@
                 <filter>text</filter>
                 <label translate="true">Payer Name</label>
                 <sortable>false</sortable>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <column name="customer_name" sortOrder="50">
@@ -74,6 +75,7 @@
                 <filter>text</filter>
                 <label translate="true">Order Customer Name</label>
                 <sortable>false</sortable>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <column name="transaction_purpose" sortOrder="60">
@@ -105,20 +107,22 @@
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
-        <column name="transaction_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
+        <column name="transaction_amount" sortOrder="100">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Amount</label>
                 <sortable>false</sortable>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
-        <column name="grand_total" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
+        <column name="grand_total" sortOrder="110">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Document Amount</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
-        <column name="match_confidence_text" sortOrder="110">
+        <column name="match_confidence_text" sortOrder="120">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Confidence</label>
@@ -126,7 +130,7 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
-        <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\TempTransactionDetails\Actions" sortOrder="120">
+        <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\TempTransactionDetails\Actions" sortOrder="130">
             <settings>
                 <indexField>entity_id</indexField>
                 <resizeEnabled>false</resizeEnabled>

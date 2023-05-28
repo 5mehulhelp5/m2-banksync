@@ -2,7 +2,7 @@
 
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Data as BankSyncHelper;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
 use Magento\Customer\Model\Customer;
@@ -14,6 +14,7 @@ use Magento\Framework\App\Request\Http;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
@@ -33,44 +34,47 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
     protected OrderCollectionFactory $orderCollectionFactory;
     protected CustomerResource $customerResource;
     protected CustomerFactory $customerFactory;
-    protected Data $helper;
+    protected BankSyncHelper $helper;
     protected CustomerCollectionFactory $customerCollectionFactory;
+    private PriceHelper $priceHelper;
 
     /**
-     * @param string                      $name
-     * @param string                      $primaryFieldName
-     * @param string                      $requestFieldName
-     * @param UrlInterface                $urlBuilder
-     * @param InvoiceCollectionFactory    $invoiceCollectionFactory
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param UrlInterface $urlBuilder
+     * @param InvoiceCollectionFactory $invoiceCollectionFactory
      * @param CreditmemoCollectionFactory $creditmemoCollectionFactory
-     * @param TempTransactionRepository   $tempTransactionRepository
-     * @param OrderCollectionFactory      $orderCollectionFactory
-     * @param CustomerFactory             $customerFactory
-     * @param CustomerResource            $customerResource
-     * @param Http                        $request
-     * @param array                       $meta
-     * @param array                       $data
+     * @param TempTransactionRepository $tempTransactionRepository
+     * @param OrderCollectionFactory $orderCollectionFactory
+     * @param CustomerFactory $customerFactory
+     * @param CustomerResource $customerResource
+     * @param Http $request
+     * @param array $meta
+     * @param array $data
      *
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
     public function __construct(
         $name,
-        $primaryFieldName,
-        $requestFieldName,
-        UrlInterface $urlBuilder,
-        InvoiceCollectionFactory $invoiceCollectionFactory,
+                                    $primaryFieldName,
+                                    $requestFieldName,
+        UrlInterface                $urlBuilder,
+        InvoiceCollectionFactory    $invoiceCollectionFactory,
         CreditmemoCollectionFactory $creditmemoCollectionFactory,
-        TempTransactionRepository $tempTransactionRepository,
-        OrderCollectionFactory $orderCollectionFactory,
-        CustomerFactory $customerFactory,
-        CustomerResource $customerResource,
-        Http $request,
-        Data $helper,
-        CustomerCollectionFactory $customerCollectionFactory,
-        array $meta = [],
-        array $data = []
-    ) {
+        TempTransactionRepository   $tempTransactionRepository,
+        OrderCollectionFactory      $orderCollectionFactory,
+        CustomerFactory             $customerFactory,
+        CustomerResource            $customerResource,
+        Http                        $request,
+        BankSyncHelper              $helper,
+        CustomerCollectionFactory   $customerCollectionFactory,
+        PriceHelper                 $priceHelper,
+        array                       $meta = [],
+        array                       $data = []
+    )
+    {
         $this->urlBuilder = $urlBuilder;
         $this->invoiceCollectionFactory = $invoiceCollectionFactory;
         $this->creditmemoCollectionFactory = $creditmemoCollectionFactory;
@@ -80,6 +84,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         $this->customerResource = $customerResource;
         $this->helper = $helper;
         $this->customerCollectionFactory = $customerCollectionFactory;
+        $this->priceHelper = $priceHelper;
 
         $this->request = $request;
 
@@ -160,17 +165,19 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
 
         foreach ($data['items'] as &$item) {
             $document = $this->getDocument($item['entity_id']);
+            $order = $document->getOrder();
             $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
 
             $item['document_type'] = $tempTransaction->getDocumentType();
-            $item['customer_name'] = $document->getOrder()->getCustomerName();
-
             $item['transaction_date'] = $tempTransaction->getTransactionDate();
-            $item['transaction_amount'] = $tempTransaction->getAmount();
-            $item['transaction_payer_name'] = $tempTransaction->getPayerName();
             $item['transaction_id'] = $tempTransaction->getId();
             $item['increment_id'] = $this->getObjectLink($document, $purposeMatches);
             $item['order_increment_id'] = $this->getObjectLink($document->getOrder(), $purposeMatches);
+
+            $amountIsMatched = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal()) < 0.01;
+            $amountClass = $amountIsMatched ? 'banksync-matched-text' : '';
+            $item['transaction_amount'] = "<span class='$amountClass'>{$this->priceHelper->currency($tempTransaction->getAmount())}</span>";
+            $item['grand_total'] = "<span class='$amountClass'>{$this->priceHelper->currency($document->getGrandTotal())}</span>";
 
             $customerId = $document->getOrder()->getCustomerId();
             if ($customerId) {
@@ -181,11 +188,32 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
                 $item['customer_increment_id'] = "-";
             }
 
+            $names = array_filter(array_unique([
+                trim($order->getCustomerName() ?? ""),
+                trim(($order->getBillingAddress()->getFirstname() ?? "") . ' ' . ($order->getBillingAddress()->getLastname() ?? "")),
+                trim($order->getBillingAddress()->getCompany() ?? ""),
+                trim(($order->getShippingAddress()->getFirstname() ?? "") . ' ' . ($order->getShippingAddress()->getLastname() ?? "")),
+                trim($order->getShippingAddress()->getCompany() ?? ""),
+            ]));
+            $nameMatches = $this->helper->getNameMatches($tempTransaction, $document);
+
+            $documentName = implode("<br>", $names);
             $purpose = $tempTransaction->getPurpose();
-            foreach ($purposeMatches as $match => $score) {
+            $payerName = $tempTransaction->getPayerName();
+
+            foreach (array_keys($purposeMatches) as $match) {
                 $purpose = str_replace($match, "<span class='banksync-matched-text'>$match</span>", $purpose);
+                $documentName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $documentName);
             }
+            foreach (array_keys($nameMatches) as $match) {
+                $payerName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $payerName);
+                $documentName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $documentName);
+            }
+
             $item['transaction_purpose'] = $purpose;
+            $item['customer_name'] = $documentName;
+            $item['transaction_payer_name'] = $payerName;
+
         }
 
         return $data;

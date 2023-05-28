@@ -75,13 +75,7 @@ class Data extends AbstractHelper
         return $nameScores;
     }
 
-    /**
-     * @param TempTransaction    $tempTransaction
-     * @param Invoice|Creditmemo $document
-     *
-     * @return float
-     */
-    private function compareName(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
+    public function getNameMatches(TempTransaction $tempTransaction, Invoice|Creditmemo $document): array
     {
         $transactionName = $tempTransaction->getPayerName();
         $transactionNames = [$transactionName];
@@ -101,7 +95,7 @@ class Data extends AbstractHelper
         });
 
         $nameScores = $this->getNameComparisonScores($document->getOrder());
-
+        $matches = [];
         foreach ($nameScores as $name => $score) {
             $name = $this->normalizeName($name);
             if (empty($name)) {
@@ -109,27 +103,28 @@ class Data extends AbstractHelper
             }
             foreach ($transactionNames as $transactionName) {
                 if (str_contains($transactionName, $name)) {
-                    return $score;
+                    $matches[$name] = $score;
                 }
             }
         }
-        return 0;
+        return $matches;
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @param Invoice|Creditmemo $document
+     *
+     * @return float
+     */
+    private function compareName(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
+    {
+        $nameMatches = $this->getNameMatches($tempTransaction, $document);
+        return !empty($nameMatches) ? max($nameMatches) : 0;
     }
 
     private function getIncrementIdPattern(string $type, string $incrementId): string
     {
         $template = $this->scopeConfig->getValue("banksync/matching/patterns/{$type}_increment_id") ?? "";
-        return str_replace('{{value}}', $incrementId, $template);
-    }
-
-    /**
-     * @param string $incrementId
-     *
-     * @return string
-     */
-    private function getCustomerIncrementIdPattern(string $incrementId): string
-    {
-        $template = $this->scopeConfig->getValue('banksync/matching/patterns/customer_increment_id');
         return str_replace('{{value}}', $incrementId, $template);
     }
 

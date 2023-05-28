@@ -63,7 +63,7 @@
         </selectionsColumn>
         <column name="transaction_date" sortOrder="10">
             <settings>
-                <filter>text</filter>
+                <filter>textRange</filter>
                 <label translate="true">Transaction Date</label>
             </settings>
         </column>
