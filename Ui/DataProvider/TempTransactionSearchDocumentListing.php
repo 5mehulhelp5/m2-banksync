@@ -148,8 +148,10 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         } else {
             return '';
         }
-        $class = in_array($object->getIncrementId(), array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
-        return "<a class='$class' href='$url'>{$object->getIncrementId()}</a>";
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        $incrementId = $object->getIncrementId();
+        $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        return "<a class='$class' href='$url'>$incrementId</a>";
     }
 
     /**

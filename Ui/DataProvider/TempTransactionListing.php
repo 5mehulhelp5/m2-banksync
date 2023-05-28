@@ -94,13 +94,14 @@ class TempTransactionListing extends AbstractDataProvider
         } else {
             return '';
         }
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $incrementId = $object->getIncrementId();
         $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
         if ($class == '' && str_ends_with($incrementId, '00')) {
             $incrementId = substr($incrementId, 0, -2);
             $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
         }
-        return "<a class='$class' href='$url'>{$object->getIncrementId()}</a>";
+        return "<a class='$class' href='$url'>$incrementId</a>";
     }
 
     public function getData()
