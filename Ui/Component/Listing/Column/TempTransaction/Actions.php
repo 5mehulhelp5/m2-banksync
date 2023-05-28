@@ -69,7 +69,7 @@ class Actions extends Column
                         'confirm' => [
                             'title' => __('Delete "%1"', $item['entity_id']),
                             'message' => __(
-                                'Are you sure you want to delete the record "%1"',
+                                'Are you sure you want to delete the record "%1"?',
                                 $item['entity_id']
                             ),
                         ],
