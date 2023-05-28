@@ -132,7 +132,6 @@ class Booker
         }
 
         foreach ($tempTransactions as $tempTransaction) {
-            echo "Processing temp transaction {$tempTransaction->getId()}\n";
             /** @var MatchConfidence[] $allMatches */
             $allMatches = $this->matchConfidenceCollectionFactory->create()
                 ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId())
@@ -158,7 +157,7 @@ class Booker
 
                 $confidence = $this->helper->getMatchConfidence($tempTransaction, $document);
                 if ($confidence < $threshold) {
-                    echo "Transaction {$tempTransaction->getId()} has low confidence: {$confidence}\n";
+                    echo "Transaction {$tempTransaction->getId()} has low confidence: $confidence\n";
                     continue;
                 }
 

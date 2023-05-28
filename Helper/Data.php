@@ -259,7 +259,6 @@ class Data extends AbstractHelper
      */
     public function getStartDate(): string
     {
-        return '2023-02-01';
         $config = $this->scopeConfig->getValue('banksync/matching/filter/start_date');
         $timestamp = strtotime($config);
         return $timestamp !== false
