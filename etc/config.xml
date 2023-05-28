@@ -24,6 +24,7 @@
                     <payer_name>20</payer_name>
                     <purpose>40</purpose>
                     <amount>40</amount>
+                    <strict_amount>1</strict_amount>
                 </weights>
             </matching>
             <csv_settings>

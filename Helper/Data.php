@@ -277,9 +277,12 @@ class Data extends AbstractHelper
         $weightAmount = $this->scopeConfig->getValue('banksync/matching/weights/amount');
         $weightPurpose = $this->scopeConfig->getValue('banksync/matching/weights/purpose');
         $weightName = $this->scopeConfig->getValue('banksync/matching/weights/payer_name');
+        $strictAmount = $this->scopeConfig->isSetFlag('banksync/matching/weights/strict_amount');
         $amountDif = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal());
 
-        $amountScore = $weightAmount * ($amountDif < 0.01 ? 1 : (1 - $amountDif / $this->getAmountThreshold()));
+        $amountScore = $strictAmount
+            ? $amountDif < 0.01 ? $weightAmount : 0
+            : $weightAmount * ($amountDif < 0.01 ? 1 : (1 - $amountDif / $this->getAmountThreshold()));
         $purposeScore = $weightPurpose * $this->comparePurpose($tempTransaction, $document);
         $nameScore = $weightName * $this->compareName($tempTransaction, $document);
 
