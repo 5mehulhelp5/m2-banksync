@@ -45,7 +45,7 @@ class Booker
         InvoiceRepository                $invoiceRepository,
         CreditmemoRepository             $creditmemoRepository,
         Helper                           $helper,
-        LoggerInterface                  $logger
+        LoggerInterface                  $logger,
     ) {
         $this->tempTransactionResource = $tempTransactionResource;
         $this->transactionResource = $transactionResource;
@@ -115,13 +115,16 @@ class Booker
      *
      * @return int[][]
      */
-    public function autoBook(array $ids = null): array
+    public function autoBook(array $ids = null, $threshold = null): array
     {
         $result = [
             'success' => [],
             'error' => [],
         ];
-        $threshold = $this->helper->getAcceptConfidenceThreshold();
+        if ($threshold === null) {
+            $threshold = $this->helper->getAcceptConfidenceThreshold();
+        }
+
         $absoluteThreshold = $this->helper->getAbsoluteConfidenceThreshold();
 
         $tempTransactions = $this->tempTransactionCollectionFactory->create()

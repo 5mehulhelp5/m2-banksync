@@ -58,7 +58,7 @@ class MassBook extends Action
      */
     public function execute()
     {
-        $results = $this->booker->autoBook($this->getIds());
+        $results = $this->booker->autoBook($this->getIds(), 0);
         $successCount = count($results['success']);
         $errorCount = count($results['error']);
 
