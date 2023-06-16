@@ -248,8 +248,13 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
                 ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
                 ->getFirstItem();
 
-            $filter->setField('customer_id')
-                ->setValue($customer->getId());
+            $orderIds = $this->orderCollectionFactory->create()
+                ->addFieldToFilter('customer_id', $customer->getId())
+                ->getAllIds();
+
+            $filter->setField('order_id')
+                ->setConditionType('in')
+                ->setValue(implode(',', $orderIds));
         }
 
         parent::addFilter($filter);
