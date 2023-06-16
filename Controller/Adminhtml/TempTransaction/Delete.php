@@ -45,7 +45,7 @@ class Delete extends Action
         $idParam = $this->getRequest()->getParam('id');
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return !empty($idParam)
-            ? $this->collectionFactory->create()->addFieldToFilter('id', $idParam)
+            ? $this->collectionFactory->create()->addFieldToFilter('entity_id', $idParam)
             : $this->filter->getCollection($this->collectionFactory->create());
     }
 
