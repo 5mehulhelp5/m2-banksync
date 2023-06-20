@@ -58,7 +58,12 @@ class MassBook extends Action
      */
     public function execute()
     {
-        $results = $this->booker->autoBook($this->getIds(), 0);
+        $this->logger->info("IDs: ".var_export($this->getIds(), true));
+        $ids = $this->getIds();
+        # When IDs are selected, don't check the threshold (manual action).
+        # Otherwise, only autobook if the threshold is reached.
+        $threshold = empty($ids) ? null : 0;
+        $results = $this->booker->autoBook($ids, $threshold);
         $successCount = count($results['success']);
         $errorCount = count($results['error']);
 
