@@ -6,8 +6,8 @@
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="banksync_match" xsi:type="object">Ibertrand\BankSync\Console\Command\MatchTransactions</item>
+                <item name="banksync_calc_hashes" xsi:type="object">Ibertrand\BankSync\Console\Command\CalcHashes</item>
             </argument>
         </arguments>
     </type>
-
 </config>

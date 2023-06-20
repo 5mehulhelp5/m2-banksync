@@ -42,6 +42,7 @@ class TempTransaction extends AbstractDb
             ->setPayerName($transaction->getPayerName())
             ->setTransactionDate($transaction->getTransactionDate())
             ->setPurpose($transaction->getPurpose())
-            ->setAmount($transaction->getAmount());
+            ->setAmount($transaction->getAmount())
+            ->setHash($transaction->getHash());
     }
 }

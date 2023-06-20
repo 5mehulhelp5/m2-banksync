@@ -15,6 +15,8 @@ use Magento\Framework\Model\AbstractModel;
  * @method Transaction setPurpose(string $purpose)
  * @method float getAmount()
  * @method Transaction setAmount(float $amount)
+ * @method string|null getHash()
+ * @method $this setHash(string $hash)
  * @method int getDocumentId()
  * @method Transaction setDocumentId(int $documentId)
  * @method string getDocumentType()

@@ -5,12 +5,16 @@
         <column xsi:type="timestamp" name="transaction_date" nullable="false" comment="Transaction Date"/>
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
+        <column xsi:type="varchar" name="hash" nullable="true" length="40" comment="Hash"/>
         <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
         <column xsi:type="float" name="match_confidence" nullable="true" comment="Match Confidence"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="IDX_BNKSNC_TMPTRNSCTN_HASH">
+            <column name="hash"/>
         </constraint>
     </table>
     <table name="banksync_transaction" resource="default" engine="innodb" comment="BankSync Transactions">
@@ -19,6 +23,7 @@
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
         <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
+        <column xsi:type="varchar" name="hash" nullable="true" length="40" comment="Hash"/>
         <column xsi:type="text" name="document_type" nullable="false" comment="Document Type"/>
         <column xsi:type="int" name="document_id" nullable="false" comment="Document ID"/>
         <column xsi:type="float" name="match_confidence" nullable="true" comment="Document ID"/>
@@ -26,6 +31,9 @@
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="IDX_BNKSNC_TRNSCTN_HASH">
+            <column name="hash"/>
         </constraint>
     </table>
     <table name="banksync_temptransaction_confidence" resource="default" engine="innodb" comment="BankSync Transaction Confidence">

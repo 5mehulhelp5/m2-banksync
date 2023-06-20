@@ -6,6 +6,8 @@ use Exception;
 use Ibertrand\BankSync\Helper\Data as Helper;
 use Ibertrand\BankSync\Lib\NamedCsv;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
+use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
+use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory as TransactionCollectionFactory;
 use Ibertrand\BankSync\Model\TempTransactionFactory;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
 use Ibertrand\BankSync\Service\Matcher;
@@ -28,23 +30,29 @@ class ImportFile extends Action
     private Helper $helper;
     private Matcher $matcher;
     private TempTransactionRepository $tempTransactionRepository;
+    private TempTransactionCollectionFactory $tempTransactionCollectionFactory;
+    private TransactionCollectionFactory $transactionCollectionFactory;
 
     public function __construct(
-        Action\Context            $context,
-        NamedCsv                  $csvProcessor,
-        TempTransactionFactory    $tempTransactionFactory,
-        TempTransactionResource   $tempTransactionResource,
-        TempTransactionRepository $tempTransactionRepository,
-        LoggerInterface           $logger,
-        ScopeConfigInterface      $scopeConfig,
-        Helper                    $helper,
-        Matcher                   $matcher,
+        Action\Context                   $context,
+        NamedCsv                         $csvProcessor,
+        TempTransactionFactory           $tempTransactionFactory,
+        TempTransactionResource          $tempTransactionResource,
+        TempTransactionRepository        $tempTransactionRepository,
+        TempTransactionCollectionFactory $tempTransactionCollectionFactory,
+        TransactionCollectionFactory     $transactionCollectionFactory,
+        LoggerInterface                  $logger,
+        ScopeConfigInterface             $scopeConfig,
+        Helper                           $helper,
+        Matcher                          $matcher,
     ) {
         parent::__construct($context);
         $this->csvProcessor = $csvProcessor;
         $this->tempTransactionFactory = $tempTransactionFactory;
         $this->tempTransactionResource = $tempTransactionResource;
         $this->tempTransactionRepository = $tempTransactionRepository;
+        $this->tempTransactionCollectionFactory = $tempTransactionCollectionFactory;
+        $this->transactionCollectionFactory = $transactionCollectionFactory;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
         $this->helper = $helper;
@@ -122,6 +130,7 @@ class ImportFile extends Action
                 $this->tempTransactionRepository->deleteAll();
             }
 
+            $newTransactions = [];
             foreach ($csvRows as $csvRow) {
                 $data = [
                     'payer_name' => $csvRow[$colMap['payer_name']] ?? "",
@@ -131,7 +140,26 @@ class ImportFile extends Action
                 ];
                 $transaction = $this->tempTransactionFactory->create(['data' => $data]);
                 $transaction->setHasDataChanges(true);
-                $this->tempTransactionResource->save($transaction);
+                $transaction->setHash($this->helper->calculateHash($transaction));
+                $newTransactions[$transaction->getHash()] = $transaction;
+            }
+
+            $hashes = array_keys($newTransactions);
+
+            $existingTempHashes = $this->tempTransactionCollectionFactory->create()
+                ->addFieldToFilter('hash', ['in' => $hashes])
+                ->getColumnValues('hash');
+            $existingBookedHashes = $this->transactionCollectionFactory->create()
+                ->addFieldToFilter('hash', ['in' => $hashes])
+                ->getColumnValues('hash');
+
+            $newHashes = array_diff($hashes, $existingTempHashes, $existingBookedHashes);
+            $newHashes = array_combine($newHashes, $newHashes);
+
+            foreach ($newTransactions as $transaction) {
+                if (isset($newHashes[$transaction->getHash()])) {
+                    $this->tempTransactionResource->save($transaction);
+                }
             }
             unlink($csvFilePath);
 

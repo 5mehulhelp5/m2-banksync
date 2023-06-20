@@ -25,6 +25,8 @@ use Magento\Sales\Model\Order\InvoiceRepository;
  * @method $this setPayerName(string $payerName)
  * @method string|null getPurpose()
  * @method $this setPurpose(string $purpose)
+ * @method string|null getHash()
+ * @method $this setHash(string $hash)
  * @method float|null getAmount()
  * @method $this setAmount(float $amount)
  * @method int|null getMatchConfidence()
@@ -46,7 +48,7 @@ class TempTransaction extends AbstractModel
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
         AbstractResource                 $resource = null,
         AbstractDb                       $resourceCollection = null,
-        array                            $data = []
+        array                            $data = [],
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->invoiceRepository = $invoiceRepository;

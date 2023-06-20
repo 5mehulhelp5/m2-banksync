@@ -4,6 +4,7 @@ namespace Ibertrand\BankSync\Helper;
 
 use Exception;
 use Ibertrand\BankSync\Model\TempTransaction;
+use Ibertrand\BankSync\Model\Transaction;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
@@ -302,5 +303,24 @@ class Data extends AbstractHelper
         $customer = $this->customerFactory->create();
         $this->customerResource->load($customer, $customerId);
         return $customer;
+    }
+
+    /**
+     * @param TempTransaction|Transaction $transaction
+     * @return string
+     */
+    public function calculateHash(TempTransaction|Transaction $transaction):string
+    {
+        return sha1(
+            implode(
+                '|',
+                [
+                    $transaction->getPayerName(),
+                    number_format($transaction->getAmount(), 2, '.', ''),
+                    $transaction->getPurpose(),
+                    date('Y-m-d H:i:s', strtotime($transaction->getTransactionDate())),
+                ]
+            )
+        );
     }
 }

@@ -26,7 +26,8 @@ class Transaction extends AbstractDb
             ->setTransactionDate($tempTransaction->getTransactionDate())
             ->setPurpose($tempTransaction->getPurpose())
             ->setAmount($tempTransaction->getAmount())
-            ->setDocumentType($tempTransaction->getDocumentType());
+            ->setDocumentType($tempTransaction->getDocumentType())
+            ->setHash($tempTransaction->getHash());
     }
 
     protected function _construct()
