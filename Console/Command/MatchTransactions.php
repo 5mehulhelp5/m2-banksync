@@ -57,7 +57,7 @@ class MatchTransactions extends Command
             $progressBar->setMaxSteps($total);
             $progressBar->setProgress($current);
         });
-        $result = $input->hasOption('all')
+        $result = $input->getOption('all')
             ? $this->matcher->matchAllTransactions()
             : $this->matcher->matchNewTransactions();
         $output->writeln("");

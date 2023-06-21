@@ -69,7 +69,7 @@ class CalcHashes extends Command
 
         $tempTransactions = $this->tempTransactionCollectionFactory->create();
         $transactions = $this->transactionCollectionFactory->create();
-        if (!$input->hasOption('all')) {
+        if (!$input->getOption('all')) {
             $tempTransactions->addFieldToFilter('hash', ['null' => true]);
             $transactions->addFieldToFilter('hash', ['null' => true]);
         }
