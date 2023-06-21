@@ -15,9 +15,13 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException as CouldNotDeleteExceptionAlias;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Reports\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\CollectionFactory as CreditmemoCollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection as InvoiceCollection;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Payment;
 use Psr\Log\LoggerInterface;
@@ -38,6 +42,8 @@ class Matcher
      * @var callable
      */
     private $progressCallBack;
+    private CustomerCollectionFactory $customerCollectionFactory;
+    private OrderCollectionFactory $orderCollectionFactory;
 
     public function __construct(
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
@@ -48,6 +54,8 @@ class Matcher
         MatchConfidenceFactory           $matchConfidenceFactory,
         MatchConfidenceRepository        $matchConfidenceRepository,
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
+        CustomerCollectionFactory        $customerCollectionFactory,
+        OrderCollectionFactory           $orderCollectionFactory,
         Payment                          $paymentResource,
         Data                             $helper,
     ) {
@@ -59,6 +67,8 @@ class Matcher
         $this->matchConfidenceFactory = $matchConfidenceFactory;
         $this->matchConfidenceRepository = $matchConfidenceRepository;
         $this->matchConfidenceCollectionFactory = $matchConfidenceCollectionFactory;
+        $this->customerCollectionFactory = $customerCollectionFactory;
+        $this->orderCollectionFactory = $orderCollectionFactory;
         $this->paymentResource = $paymentResource;
         $this->helper = $helper;
     }
@@ -88,29 +98,17 @@ class Matcher
 
     /**
      * @param TempTransaction $tempTransaction
-     *
-     * @return int[]
+     * @return InvoiceCollection|CreditmemoCollection
      * @throws LocalizedException
      */
-    private function getDocumentConfidences(TempTransaction $tempTransaction): array
+    private function getBaseDocumentCollection(TempTransaction $tempTransaction): InvoiceCollection|CreditmemoCollection
     {
         $collection = $tempTransaction->getAmount() >= 0
             ? $this->invoiceCollectionFactory->create()
             : $this->creditmemoCollectionFactory->create();
 
-        $amount = abs($tempTransaction->getAmount());
-        $amountThreshold = $this->helper->getAmountThreshold();
-        $latestDate = date(
-            'Y-m-d H:i:s',
-            strtotime($tempTransaction->getTransactionDate()) + $this->helper->getDateThreshold() * 86400
-        );
-
         $collection
-            ->addFieldToFilter('state', ['neq' => 'canceled'])
-            ->addFieldToFilter('main_table.created_at', ['lteq' => $latestDate])
-            ->addFieldToFilter('main_table.created_at', ['gteq' => $this->helper->getStartDate()])
-            ->addFieldToFilter('grand_total', ['gteq' => $amount - $amountThreshold])
-            ->addFieldToFilter('grand_total', ['lteq' => $amount + $amountThreshold]);
+            ->addFieldToFilter('state', ['neq' => 'canceled']);
 
         $condition = $collection->getConnection()->quoteInto(
             'tt.document_id = main_table.entity_id and tt.document_type = ?',
@@ -130,9 +128,157 @@ class Matcher
             $collection->getSelect()->where($where);
         }
 
+        return $collection;
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @return array
+     * @throws LocalizedException
+     */
+    private function getDocumentsViaDocumentNumbers(TempTransaction $tempTransaction): array
+    {
+        if (!preg_match_all('/(?<!\d)\d{4,}(?!\d)/', $tempTransaction->getPurpose(), $matches)) {
+            return [];
+        }
+
+        $numbers = [];
+        foreach ($matches as $match) {
+            $numbers[] = $match[0];
+        }
+
+        if (empty($numbers)) {
+            return [];
+        }
+
+        $collection = $this->getBaseDocumentCollection($tempTransaction);
+        $collection->addFieldToFilter('increment_id', ['in' => $numbers]);
+
+        return $collection->getItems();
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @return array
+     * @throws LocalizedException
+     */
+    private function getDocumentsViaOrderNumbers(TempTransaction $tempTransaction): array
+    {
+        if (!preg_match_all('/(?<!\d)\d{4,}(?!\d)/', $tempTransaction->getPurpose(), $matches)) {
+            return [];
+        }
+
+        $numbers = [];
+        foreach ($matches as $match) {
+            $numbers[] = $match[0];
+        }
+
+        if (empty($numbers)) {
+            return [];
+        }
+
+        $orderIds = $this->orderCollectionFactory->create()
+            ->addFieldToFilter('increment_id', ['in' => $numbers])
+            ->getAllIds();
+
+        if (empty($orderIds)) {
+            return [];
+        }
+
+
+        $collection = $this->getBaseDocumentCollection($tempTransaction);
+        $collection->addFieldToFilter('order_id', ['in' => $numbers]);
+
+        return $collection->getItems();
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @return array
+     * @throws LocalizedException
+     */
+    private function getDocumentsViaCustomer(TempTransaction $tempTransaction): array
+    {
+        if (!preg_match_all('/(?<!\d)\d{5,7}?(?!\d)/', $tempTransaction->getPurpose(), $matches)) {
+            return [];
+        }
+
+        $numbers = [];
+        foreach ($matches as $match) {
+            $number = $match[0];
+            if (strlen($number) == 5) {
+                $number = $number . '00';
+            }
+            $numbers[] = $number;
+        }
+
+        if (empty($numbers)) {
+            return [];
+        }
+
+        $customerIds = $this->customerCollectionFactory->create()
+            ->addFieldToFilter('increment_id', ['in' => $numbers])
+            ->getAllIds();
+
+        if (empty($customerIds)) {
+            return [];
+        }
+
+        $orderIds = $this->orderCollectionFactory->create()
+            ->addFieldToFilter('customer_id', ['in' => $customerIds])
+            ->getAllIds();
+
+        if (empty($orderIds)) {
+            return [];
+        }
+
+        $collection = $this->getBaseDocumentCollection($tempTransaction);
+        $collection->addFieldToFilter('order_id', ['in' => $orderIds]);
+
+        return $collection->getItems();
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @return array
+     * @throws LocalizedException
+     */
+    private function getDocumentsViaAmount(TempTransaction $tempTransaction): array
+    {
+        $amount = abs($tempTransaction->getAmount());
+        $amountThreshold = $this->helper->getAmountThreshold();
+        $latestDate = date(
+            'Y-m-d H:i:s',
+            strtotime($tempTransaction->getTransactionDate()) + $this->helper->getDateThreshold() * 86400
+        );
+
+        $collection = $this->getBaseDocumentCollection($tempTransaction)
+            ->addFieldToFilter('main_table.created_at', ['gteq' => $this->helper->getStartDate()])
+            ->addFieldToFilter('main_table.created_at', ['lteq' => $latestDate])
+            ->addFieldToFilter('grand_total', ['gteq' => $amount - $amountThreshold])
+            ->addFieldToFilter('grand_total', ['lteq' => $amount + $amountThreshold]);
+
+        return $collection->getItems();
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     *
+     * @return int[]
+     * @throws LocalizedException
+     */
+    private function getDocumentConfidences(TempTransaction $tempTransaction): array
+    {
+        $documents = array_merge(
+            $this->getDocumentsViaAmount($tempTransaction),
+            $this->getDocumentsViaDocumentNumbers($tempTransaction),
+            $this->getDocumentsViaOrderNumbers($tempTransaction),
+            $this->getDocumentsViaCustomer($tempTransaction),
+        );
+
         $minConfidence = $this->helper->getMinConfidenceThreshold();
         $confidences = [];
-        foreach ($collection as $document) {
+        foreach ($documents as $document) {
             /** @var Invoice|Creditmemo $document */
             $confidence = $this->helper->getMatchConfidence($tempTransaction, $document);
             if ($confidence >= $minConfidence) {
