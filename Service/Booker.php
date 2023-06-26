@@ -4,16 +4,19 @@ namespace Ibertrand\BankSync\Service;
 
 use Ibertrand\BankSync\Helper\Data as Helper;
 use Ibertrand\BankSync\Model\MatchConfidence;
+use Ibertrand\BankSync\Model\MatchConfidenceRepository;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction as TransactionResource;
+use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory as TransactionCollectionFactory;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
 use Ibertrand\BankSync\Model\Transaction;
 use Ibertrand\BankSync\Model\TransactionRepository;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order\Creditmemo;
@@ -32,7 +35,9 @@ class Booker
     private Helper $helper;
     private TransactionRepository $transactionRepository;
     private TempTransactionCollectionFactory $tempTransactionCollectionFactory;
+    private TransactionCollectionFactory $transactionCollectionFactory;
     private MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
+    private MatchConfidenceRepository $matchConfidenceRepository;
     private LoggerInterface $logger;
 
     public function __construct(
@@ -41,7 +46,9 @@ class Booker
         TempTransactionRepository        $tempTransactionRepository,
         TransactionRepository            $transactionRepository,
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
+        TransactionCollectionFactory     $transactionCollectionFactory,
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
+        MatchConfidenceRepository        $matchConfidenceRepository,
         InvoiceRepository                $invoiceRepository,
         CreditmemoRepository             $creditmemoRepository,
         Helper                           $helper,
@@ -52,7 +59,9 @@ class Booker
         $this->tempTransactionRepository = $tempTransactionRepository;
         $this->transactionRepository = $transactionRepository;
         $this->tempTransactionCollectionFactory = $tempTransactionCollectionFactory;
+        $this->transactionCollectionFactory = $transactionCollectionFactory;
         $this->matchConfidenceCollectionFactory = $matchConfidenceCollectionFactory;
+        $this->matchConfidenceRepository = $matchConfidenceRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->creditmemoRepository = $creditmemoRepository;
         $this->helper = $helper;
@@ -62,14 +71,17 @@ class Booker
     /**
      * @param TempTransaction|int    $tempTransaction
      * @param Invoice|Creditmemo|int $document
+     * @param bool                   $partial
      *
      * @return void
+     *
      * @throws AlreadyExistsException
      * @throws CouldNotDeleteException
      * @throws InputException
      * @throws NoSuchEntityException
+     * @throws CouldNotSaveException
      */
-    public function book(TempTransaction|int $tempTransaction, Invoice|Creditmemo|int $document): void
+    public function book(TempTransaction|int $tempTransaction, Invoice|Creditmemo|int $document, $partial = false): void
     {
         if (is_int($tempTransaction)) {
             $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
@@ -85,8 +97,28 @@ class Booker
             ->setMatchConfidence($this->helper->getMatchConfidence($tempTransaction, $document));
         $transaction->setHasDataChanges(true);
 
-        $this->transactionResource->save($transaction);
-        $this->tempTransactionRepository->delete($tempTransaction);
+        if (!$partial) {
+            $this->tempTransactionRepository->delete($tempTransaction);
+        } else {
+            $transaction->setAmount($document->getGrandTotal());
+            $transaction->setPartialHash($tempTransaction->getHash());
+            $transaction->setPartialHash($tempTransaction->getHash());
+
+            $tempTransaction->setAmount($tempTransaction->getAmount() - $document->getGrandTotal());
+            $tempTransaction->setDirty(1);
+            $tempTransaction->setHasDataChanges(true);
+            $this->tempTransactionRepository->save($tempTransaction);
+
+            /** @var MatchConfidence $confidence */
+            $confidence = $this->matchConfidenceCollectionFactory->create()
+                ->addFieldToFilter('temp_transaction_id', $transaction->getId())
+                ->addFieldToFilter('document_id', $document->getId())
+                ->getFirstItem();
+            if ($confidence->getId()) {
+                $this->matchConfidenceRepository->delete($confidence);
+            }
+        }
+        $this->transactionRepository->save($transaction);
     }
 
     /**
@@ -103,7 +135,31 @@ class Booker
             $transaction = $this->transactionRepository->getById($transaction);
         }
 
-        $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
+        $tempTransaction = null;
+        if ($transaction->getPartialHash()) {
+            $tempTransactionCollection = $this->tempTransactionCollectionFactory->create()
+                ->addFieldToFilter('partial_hash', $transaction->getPartialHash());
+
+
+            if ($tempTransactionCollection->getSize() > 0) {
+                /** @var TempTransaction $tempTransaction */
+                $tempTransaction = $tempTransactionCollection->getFirstItem();
+                $tempTransaction->setAmount($tempTransaction->getAmount() + $transaction->getAmount());
+                $tempTransaction->setDirty(1);
+
+                $transactionCollection = $this->transactionCollectionFactory->create()
+                    ->addFieldToFilter('partial_hash', $transaction->getPartialHash())
+                    ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()]);
+
+                if ($transactionCollection->getSize() == 0) {
+                    $tempTransaction->setPartialHash(null);
+                }
+            }
+
+        }
+        if (!$tempTransaction) {
+            $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
+        }
         $tempTransaction->setHasDataChanges(true);
 
         $this->tempTransactionResource->save($tempTransaction);

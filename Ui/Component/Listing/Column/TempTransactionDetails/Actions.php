@@ -16,7 +16,7 @@ class Actions extends Column
         UiComponentFactory $uiComponentFactory,
         UrlInterface       $urlBuilder,
         array              $components = [],
-        array              $data = []
+        array              $data = [],
     ) {
         $this->urlBuilder = $urlBuilder;
         parent::__construct($context, $uiComponentFactory, $components, $data);
@@ -36,6 +36,16 @@ class Actions extends Column
                         'label' => __('✓ Book'),
                         'hidden' => false,
                     ];
+                    if ($item['transaction_amount_raw'] > $item['grand_total_raw']) {
+                        $item[$name]['partial_book'] = [
+                            'href' => $this->urlBuilder->getUrl(
+                                'banksync/temptransaction/book',
+                                ['id' => $item['transaction_id'], 'document_id' => $item['entity_id'], 'partial' => 1]
+                            ),
+                            'label' => __('✓ Partial book'),
+                            'hidden' => false,
+                        ];
+                    }
                 }
             }
         }

@@ -183,6 +183,9 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             $item['transaction_amount'] = "<span class='$amountClass'>{$this->priceHelper->currency($tempTransaction->getAmount())}</span>";
             $item['grand_total'] = "<span class='$amountClass'>{$this->priceHelper->currency($document->getGrandTotal())}</span>";
 
+            $item['transaction_amount_raw'] = $tempTransaction->getAmount();
+            $item['grand_total_raw'] = $document->getGrandTotal();
+
             $customerId = $document->getOrder()->getCustomerId();
             if ($customerId) {
                 $customer = $this->customerFactory->create();

@@ -33,15 +33,24 @@ class Book extends Action
     {
         $transactionId = $this->getRequest()->getParam('id');
         $documentId = $this->getRequest()->getParam('document_id');
+        $partial = !empty($this->getRequest()->getParam('partial'));
 
         try {
-            $this->booker->book($transactionId, $documentId);
+            $this->booker->book($transactionId, $documentId, $partial);
             $this->messageManager->addSuccessMessage(__('Transaction booked'));
         } catch (Exception $e) {
             $this->logger->error($e);
             $this->messageManager->addErrorMessage(__('Failed to book the transaction'));
         }
 
-        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('*/*/index');
+        $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+
+        if ($partial) {
+             $redirect->setPath('*/*/edit', ['id' => $transactionId]);
+        } else {
+             $redirect->setPath('*/*/index');
+        }
+
+        return $redirect;
     }
 }

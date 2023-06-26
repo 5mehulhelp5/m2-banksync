@@ -316,6 +316,7 @@ class Matcher
         if (!empty($confidences)) {
             $this->saveConfidences($tempTransaction, $confidences);
             $tempTransaction->setMatchConfidence(max($confidences));
+            $tempTransaction->setDirty(0);
             $this->tempTransactionResource->save($tempTransaction);
         }
         return count($confidences);
@@ -367,7 +368,11 @@ class Matcher
 
         if ($alreadyMatched) {
             $alreadyMatched = array_unique($alreadyMatched);
-            $tempTransactions->addFieldToFilter('entity_id', ['nin' => $alreadyMatched]);
+            $tempTransactions
+                ->addFieldToFilter(
+                    ['dirty', 'entity_id'],
+                    [['eq' => 1], ['nin' => $alreadyMatched]]
+                );
         }
 
         return $this->matchTransactions($tempTransactions);
