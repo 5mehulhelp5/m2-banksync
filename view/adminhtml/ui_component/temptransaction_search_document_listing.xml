@@ -41,7 +41,6 @@
         </settings>
         <paging name="listing_paging"/>
         <filters name="listing_filters"/>
-        <bookmark name="bookmarks"/>
     </listingToolbar>
     <columns name="temptransaction_details_columns">
         <settings>
