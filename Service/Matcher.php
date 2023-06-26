@@ -138,7 +138,11 @@ class Matcher
      */
     private function getDocumentsViaDocumentNumbers(TempTransaction $tempTransaction): array
     {
-        if (!preg_match_all('/(?<!\d)\d{4,}(?!\d)/', $tempTransaction->getPurpose(), $matches)) {
+        $pattern = $this->helper->getNrFilterPattern('document');
+        if (empty($tempTransaction->getPurpose()) || empty($pattern)) {
+            return [];
+        }
+        if (!preg_match_all($pattern, $tempTransaction->getPurpose(), $matches)) {
             return [];
         }
 
@@ -164,7 +168,12 @@ class Matcher
      */
     private function getDocumentsViaOrderNumbers(TempTransaction $tempTransaction): array
     {
-        if (!preg_match_all('/(?<!\d)\d{4,}(?!\d)/', $tempTransaction->getPurpose(), $matches)) {
+        $pattern = $this->helper->getNrFilterPattern('order');
+        if (empty($tempTransaction->getPurpose()) || empty($pattern)) {
+            return [];
+        }
+
+        if (!preg_match_all($pattern, $tempTransaction->getPurpose(), $matches)) {
             return [];
         }
 
@@ -199,7 +208,11 @@ class Matcher
      */
     private function getDocumentsViaCustomer(TempTransaction $tempTransaction): array
     {
-        if (!preg_match_all('/(?<!\d)\d{5,7}?(?!\d)/', $tempTransaction->getPurpose(), $matches)) {
+        $pattern = $this->helper->getNrFilterPattern('customer');
+        if (empty($tempTransaction->getPurpose()) || empty($pattern)) {
+            return [];
+        }
+        if (!preg_match_all($pattern, $tempTransaction->getPurpose(), $matches)) {
             return [];
         }
 

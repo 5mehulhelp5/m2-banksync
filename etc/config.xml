@@ -14,6 +14,9 @@
                 <filter>
                     <amount>5</amount>
                     <date>14</date>
+                    <document_nr_pattern><![CDATA[/(?<!\d)\d+(?!\d)/]]></document_nr_pattern>
+                    <order_nr_pattern><![CDATA[/(?<!\d)\d+(?!\d)/]]></order_nr_pattern>
+                    <customer_nr_pattern><![CDATA[/(?<!\d)\d+(?!\d)/]]></customer_nr_pattern>
                 </filter>
                 <patterns>
                     <document_increment_id><![CDATA[/(?<=\b|bill|invoice|creditmemo|refund|nr){{value}}\b/i]]></document_increment_id>

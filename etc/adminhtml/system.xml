@@ -41,6 +41,18 @@
                         <label>Start Date</label>
                         <comment>Only documents after this date will be considered</comment>
                     </field>
+                    <field id="document_nr_pattern" translate="label,comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Document Nr Pattern</label>
+                        <comment>Regular expression to extract the document number from the purpose</comment>
+                    </field>
+                    <field id="order_nr_pattern" translate="label,comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Order Nr Pattern</label>
+                        <comment>Regular expression to extract the order number from the purpose</comment>
+                    </field>
+                    <field id="customer_nr_pattern" translate="label,comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Customer Nr Pattern</label>
+                        <comment>Regular expression to extract the customer number from the purpose</comment>
+                    </field>
                 </group>
                 <group id="weights" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Weights</label>

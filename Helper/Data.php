@@ -309,7 +309,7 @@ class Data extends AbstractHelper
      * @param TempTransaction|Transaction $transaction
      * @return string
      */
-    public function calculateHash(TempTransaction|Transaction $transaction):string
+    public function calculateHash(TempTransaction|Transaction $transaction): string
     {
         return sha1(
             implode(
@@ -323,4 +323,10 @@ class Data extends AbstractHelper
             )
         );
     }
+
+    public function getNrFilterPattern(string $type): string
+    {
+        return $this->scopeConfig->getValue("banksync/matching/filter/{$type}_nr_pattern") ?? "";
+    }
+
 }
