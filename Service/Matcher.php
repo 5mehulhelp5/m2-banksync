@@ -361,19 +361,8 @@ class Matcher
      */
     public function matchNewTransactions(): string
     {
-        $tempTransactions = $this->tempTransactionCollectionFactory->create();
-
-        $alreadyMatched = $this->matchConfidenceCollectionFactory->create()
-            ->getColumnValues('temp_transaction_id');
-
-        if ($alreadyMatched) {
-            $alreadyMatched = array_unique($alreadyMatched);
-            $tempTransactions
-                ->addFieldToFilter(
-                    ['dirty', 'entity_id'],
-                    [['eq' => 1], ['nin' => $alreadyMatched]]
-                );
-        }
+        $tempTransactions = $this->tempTransactionCollectionFactory->create()
+            ->addFieldToFilter('dirty', 1);
 
         return $this->matchTransactions($tempTransactions);
     }

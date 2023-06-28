@@ -137,6 +137,7 @@ class ImportFile extends Action
                     'purpose' => $csvRow[$colMap['purpose']] ?? "",
                     'amount' => $this->parseFloat($csvRow[$colMap['amount']] ?? ""),
                     'transaction_date' => date('Y-m-d', strtotime($csvRow[$colMap['transaction_date']] ?? "")),
+                    'dirty' => 1,
                 ];
                 $transaction = $this->tempTransactionFactory->create(['data' => $data]);
                 $transaction->setHasDataChanges(true);
