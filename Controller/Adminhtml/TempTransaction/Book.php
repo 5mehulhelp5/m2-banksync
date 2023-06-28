@@ -46,9 +46,9 @@ class Book extends Action
         $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
 
         if ($partial) {
-             $redirect->setPath('*/*/edit', ['id' => $transactionId]);
+            $redirect->setPath('*/*/details', ['id' => $transactionId]);
         } else {
-             $redirect->setPath('*/*/index');
+            $redirect->setPath('*/*/index');
         }
 
         return $redirect;
