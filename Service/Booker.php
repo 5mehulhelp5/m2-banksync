@@ -75,14 +75,16 @@ class Booker
      *
      * @return void
      *
-     * @throws AlreadyExistsException
      * @throws CouldNotDeleteException
      * @throws InputException
      * @throws NoSuchEntityException
      * @throws CouldNotSaveException
      */
-    public function book(TempTransaction|int $tempTransaction, Invoice|Creditmemo|int $document, $partial = false): void
-    {
+    public function book(
+        TempTransaction|int    $tempTransaction,
+        Invoice|Creditmemo|int $document,
+        bool                   $partial = false,
+    ): void {
         if (is_int($tempTransaction)) {
             $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
         }
@@ -97,6 +99,9 @@ class Booker
             ->setMatchConfidence($this->helper->getMatchConfidence($tempTransaction, $document));
         $transaction->setHasDataChanges(true);
 
+        $confidences = $this->matchConfidenceCollectionFactory->create()
+            ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
+
         if (!$partial) {
             $this->tempTransactionRepository->delete($tempTransaction);
         } else {
@@ -109,14 +114,11 @@ class Booker
             $tempTransaction->setHasDataChanges(true);
             $this->tempTransactionRepository->save($tempTransaction);
 
-            /** @var MatchConfidence $confidence */
-            $confidence = $this->matchConfidenceCollectionFactory->create()
-                ->addFieldToFilter('temp_transaction_id', $transaction->getId())
-                ->addFieldToFilter('document_id', $document->getId())
-                ->getFirstItem();
-            if ($confidence->getId()) {
-                $this->matchConfidenceRepository->delete($confidence);
-            }
+            $confidences->addFieldToFilter('document_id', $document->getId());
+        }
+
+        foreach ($confidences as $confidence) {
+            $this->matchConfidenceRepository->delete($confidence);
         }
         $this->transactionRepository->save($transaction);
     }
