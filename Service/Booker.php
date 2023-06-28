@@ -102,10 +102,10 @@ class Booker
         } else {
             $transaction->setAmount($document->getGrandTotal());
             $transaction->setPartialHash($tempTransaction->getHash());
-            $transaction->setPartialHash($tempTransaction->getHash());
 
             $tempTransaction->setAmount($tempTransaction->getAmount() - $document->getGrandTotal());
             $tempTransaction->setDirty(1);
+            $tempTransaction->setPartialHash($tempTransaction->getHash());
             $tempTransaction->setHasDataChanges(true);
             $this->tempTransactionRepository->save($tempTransaction);
 
