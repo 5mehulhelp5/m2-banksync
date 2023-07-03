@@ -146,14 +146,10 @@ class Matcher
             return [];
         }
 
-        $numbers = [];
-        foreach ($matches as $match) {
-            $numbers[] = $match[0];
-        }
-
-        if (empty($numbers)) {
+        if (empty($matches[0])) {
             return [];
         }
+        $numbers = $matches[0];
 
         $collection = $this->getBaseDocumentCollection($tempTransaction);
         $collection->addFieldToFilter('increment_id', ['in' => $numbers]);
@@ -177,14 +173,10 @@ class Matcher
             return [];
         }
 
-        $numbers = [];
-        foreach ($matches as $match) {
-            $numbers[] = $match[0];
-        }
-
-        if (empty($numbers)) {
+        if (empty($matches[0])) {
             return [];
         }
+        $numbers = $matches[0];
 
         $orderIds = $this->orderCollectionFactory->create()
             ->addFieldToFilter('increment_id', ['in' => $numbers])
@@ -194,9 +186,8 @@ class Matcher
             return [];
         }
 
-
         $collection = $this->getBaseDocumentCollection($tempTransaction);
-        $collection->addFieldToFilter('order_id', ['in' => $numbers]);
+        $collection->addFieldToFilter('order_id', ['in' => $orderIds]);
 
         return $collection->getItems();
     }
@@ -216,18 +207,10 @@ class Matcher
             return [];
         }
 
-        $numbers = [];
-        foreach ($matches as $match) {
-            $number = $match[0];
-            if (strlen($number) == 5) {
-                $number = $number . '00';
-            }
-            $numbers[] = $number;
-        }
-
-        if (empty($numbers)) {
+        if (empty($matches[0])) {
             return [];
         }
+        $numbers = $matches[0];
 
         $customerIds = $this->customerCollectionFactory->create()
             ->addFieldToFilter('increment_id', ['in' => $numbers])
