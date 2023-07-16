@@ -11,8 +11,8 @@ use Psr\Log\LoggerInterface;
 
 class Book extends Action
 {
-    private Booker $booker;
-    private LoggerInterface $logger;
+    protected Booker $booker;
+    protected LoggerInterface $logger;
 
     public function __construct(
         Context         $context,

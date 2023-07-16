@@ -12,10 +12,10 @@ use Psr\Log\LoggerInterface;
 
 class TransactionListing extends AbstractDataProvider
 {
-    private UrlInterface $urlBuilder;
-    private InvoiceRepository $invoiceRepository;
-    private CreditmemoRepository $creditmemoRepository;
-    private LoggerInterface $logger;
+    protected UrlInterface $urlBuilder;
+    protected InvoiceRepository $invoiceRepository;
+    protected CreditmemoRepository $creditmemoRepository;
+    protected LoggerInterface $logger;
 
     public function __construct(
         $name,

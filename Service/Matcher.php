@@ -31,19 +31,19 @@ class Matcher
     protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
     protected TempTransactionResource $tempTransactionResource;
     protected LoggerInterface $logger;
-    private InvoiceCollectionFactory $invoiceCollectionFactory;
-    private CreditmemoCollectionFactory $creditmemoCollectionFactory;
-    private Data $helper;
-    private MatchConfidenceFactory $matchConfidenceFactory;
-    private MatchConfidenceRepository $matchConfidenceRepository;
-    private MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
-    private Payment $paymentResource;
+    protected InvoiceCollectionFactory $invoiceCollectionFactory;
+    protected CreditmemoCollectionFactory $creditmemoCollectionFactory;
+    protected Data $helper;
+    protected MatchConfidenceFactory $matchConfidenceFactory;
+    protected MatchConfidenceRepository $matchConfidenceRepository;
+    protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
+    protected Payment $paymentResource;
     /**
      * @var callable
      */
-    private $progressCallBack;
-    private CustomerCollectionFactory $customerCollectionFactory;
-    private OrderCollectionFactory $orderCollectionFactory;
+    protected $progressCallBack;
+    protected CustomerCollectionFactory $customerCollectionFactory;
+    protected OrderCollectionFactory $orderCollectionFactory;
 
     public function __construct(
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
@@ -89,7 +89,7 @@ class Matcher
      *
      * @return void
      */
-    private function progress(int $current, int $total): void
+    protected function progress(int $current, int $total): void
     {
         if ($this->progressCallBack) {
             call_user_func($this->progressCallBack, $current, $total);
@@ -101,7 +101,7 @@ class Matcher
      * @return InvoiceCollection|CreditmemoCollection
      * @throws LocalizedException
      */
-    private function getBaseDocumentCollection(TempTransaction $tempTransaction): InvoiceCollection|CreditmemoCollection
+    protected function getBaseDocumentCollection(TempTransaction $tempTransaction): InvoiceCollection|CreditmemoCollection
     {
         $collection = $tempTransaction->getAmount() >= 0
             ? $this->invoiceCollectionFactory->create()
@@ -132,24 +132,36 @@ class Matcher
     }
 
     /**
-     * @param TempTransaction $tempTransaction
+     * @param string $purpose
      * @return array
-     * @throws LocalizedException
      */
-    private function getDocumentsViaDocumentNumbers(TempTransaction $tempTransaction): array
+    protected function extractDocumentNumbersFromPurpose(string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('document');
-        if (empty($tempTransaction->getPurpose()) || empty($pattern)) {
+        if (empty($purpose) || empty($pattern)) {
             return [];
         }
-        if (!preg_match_all($pattern, $tempTransaction->getPurpose(), $matches)) {
+        if (!preg_match_all($pattern, $purpose, $matches)) {
             return [];
         }
 
         if (empty($matches[0])) {
             return [];
         }
-        $numbers = $matches[0];
+        return $matches[0];
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @return array
+     * @throws LocalizedException
+     */
+    protected function getDocumentsViaDocumentNumbers(TempTransaction $tempTransaction): array
+    {
+        $numbers = $this->extractDocumentNumbersFromPurpose($tempTransaction->getPurpose());
+        if (empty($numbers)) {
+            return [];
+        }
 
         $collection = $this->getBaseDocumentCollection($tempTransaction);
         $collection->addFieldToFilter('increment_id', ['in' => $numbers]);
@@ -158,25 +170,35 @@ class Matcher
     }
 
     /**
+     * @param string $purpose
+     * @return array
+     */
+    protected function extractOrderNumbersFromPurpose(string $purpose): array
+    {
+        $pattern = $this->helper->getNrFilterPattern('order');
+        if (empty($purpose) || empty($pattern)) {
+            return [];
+        }
+        if (!preg_match_all($pattern, $purpose, $matches)) {
+            return [];
+        }
+        if (empty($matches[0])) {
+            return [];
+        }
+        return $matches[0];
+    }
+
+    /**
      * @param TempTransaction $tempTransaction
      * @return array
      * @throws LocalizedException
      */
-    private function getDocumentsViaOrderNumbers(TempTransaction $tempTransaction): array
+    protected function getDocumentsViaOrderNumbers(TempTransaction $tempTransaction): array
     {
-        $pattern = $this->helper->getNrFilterPattern('order');
-        if (empty($tempTransaction->getPurpose()) || empty($pattern)) {
+        $numbers = $this->extractOrderNumbersFromPurpose($tempTransaction->getPurpose());
+        if (empty($numbers)) {
             return [];
         }
-
-        if (!preg_match_all($pattern, $tempTransaction->getPurpose(), $matches)) {
-            return [];
-        }
-
-        if (empty($matches[0])) {
-            return [];
-        }
-        $numbers = $matches[0];
 
         $orderIds = $this->orderCollectionFactory->create()
             ->addFieldToFilter('increment_id', ['in' => $numbers])
@@ -193,24 +215,35 @@ class Matcher
     }
 
     /**
+     * @param string $purpose
+     * @return array
+     */
+    protected function extractCustomerNumbersFromPurpose(string $purpose): array
+    {
+        $pattern = $this->helper->getNrFilterPattern('customer');
+        if (empty($purpose) || empty($pattern)) {
+            return [];
+        }
+        if (!preg_match_all($pattern, $purpose, $matches)) {
+            return [];
+        }
+        if (empty($matches[0])) {
+            return [];
+        }
+        return $matches[0];
+    }
+
+    /**
      * @param TempTransaction $tempTransaction
      * @return array
      * @throws LocalizedException
      */
-    private function getDocumentsViaCustomer(TempTransaction $tempTransaction): array
+    protected function getDocumentsViaCustomer(TempTransaction $tempTransaction): array
     {
-        $pattern = $this->helper->getNrFilterPattern('customer');
-        if (empty($tempTransaction->getPurpose()) || empty($pattern)) {
+        $numbers = $this->extractCustomerNumbersFromPurpose($tempTransaction->getPurpose());
+        if (empty($numbers)) {
             return [];
         }
-        if (!preg_match_all($pattern, $tempTransaction->getPurpose(), $matches)) {
-            return [];
-        }
-
-        if (empty($matches[0])) {
-            return [];
-        }
-        $numbers = $matches[0];
 
         $customerIds = $this->customerCollectionFactory->create()
             ->addFieldToFilter('increment_id', ['in' => $numbers])
@@ -239,7 +272,7 @@ class Matcher
      * @return array
      * @throws LocalizedException
      */
-    private function getDocumentsViaAmount(TempTransaction $tempTransaction): array
+    protected function getDocumentsViaAmount(TempTransaction $tempTransaction): array
     {
         $amount = abs($tempTransaction->getAmount());
         $amountThreshold = $this->helper->getAmountThreshold();
@@ -263,7 +296,7 @@ class Matcher
      * @return int[]
      * @throws LocalizedException
      */
-    private function getDocumentConfidences(TempTransaction $tempTransaction): array
+    protected function getDocumentConfidences(TempTransaction $tempTransaction): array
     {
         $documents = array_merge(
             $this->getDocumentsViaAmount($tempTransaction),
@@ -292,7 +325,7 @@ class Matcher
      * @throws LocalizedException
      * @throws CouldNotDeleteExceptionAlias
      */
-    private function processTempTransaction(TempTransaction $tempTransaction): int
+    protected function processTempTransaction(TempTransaction $tempTransaction): int
     {
         $this->deleteConfidences($tempTransaction);
         $confidences = $this->getDocumentConfidences($tempTransaction);
@@ -376,7 +409,7 @@ class Matcher
      * @return void
      * @throws CouldNotSaveException
      */
-    private function saveConfidences(TempTransaction $tempTransaction, array $documentIds)
+    protected function saveConfidences(TempTransaction $tempTransaction, array $documentIds)
     {
         foreach ($documentIds as $id => $confidence) {
             $matchObject = $this->matchConfidenceFactory->create()
@@ -394,7 +427,7 @@ class Matcher
      * @return void
      * @throws CouldNotDeleteExceptionAlias
      */
-    private function deleteConfidences(TempTransaction $tempTransaction)
+    protected function deleteConfidences(TempTransaction $tempTransaction)
     {
         $existingItems = $this->matchConfidenceCollectionFactory->create()
             ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
@@ -408,7 +441,7 @@ class Matcher
      * @return void
      * @throws CouldNotDeleteExceptionAlias
      */
-    private function deleteAllConfidences()
+    protected function deleteAllConfidences()
     {
         $existingItems = $this->matchConfidenceCollectionFactory->create();
 

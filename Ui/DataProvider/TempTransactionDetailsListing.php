@@ -20,8 +20,8 @@ use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as Invoice
 
 class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
 {
-    private MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
-    private MatchConfidence $matchConfidenceResource;
+    protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
+    protected MatchConfidence $matchConfidenceResource;
 
     /**
      * @param string                           $name

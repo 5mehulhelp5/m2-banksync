@@ -9,7 +9,7 @@ use Magento\Framework\Model\ResourceModel\Db\Context;
 
 class TempTransaction extends AbstractDb
 {
-    private TempTransactionFactory $tempTransactionFactory;
+    protected TempTransactionFactory $tempTransactionFactory;
 
     public function __construct(
         Context                $context,

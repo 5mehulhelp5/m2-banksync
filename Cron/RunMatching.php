@@ -12,7 +12,7 @@ class RunMatching
 {
     protected LoggerInterface $logger;
     protected Matcher $matcher;
-    private Data $helper;
+    protected Data $helper;
 
     public function __construct(
         LoggerInterface $logger,

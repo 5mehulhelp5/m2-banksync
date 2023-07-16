@@ -8,7 +8,7 @@ use Magento\Framework\Model\ResourceModel\Db\Context;
 
 class Transaction extends AbstractDb
 {
-    private TransactionFactory $transactionFactory;
+    protected TransactionFactory $transactionFactory;
 
     public function __construct(
         Context            $context,

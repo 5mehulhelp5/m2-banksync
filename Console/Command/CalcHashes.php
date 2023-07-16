@@ -20,12 +20,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CalcHashes extends Command
 {
-    private Data $helper;
-    private ProgressBarFactory $progressBarFactory;
-    private TempTransactionCollectionFactory $tempTransactionCollectionFactory;
-    private TransactionCollectionFactory $transactionCollectionFactory;
-    private TempTransactionRepository $tempTransactionRepository;
-    private TransactionRepository $transactionRepository;
+    protected Data $helper;
+    protected ProgressBarFactory $progressBarFactory;
+    protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
+    protected TransactionCollectionFactory $transactionCollectionFactory;
+    protected TempTransactionRepository $tempTransactionRepository;
+    protected TransactionRepository $transactionRepository;
 
     public function __construct(
         Data                             $helper,

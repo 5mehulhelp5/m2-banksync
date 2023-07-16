@@ -18,12 +18,12 @@ use Psr\Log\LoggerInterface;
 
 class MassBook extends Action
 {
-    private LoggerInterface $logger;
-    private Helper $helper;
-    private Matcher $matcher;
-    private Booker $booker;
-    private Filter $filter;
-    private CollectionFactory $collectionFactory;
+    protected LoggerInterface $logger;
+    protected Helper $helper;
+    protected Matcher $matcher;
+    protected Booker $booker;
+    protected Filter $filter;
+    protected CollectionFactory $collectionFactory;
 
     public function __construct(
         Action\Context    $context,

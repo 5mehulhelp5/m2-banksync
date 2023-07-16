@@ -12,8 +12,8 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class Price extends \Magento\Sales\Ui\Component\Listing\Column\Price
 {
-    private StoreManagerInterface $storeManager;
-    private Currency $currency;
+    protected StoreManagerInterface $storeManager;
+    protected Currency $currency;
 
     public function __construct(
         ContextInterface       $context,

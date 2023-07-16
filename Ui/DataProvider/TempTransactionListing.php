@@ -22,15 +22,15 @@ use Psr\Log\LoggerInterface;
 
 class TempTransactionListing extends AbstractDataProvider
 {
-    private UrlInterface $urlBuilder;
-    private CreditmemoRepository $creditmemoRepository;
-    private InvoiceRepository $invoiceRepository;
-    private LoggerInterface $logger;
-    private MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
-    private Data $helper;
-    private CustomerFactory $customerFactory;
-    private CustomerResource $customerResource;
-    private \Magento\Framework\Pricing\Helper\Data $priceHelper;
+    protected UrlInterface $urlBuilder;
+    protected CreditmemoRepository $creditmemoRepository;
+    protected InvoiceRepository $invoiceRepository;
+    protected LoggerInterface $logger;
+    protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
+    protected Data $helper;
+    protected CustomerFactory $customerFactory;
+    protected CustomerResource $customerResource;
+    protected \Magento\Framework\Pricing\Helper\Data $priceHelper;
 
     public function __construct(
         $name,

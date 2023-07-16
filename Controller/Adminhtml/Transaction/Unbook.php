@@ -16,10 +16,10 @@ use Psr\Log\LoggerInterface;
 
 class Unbook extends Action
 {
-    private LoggerInterface $logger;
-    private Booker $booker;
-    private Filter $filter;
-    private CollectionFactory $collectionFactory;
+    protected LoggerInterface $logger;
+    protected Booker $booker;
+    protected Filter $filter;
+    protected CollectionFactory $collectionFactory;
 
     public function __construct(
         Action\Context    $context,

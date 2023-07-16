@@ -16,9 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MatchTransactions extends Command
 {
-    private Matcher $matcher;
-    private Data $helper;
-    private ProgressBarFactory $progressBarFactory;
+    protected Matcher $matcher;
+    protected Data $helper;
+    protected ProgressBarFactory $progressBarFactory;
 
     public function __construct(
         Matcher            $matcher,

@@ -17,10 +17,10 @@ use Psr\Log\LoggerInterface;
 
 class Delete extends Action
 {
-    private LoggerInterface $logger;
-    private TempTransactionRepository $tempTransactionRepository;
-    private Filter $filter;
-    private CollectionFactory $collectionFactory;
+    protected LoggerInterface $logger;
+    protected TempTransactionRepository $tempTransactionRepository;
+    protected Filter $filter;
+    protected CollectionFactory $collectionFactory;
 
     public function __construct(
         Action\Context            $context,

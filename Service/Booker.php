@@ -27,18 +27,18 @@ use Psr\Log\LoggerInterface;
 
 class Booker
 {
-    private TransactionResource $transactionResource;
-    private TempTransactionResource $tempTransactionResource;
-    private TempTransactionRepository $tempTransactionRepository;
-    private InvoiceRepository $invoiceRepository;
-    private CreditmemoRepository $creditmemoRepository;
-    private Helper $helper;
-    private TransactionRepository $transactionRepository;
-    private TempTransactionCollectionFactory $tempTransactionCollectionFactory;
-    private TransactionCollectionFactory $transactionCollectionFactory;
-    private MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
-    private MatchConfidenceRepository $matchConfidenceRepository;
-    private LoggerInterface $logger;
+    protected TransactionResource $transactionResource;
+    protected TempTransactionResource $tempTransactionResource;
+    protected TempTransactionRepository $tempTransactionRepository;
+    protected InvoiceRepository $invoiceRepository;
+    protected CreditmemoRepository $creditmemoRepository;
+    protected Helper $helper;
+    protected TransactionRepository $transactionRepository;
+    protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
+    protected TransactionCollectionFactory $transactionCollectionFactory;
+    protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
+    protected MatchConfidenceRepository $matchConfidenceRepository;
+    protected LoggerInterface $logger;
 
     public function __construct(
         TempTransactionResource          $tempTransactionResource,

@@ -15,8 +15,8 @@ use Magento\Sales\Model\Order\Invoice;
 
 class Data extends AbstractHelper
 {
-    private CustomerResource $customerResource;
-    private CustomerFactory $customerFactory;
+    protected CustomerResource $customerResource;
+    protected CustomerFactory $customerFactory;
 
     public function __construct(
         Context          $context,
@@ -50,14 +50,14 @@ class Data extends AbstractHelper
      *
      * @return string
      */
-    private function normalizeName(string $name): string
+    protected function normalizeName(string $name): string
     {
         $name = strtolower($name);
         $name = preg_replace('/\s+/', ' ', $name);
         return trim($name);
     }
 
-    private function getNameComparisonScores($order): array
+    protected function getNameComparisonScores($order): array
     {
         $nameScores = [
             $order->getCustomerName() => 1,
@@ -117,13 +117,13 @@ class Data extends AbstractHelper
      *
      * @return float
      */
-    private function compareName(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
+    protected function compareName(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
         $nameMatches = $this->getNameMatches($tempTransaction, $document);
         return !empty($nameMatches) ? max($nameMatches) : 0;
     }
 
-    private function getIncrementIdPattern(string $type, string $incrementId): string
+    protected function getIncrementIdPattern(string $type, string $incrementId): string
     {
         $template = $this->scopeConfig->getValue("banksync/matching/patterns/{$type}_increment_id") ?? "";
         return str_replace('{{value}}', $incrementId, $template);
@@ -199,7 +199,7 @@ class Data extends AbstractHelper
      *
      * @return float
      */
-    private function comparePurpose(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
+    protected function comparePurpose(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
         $purposeMatches = $this->getPurposeMatches($tempTransaction, $document);
         if (empty($purposeMatches)) {

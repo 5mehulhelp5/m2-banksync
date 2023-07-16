@@ -22,16 +22,16 @@ use Psr\Log\LoggerInterface;
 
 class ImportFile extends Action
 {
-    private NamedCsv $csvProcessor;
-    private TempTransactionFactory $tempTransactionFactory;
-    private TempTransactionResource $tempTransactionResource;
-    private LoggerInterface $logger;
-    private ScopeConfigInterface $scopeConfig;
-    private Helper $helper;
-    private Matcher $matcher;
-    private TempTransactionRepository $tempTransactionRepository;
-    private TempTransactionCollectionFactory $tempTransactionCollectionFactory;
-    private TransactionCollectionFactory $transactionCollectionFactory;
+    protected NamedCsv $csvProcessor;
+    protected TempTransactionFactory $tempTransactionFactory;
+    protected TempTransactionResource $tempTransactionResource;
+    protected LoggerInterface $logger;
+    protected ScopeConfigInterface $scopeConfig;
+    protected Helper $helper;
+    protected Matcher $matcher;
+    protected TempTransactionRepository $tempTransactionRepository;
+    protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
+    protected TransactionCollectionFactory $transactionCollectionFactory;
 
     public function __construct(
         Action\Context                   $context,
@@ -62,7 +62,7 @@ class ImportFile extends Action
     /**
      * @return string[]
      */
-    private function getColumnMap(): array
+    protected function getColumnMap(): array
     {
         $fields = ['transaction_date', 'payer_name', 'purpose', 'amount'];
         $configPrefix = 'banksync/csv_settings/fields/';
@@ -79,7 +79,7 @@ class ImportFile extends Action
      * @return array
      * @throws Exception
      */
-    private function readData(string $file): array
+    protected function readData(string $file): array
     {
         return $this->csvProcessor
             ->setDelimiter($this->scopeConfig->getValue('banksync/csv_settings/general/delimiter'))
@@ -93,7 +93,7 @@ class ImportFile extends Action
      * @return float
      * @throws LocalizedException
      */
-    private function parseFloat(string $value): float
+    protected function parseFloat(string $value): float
     {
         $thousand = trim($this->scopeConfig->getValue('banksync/csv_settings/general/thousand_separator') ?? "");
         $decimal = trim($this->scopeConfig->getValue('banksync/csv_settings/general/decimal_separator') ?? "");

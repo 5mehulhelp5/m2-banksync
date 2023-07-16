@@ -36,7 +36,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
     protected CustomerFactory $customerFactory;
     protected BankSyncHelper $helper;
     protected CustomerCollectionFactory $customerCollectionFactory;
-    private PriceHelper $priceHelper;
+    protected PriceHelper $priceHelper;
 
     /**
      * @param string                      $name
