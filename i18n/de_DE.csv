@@ -5,6 +5,7 @@
 "%1 transactions have been booked successfully.","%1 Transaktionen wurden erfolgreich gebucht."
 "All (%1) transactions have failed.","Alle (%1) Transaktionen sind fehlgeschlagen."
 "Amount","Betrag"
+"Paid amount","Gezahlter Betrag"
 "Are you sure you want to delete the record ""%1""?","Sind Sie sicher, dass Sie den Eintrag ""%1"" löschen wollen?"
 "Back","Zurück"
 "Book all green lines","Alle grünen Zeilen buchen"

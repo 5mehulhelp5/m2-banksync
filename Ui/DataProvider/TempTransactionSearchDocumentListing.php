@@ -220,6 +220,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             $item['transaction_purpose'] = $purpose;
             $item['customer_name'] = $documentName;
             $item['transaction_payer_name'] = $payerName;
+            $item['payment_method'] = $order->getPayment()->getMethodInstance()->getTitle();
 
         }
 

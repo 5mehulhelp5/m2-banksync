@@ -100,7 +100,7 @@
         </column>
         <column name="transaction_amount" sortOrder="100">
             <settings>
-                <label translate="true">Amount</label>
+                <label translate="true">Paid amount</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
@@ -108,6 +108,12 @@
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Document Amount</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="payment_method" sortOrder="120">
+            <settings>
+                <label translate="true">Payment Method</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>

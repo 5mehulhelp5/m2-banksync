@@ -110,7 +110,7 @@
         <column name="transaction_amount" sortOrder="100">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">Amount</label>
+                <label translate="true">Paid amount</label>
                 <sortable>false</sortable>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
@@ -138,5 +138,4 @@
             </settings>
         </actionsColumn>
     </columns>
-
 </listing>
