@@ -15,7 +15,7 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="index" referenceId="IDX_BNKSNC_TMPTRNSCTN_HASH">
+        <constraint xsi:type="index" referenceId="BANKSYNC_TEMP_TRANSACTION_HASH">
             <column name="hash"/>
         </constraint>
     </table>
@@ -35,7 +35,7 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
-        <constraint xsi:type="index" referenceId="IDX_BNKSNC_TRNSCTN_HASH">
+        <constraint xsi:type="index" referenceId="BANKSYNC_TRANSACTION_HASH">
             <column name="hash"/>
         </constraint>
     </table>

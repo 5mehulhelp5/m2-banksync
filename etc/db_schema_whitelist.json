@@ -1,0 +1,56 @@
+{
+    "banksync_temp_transaction": {
+        "column": {
+            "entity_id": true,
+            "transaction_date": true,
+            "payer_name": true,
+            "purpose": true,
+            "hash": true,
+            "amount": true,
+            "match_confidence": true,
+            "partial_hash": true,
+            "dirty": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "BANKSYNC_TEMP_TRANSACTION_HASH": true
+        }
+    },
+    "banksync_transaction": {
+        "column": {
+            "entity_id": true,
+            "transaction_date": true,
+            "payer_name": true,
+            "purpose": true,
+            "amount": true,
+            "hash": true,
+            "document_type": true,
+            "document_id": true,
+            "match_confidence": true,
+            "partial_hash": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "BANKSYNC_TRANSACTION_HASH": true
+        }
+    },
+    "banksync_temptransaction_confidence": {
+        "column": {
+            "entity_id": true,
+            "temp_transaction_id": true,
+            "document_id": true,
+            "confidence": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_FF9AB1298262BD318F5C3F452C851794": true,
+            "UNQ_67A206559C555BF1F07E59B0E8F88773": true
+        }
+    }
+}
