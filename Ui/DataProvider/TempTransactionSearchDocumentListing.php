@@ -195,16 +195,9 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
                 $item['customer_increment_id'] = "-";
             }
 
-            $names = array_filter(array_unique([
-                trim($order->getCustomerName() ?? ""),
-                trim(($order->getBillingAddress()->getFirstname() ?? "") . ' ' . ($order->getBillingAddress()->getLastname() ?? "")),
-                trim($order->getBillingAddress()->getCompany() ?? ""),
-                trim(($order->getShippingAddress()->getFirstname() ?? "") . ' ' . ($order->getShippingAddress()->getLastname() ?? "")),
-                trim($order->getShippingAddress()->getCompany() ?? ""),
-            ]));
             $nameMatches = $this->helper->getNameMatches($tempTransaction, $document);
 
-            $documentName = implode("<br>", $names);
+            $documentName = $this->helper->getCustomerNamesForListing($order);
             $purpose = $tempTransaction->getPurpose();
             $payerName = $tempTransaction->getPayerName();
 

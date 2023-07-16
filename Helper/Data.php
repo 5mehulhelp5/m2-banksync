@@ -10,6 +10,7 @@ use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Invoice;
 
@@ -324,9 +325,32 @@ class Data extends AbstractHelper
         );
     }
 
+    /**
+     * @param string $type
+     * @return string
+     */
     public function getNrFilterPattern(string $type): string
     {
         return $this->scopeConfig->getValue("banksync/matching/filter/{$type}_nr_pattern") ?? "";
     }
 
+    /**
+     * @param Order $order
+     * @return string
+     */
+    public function getCustomerNamesForListing(Order $order): string
+    {
+        $billing = $order->getBillingAddress();
+        $shipping = $order->getShippingAddress();
+        return implode(
+            '<br>',
+            array_filter(array_unique([
+                trim($order->getCustomerName() ?? ""),
+                trim(($billing->getFirstname() ?? "") . ' ' . ($billing->getLastname() ?? "")),
+                trim($billing->getCompany() ?? ""),
+                trim(($shipping->getFirstname() ?? "") . ' ' . ($shipping->getLastname() ?? "")),
+                trim($shipping->getCompany() ?? ""),
+            ]))
+        );
+    }
 }

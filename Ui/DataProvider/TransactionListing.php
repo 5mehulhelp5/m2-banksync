@@ -3,6 +3,7 @@
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
 use Exception;
+use Ibertrand\BankSync\Helper\Data;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order\CreditmemoRepository;
@@ -13,6 +14,7 @@ use Psr\Log\LoggerInterface;
 class TransactionListing extends AbstractDataProvider
 {
     protected UrlInterface $urlBuilder;
+    protected Data $helper;
     protected InvoiceRepository $invoiceRepository;
     protected CreditmemoRepository $creditmemoRepository;
     protected LoggerInterface $logger;
@@ -22,6 +24,7 @@ class TransactionListing extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
+        Data $helper,
         UrlInterface $urlBuilder,
         InvoiceRepository $invoiceRepository,
         CreditmemoRepository $creditmemoRepository,
@@ -30,6 +33,7 @@ class TransactionListing extends AbstractDataProvider
         array $data = [],
     ) {
         $this->collection = $collectionFactory->create();
+        $this->helper = $helper;
         $this->urlBuilder = $urlBuilder;
         $this->invoiceRepository = $invoiceRepository;
         $this->creditmemoRepository = $creditmemoRepository;
@@ -61,7 +65,7 @@ class TransactionListing extends AbstractDataProvider
                 )->get($item['document_id']);
 
                 $item['document'] = "<a href='$url'>" . $document->getIncrementId() . "</a>";
-                $item['document_name'] = $document->getOrder()->getCustomerName();
+                $item['document_name'] = $this->helper->getCustomerNamesForListing($document->getOrder());
                 $item['document_amount'] = $document->getGrandTotal();
                 $item['document_date'] = $document->getCreatedAt();
                 $orderUrl = $this->urlBuilder->getUrl(

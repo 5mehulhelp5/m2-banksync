@@ -88,6 +88,7 @@
         <column name="document_name" sortOrder="50">
             <settings>
                 <filter>text</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Order Customer Name</label>
             </settings>
         </column>

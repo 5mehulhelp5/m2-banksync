@@ -47,7 +47,7 @@ class TempTransactionListing extends AbstractDataProvider
         LoggerInterface $logger,
         \Magento\Framework\Pricing\Helper\Data $priceHelper,
         array $meta = [],
-        array $data = []
+        array $data = [],
     ) {
         $this->collection = $collectionFactory->create();
         $this->urlBuilder = $urlBuilder;
@@ -138,14 +138,7 @@ class TempTransactionListing extends AbstractDataProvider
                     $payerName = $tempTransaction->getPayerName();
 
                     $order = $document->getOrder();
-                    $names = array_filter(array_unique([
-                        trim($order->getCustomerName() ?? ""),
-                        trim(($order->getBillingAddress()->getFirstname() ?? "") . ' ' . ($order->getBillingAddress()->getLastname() ?? "")),
-                        trim($order->getBillingAddress()->getCompany() ?? ""),
-                        trim(($order->getShippingAddress()->getFirstname() ?? "") . ' ' . ($order->getShippingAddress()->getLastname() ?? "")),
-                        trim($order->getShippingAddress()->getCompany() ?? ""),
-                    ]));
-                    $documentName = implode("<br>", $names);
+                    $documentName = $this->helper->getCustomerNamesForListing($order);
 
                     if (count($matches) == 1 || count($confidentMatches) == 1 || count($absoluteMatches) == 1) {
                         $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
