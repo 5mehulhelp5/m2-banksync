@@ -69,6 +69,7 @@ class TransactionListing extends AbstractDataProvider
                     ['order_id' => $document->getOrder()->getId()]
                 );
                 $item['order_increment_id'] = "<a href='$orderUrl'>{$document->getOrder()->getIncrementId()}</a>";
+                $item['payment_method'] = $document->getOrder()->getPayment()->getMethodInstance()->getTitle();
             } catch (Exception $e) {
                 $this->logger->error($e);
                 $item['document'] = "[Not found]";

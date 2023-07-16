@@ -125,7 +125,13 @@
                 <label translate="true">Document Amount</label>
             </settings>
         </column>
-        <column name="match_confidence" sortOrder="110">
+        <column name="payment_method" sortOrder="110">
+            <settings>
+                <label translate="true">Payment Method</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="match_confidence" sortOrder="120">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Confidence</label>
