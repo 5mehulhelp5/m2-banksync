@@ -214,7 +214,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             $item['customer_name'] = $documentName;
             $item['transaction_payer_name'] = $payerName;
             $item['payment_method'] = $order->getPayment()->getMethodInstance()->getTitle();
-
+            $item['comment'] = $tempTransaction->getComment();
         }
 
         return $data;

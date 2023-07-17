@@ -6,6 +6,7 @@
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
         <column xsi:type="varchar" name="hash" nullable="true" length="40" comment="Hash"/>
+        <column xsi:type="text" name="comment" nullable="true" comment="Comment"/>
         <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
         <column xsi:type="float" name="match_confidence" nullable="true" comment="Match Confidence"/>
         <column xsi:type="varchar" name="partial_hash" nullable="true" length="40" comment="Partial reference"/>
@@ -25,6 +26,7 @@
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
         <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
+        <column xsi:type="text" name="comment" nullable="true" comment="Comment"/>
         <column xsi:type="varchar" name="hash" nullable="true" length="40" comment="Hash"/>
         <column xsi:type="text" name="document_type" nullable="false" comment="Document Type"/>
         <column xsi:type="int" name="document_id" nullable="false" comment="Document ID"/>

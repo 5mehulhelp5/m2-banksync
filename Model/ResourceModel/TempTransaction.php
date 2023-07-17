@@ -14,7 +14,7 @@ class TempTransaction extends AbstractDb
     public function __construct(
         Context                $context,
         TempTransactionFactory $tempTransactionFactory,
-        $connectionName = null
+        $connectionName = null,
     ) {
         parent::__construct($context, $connectionName);
         $this->tempTransactionFactory = $tempTransactionFactory;
@@ -32,7 +32,6 @@ class TempTransaction extends AbstractDb
     public function deleteAll()
     {
         $connection = $this->getConnection();
-
         $connection->truncateTable($this->getMainTable());
     }
 
@@ -43,6 +42,7 @@ class TempTransaction extends AbstractDb
             ->setTransactionDate($transaction->getTransactionDate())
             ->setPurpose($transaction->getPurpose())
             ->setAmount($transaction->getAmount())
+            ->setComment($transaction->getComment())
             ->setHash($transaction->getHash());
     }
 }

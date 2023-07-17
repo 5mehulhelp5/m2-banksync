@@ -15,6 +15,8 @@ use Magento\Framework\Model\AbstractModel;
  * @method Transaction setPurpose(string $purpose)
  * @method float getAmount()
  * @method Transaction setAmount(float $amount)
+ * @method string|null getComment()
+ * @method $this setComment(string $comment)
  * @method string|null getHash()
  * @method $this setHash(string $hash)
  * @method string|null getPartialHash()

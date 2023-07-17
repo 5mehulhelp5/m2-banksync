@@ -130,6 +130,12 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
+        <column name="comment" sortOrder="130">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Comment</label>
+            </settings>
+        </column>
         <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\TempTransactionDetails\Actions" sortOrder="130">
             <settings>
                 <indexField>entity_id</indexField>

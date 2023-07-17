@@ -59,6 +59,15 @@ class Actions extends Column
                         ];
                     }
 
+                    $item[$name]['edit'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            'banksync/temptransaction/edit',
+                            ['id' => $item['entity_id']]
+                        ),
+                        'label' => __('🖉 Edit comment'),
+                        'hidden' => false,
+                    ];
+
                     $item[$name]['delete'] = [
                         'href' => $this->urlBuilder->getUrl(
                             'banksync/temptransaction/delete',

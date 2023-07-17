@@ -29,6 +29,8 @@ use Magento\Sales\Model\Order\InvoiceRepository;
  * @method $this setHash(string $hash)
  * @method float|null getAmount()
  * @method $this setAmount(float $amount)
+ * @method string|null getComment()
+ * @method $this setComment(string $comment)
  * @method int|null getMatchConfidence()
  * @method $this setMatchConfidence(?int $matchConfidence)
  * @method int|null getDocumentCount()

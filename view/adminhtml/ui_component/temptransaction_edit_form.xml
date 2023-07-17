@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">temptransaction_edit_form.temptransaction_edit_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Import Transaction</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">temptransaction_edit_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save">
+                <param name="label" xsi:type="string" translate="true">Save</param>
+                <param name="class" xsi:type="string">primary</param>
+            </button>
+        </buttons>
+        <deps>
+            <dep>temptransaction_edit_form.temptransaction_edit_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="temptransaction_edit_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\TempTransactionEditForm</argument>
+            <argument name="name" xsi:type="string">temptransaction_edit_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="*/*/save"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+
+    <fieldset name="general">
+        <settings>
+            <collapsible>false</collapsible>
+            <label translate="true">Edit transaction</label>
+        </settings>
+
+        <input name="transaction_date">
+            <settings>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label>Transaction Date</label>
+                <dataScope>transaction_date</dataScope>
+            </settings>
+        </input>
+
+        <input name="amount">
+            <settings>
+                <dataScope>amount</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label>Paid amount</label>
+            </settings>
+        </input>
+
+        <input name="purpose">
+            <settings>
+                <dataScope>purpose</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label>Purpose</label>
+            </settings>
+        </input>
+
+        <input name="payer_name">
+            <settings>
+                <dataScope>payer_name</dataScope>
+                <elementTmpl>ui/form/element/text</elementTmpl>
+                <label>Payer Name</label>
+            </settings>
+        </input>
+
+        <textarea name="comment">
+            <settings>
+                <dataScope>comment</dataScope>
+                <label>Comment</label>
+            </settings>
+        </textarea>
+
+    </fieldset>
+</form>

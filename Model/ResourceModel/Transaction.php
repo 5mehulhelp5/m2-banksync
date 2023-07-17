@@ -13,7 +13,7 @@ class Transaction extends AbstractDb
     public function __construct(
         Context            $context,
         TransactionFactory $transactionFactory,
-        $connectionName = null
+        $connectionName = null,
     ) {
         $this->transactionFactory = $transactionFactory;
         parent::__construct($context, $connectionName);
@@ -26,6 +26,7 @@ class Transaction extends AbstractDb
             ->setTransactionDate($tempTransaction->getTransactionDate())
             ->setPurpose($tempTransaction->getPurpose())
             ->setAmount($tempTransaction->getAmount())
+            ->setComment($tempTransaction->getComment())
             ->setDocumentType($tempTransaction->getDocumentType())
             ->setHash($tempTransaction->getHash());
     }
