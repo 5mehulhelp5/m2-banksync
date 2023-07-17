@@ -47,6 +47,15 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @return bool
+     */
+    public function isSupportCreditmemos(): bool
+    {
+        return $this->scopeConfig->isSetFlag('banksync/general/support_creditmemos');
+    }
+
+
+    /**
      * @param string $name
      *
      * @return string

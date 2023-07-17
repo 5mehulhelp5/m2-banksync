@@ -5,6 +5,7 @@
             <general>
                 <enabled>1</enabled>
                 <async_matching>1</async_matching>
+                <support_creditmemos>0</support_creditmemos>
             </general>
             <matching>
                 <confidence_thresholds>

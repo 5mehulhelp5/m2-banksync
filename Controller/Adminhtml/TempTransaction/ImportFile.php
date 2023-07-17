@@ -130,12 +130,19 @@ class ImportFile extends Action
                 $this->tempTransactionRepository->deleteAll();
             }
 
+            $useNegativeAmounts = $this->helper->isSupportCreditmemos();
+
             $newTransactions = [];
             foreach ($csvRows as $csvRow) {
+                $amount = $this->parseFloat($csvRow[$colMap['amount']] ?? "");
+                if (!$useNegativeAmounts && $amount < 0) {
+                    continue;
+                }
+
                 $data = [
                     'payer_name' => $csvRow[$colMap['payer_name']] ?? "",
                     'purpose' => $csvRow[$colMap['purpose']] ?? "",
-                    'amount' => $this->parseFloat($csvRow[$colMap['amount']] ?? ""),
+                    'amount' => $amount,
                     'transaction_date' => date('Y-m-d', strtotime($csvRow[$colMap['transaction_date']] ?? "")),
                     'dirty' => 1,
                 ];

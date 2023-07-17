@@ -16,6 +16,11 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>If you have a lot of transactions and invoices to match and importing the files takes too long, enable this.</comment>
                 </field>
+                <field id="support_creditmemos" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Support Creditmemos</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable this if you want to match creditmemos as well as invoices.</comment>
+                </field>
             </group>
             <group id="matching" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Matching</label>

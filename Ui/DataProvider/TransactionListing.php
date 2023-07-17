@@ -9,7 +9,6 @@ use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
-use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory as orderAddressCollectionFactory;
@@ -112,9 +111,11 @@ class TransactionListing extends AbstractDataProvider
      */
     protected function setFilterByOrderIds(Filter $filter, array $orderIds): void
     {
-        $creditMemoIds = $this->creditmemoCollectionFactory->create()
-            ->addFieldToFilter('order_id', ['in' => $orderIds])
-            ->getAllIds();
+        $creditMemoIds = $this->helper->isSupportCreditmemos()
+            ? $this->creditmemoCollectionFactory->create()
+                ->addFieldToFilter('order_id', ['in' => $orderIds])
+                ->getAllIds()
+            : [];
 
         $invoiceIds = $this->invoiceCollectionFactory->create()
             ->addFieldToFilter('order_id', ['in' => $orderIds])
@@ -133,8 +134,6 @@ class TransactionListing extends AbstractDataProvider
     public function addFilter(Filter $filter)
     {
         if ($filter->getField() === 'order_increment_id') {
-            /** @var Order $order */
-
             $orderIds = $this->orderCollectionFactory->create()
                 ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
                 ->getAllIds();
@@ -143,11 +142,12 @@ class TransactionListing extends AbstractDataProvider
         }
 
         if ($filter->getField() === 'document') {
-            /** @var Order $order */
+            $creditMemoIds = $this->helper->isSupportCreditmemos()
+                ? $this->creditmemoCollectionFactory->create()
+                    ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
+                    ->getAllIds()
+                : [];
 
-            $creditMemoIds = $this->creditmemoCollectionFactory->create()
-                ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
-                ->getAllIds();
             $invoiceIds = $this->invoiceCollectionFactory->create()
                 ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
                 ->getAllIds();
