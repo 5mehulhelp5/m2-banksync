@@ -94,6 +94,14 @@ class Booker
                 : $this->creditmemoRepository->get($document);
         }
 
+        $document->setIsBanksynced(1);
+        $document->setHasDataChanges(true);
+
+        $repository = $tempTransaction->getDocumentType() === 'invoice'
+            ? $this->invoiceRepository
+            : $this->creditmemoRepository;
+        $repository->save($document);
+
         $transaction = $this->transactionResource->fromTempTransaction($tempTransaction)
             ->setDocumentId($document->getId())
             ->setMatchConfidence($this->helper->getMatchConfidence($tempTransaction, $document));
@@ -130,12 +138,22 @@ class Booker
      * @throws AlreadyExistsException
      * @throws CouldNotDeleteException
      * @throws NoSuchEntityException
+     * @throws InputException
+     * @throws CouldNotSaveException
      */
     public function unbook(Transaction|int $transaction): void
     {
         if (is_int($transaction)) {
             $transaction = $this->transactionRepository->getById($transaction);
         }
+
+        $repository = $transaction->getDocumentType() === 'invoice'
+            ? $this->invoiceRepository
+            : $this->creditmemoRepository;
+        $document = $repository->get($transaction->getDocumentId());
+        $document->setIsBanksynced(0);
+        $document->setHasDataChanges(true);
+        $repository->save($document);
 
         $tempTransaction = null;
         if ($transaction->getPartialHash()) {

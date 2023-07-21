@@ -10,4 +10,13 @@
             </argument>
         </arguments>
     </type>
+
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Invoice\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="is_banksynced" xsi:type="string">sales_invoice.is_banksynced</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
 </config>
