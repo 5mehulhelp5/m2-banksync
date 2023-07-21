@@ -157,8 +157,8 @@ class Booker
                     $tempTransaction->setPartialHash(null);
                 }
             }
-
         }
+
         if (!$tempTransaction) {
             $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
             $tempTransaction->setDirty(true);
@@ -173,42 +173,45 @@ class Booker
      * @param int[]|null $ids
      *
      * @return int[][]
+     * @throws CouldNotSaveException
      */
-    public function autoBook(array $ids = null, $threshold = null): array
+    public function autoBook(array $ids = null, $minThreshold = null): array
     {
         $result = [
             'success' => [],
             'error' => [],
         ];
-        if ($threshold === null) {
-            $threshold = $this->helper->getAcceptConfidenceThreshold();
+        if ($minThreshold === null) {
+            $minThreshold = $this->helper->getAcceptConfidenceThreshold();
         }
 
         $absoluteThreshold = $this->helper->getAbsoluteConfidenceThreshold();
+        $acceptanceThreshold = $this->helper->getAcceptConfidenceThreshold();
 
         $tempTransactions = $this->tempTransactionCollectionFactory->create()
-            ->addFieldToFilter('match_confidence', ['gteq' => $threshold]);
+            ->addFieldToFilter('match_confidence', ['gteq' => $minThreshold]);
 
         if (is_array($ids)) {
             $tempTransactions->addFieldToFilter('entity_id', ['in' => $ids]);
         }
 
         foreach ($tempTransactions as $tempTransaction) {
+            /** @var TempTransaction $tempTransaction */
             /** @var MatchConfidence[] $allMatches */
             $allMatches = $this->matchConfidenceCollectionFactory->create()
                 ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId())
-                ->addFieldToFilter('confidence', ['gteq' => $threshold])
+                ->addFieldToFilter('confidence', ['gteq' => $minThreshold])
                 ->getItems();
 
-
+            $acceptMatches = array_filter($allMatches, fn ($m) => $m->getConfidence() >= $acceptanceThreshold);
             $absoluteMatches = array_filter($allMatches, fn ($m) => $m->getConfidence() >= $absoluteThreshold);
 
-            if (count($allMatches) !== 1 && count($absoluteMatches) !== 1) {
+            if (count($allMatches) !== 1 && count($acceptMatches) !== 1 && count($absoluteMatches) !== 1) {
                 $this->logger->error("Transaction {$tempTransaction->getId()} has " . count($allMatches) . " matches");
                 continue;
             }
 
-            usort($allMatches, fn ($b, $a) => $b->getConfidence() <=> $a->getConfidence());
+            usort($allMatches, fn ($a, $b) => $b->getConfidence() <=> $a->getConfidence());
 
             $documentId = $allMatches[0]->getDocumentId();
 
@@ -218,12 +221,13 @@ class Booker
                     : $this->creditmemoRepository->get($documentId);
 
                 $confidence = $this->helper->getMatchConfidence($tempTransaction, $document);
-                if ($confidence < $threshold) {
+                if ($confidence < $minThreshold) {
                     echo "Transaction {$tempTransaction->getId()} has low confidence: $confidence\n";
                     continue;
                 }
 
                 $this->book($tempTransaction, $document);
+
                 $result['success'][] = $tempTransaction->getId();
             } catch (AlreadyExistsException|CouldNotDeleteException|InputException|NoSuchEntityException $e) {
                 $result['error'][] = $tempTransaction->getId();
