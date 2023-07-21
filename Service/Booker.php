@@ -161,6 +161,7 @@ class Booker
         }
         if (!$tempTransaction) {
             $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
+            $tempTransaction->setDirty(true);
         }
         $tempTransaction->setHasDataChanges(true);
 
