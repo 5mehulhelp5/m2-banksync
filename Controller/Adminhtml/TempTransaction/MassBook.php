@@ -58,7 +58,6 @@ class MassBook extends Action
      */
     public function execute()
     {
-        $this->logger->info("IDs: ".var_export($this->getIds(), true));
         $ids = $this->getIds();
         # When IDs are selected, don't check the threshold (manual action).
         # Otherwise, only autobook if the threshold is reached.
