@@ -14,6 +14,9 @@
             "created_at": true,
             "updated_at": true
         },
+        "index": {
+            "BANKSYNC_TEMP_TRANSACTION_HASH": true
+        },
         "constraint": {
             "PRIMARY": true,
             "BANKSYNC_TEMP_TRANSACTION_HASH": true
@@ -34,6 +37,9 @@
             "partial_hash": true,
             "created_at": true,
             "updated_at": true
+        },
+        "index": {
+            "BANKSYNC_TRANSACTION_HASH": true
         },
         "constraint": {
             "PRIMARY": true,
