@@ -166,7 +166,13 @@ class Data extends AbstractHelper
     protected function getIncrementIdPattern(string $type, string $incrementId): string
     {
         $template = $this->scopeConfig->getValue("banksync/matching/patterns/{$type}_increment_id") ?? "";
-        return str_replace('{{value}}', $incrementId, $template);
+        $pattern = str_replace('{{value}}', preg_quote($incrementId), $template);
+
+        if (preg_match($pattern, '') === false) {
+            $this->_logger->error("Invalid pattern for $type increment ID: $pattern");
+            return "/$ not match possible ^/";
+        }
+        return $pattern;
     }
 
     /**
