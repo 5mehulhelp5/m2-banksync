@@ -287,9 +287,18 @@ class Data extends AbstractHelper
      */
     public function getAbsoluteConfidenceThreshold(): float
     {
-        return $this->scopeConfig->getValue('banksync/matching/weights/amount')
-            + $this->scopeConfig->getValue('banksync/matching/weights/purpose')
-            + $this->scopeConfig->getValue('banksync/matching/weights/payer_name');
+        return $this->getWeightconfig('amount')
+            + $this->getWeightconfig('purpose')
+            + $this->getWeightconfig('payer_name');
+    }
+
+    /**
+     * @param string $type
+     * @return float
+     */
+    public function getWeightConfig(string $type): float
+    {
+        return (float)$this->scopeConfig->getValue("banksync/matching/weights/$type");
     }
 
     /**
@@ -321,6 +330,14 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @return bool
+     */
+    public function useStrictAmountMatching(): bool
+    {
+        return $this->scopeConfig->isSetFlag('banksync/matching/weights/strict_amount');
+    }
+
+    /**
      * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      *
@@ -328,13 +345,13 @@ class Data extends AbstractHelper
      */
     public function getMatchConfidence(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
-        $weightAmount = $this->scopeConfig->getValue('banksync/matching/weights/amount');
-        $weightPurpose = $this->scopeConfig->getValue('banksync/matching/weights/purpose');
-        $weightName = $this->scopeConfig->getValue('banksync/matching/weights/payer_name');
-        $strictAmount = $this->scopeConfig->isSetFlag('banksync/matching/weights/strict_amount');
+        $weightAmount = $this->getWeightConfig('amount');
+        $weightPurpose = $this->getWeightConfig('purpose');
+        $weightName = $this->getWeightConfig('payer_name');
+
         $amountDif = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal());
 
-        $amountScore = $strictAmount
+        $amountScore = $this->useStrictAmountMatching()
             ? $amountDif < 0.01 ? $weightAmount : 0
             : $weightAmount * ($amountDif < 0.01 ? 1 : (1 - $amountDif / $this->getAmountThreshold()));
         $purposeScore = $weightPurpose * $this->comparePurpose($tempTransaction, $document);
