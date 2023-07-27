@@ -2,7 +2,6 @@
 
 namespace Ibertrand\BankSync\Helper;
 
-use Exception;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Ibertrand\BankSync\Model\Transaction;
 use Magento\Customer\Model\Customer;
