@@ -298,12 +298,7 @@ class Matcher
      */
     protected function getDocumentConfidences(TempTransaction $tempTransaction): array
     {
-        $documents = array_merge(
-            $this->getDocumentsViaAmount($tempTransaction),
-            $this->getDocumentsViaDocumentNumbers($tempTransaction),
-            $this->getDocumentsViaOrderNumbers($tempTransaction),
-            $this->getDocumentsViaCustomer($tempTransaction),
-        );
+        $documents = $this->getDocuments($tempTransaction);
 
         $minConfidence = $this->helper->getMinConfidenceThreshold();
         $confidences = [];
@@ -315,6 +310,21 @@ class Matcher
             }
         }
         return $confidences;
+    }
+
+    /**
+     * @param TempTransaction $tempTransaction
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getDocuments(TempTransaction $tempTransaction): array
+    {
+        return array_merge(
+            $this->getDocumentsViaAmount($tempTransaction),
+            $this->getDocumentsViaDocumentNumbers($tempTransaction),
+            $this->getDocumentsViaOrderNumbers($tempTransaction),
+            $this->getDocumentsViaCustomer($tempTransaction),
+        );
     }
 
     /**
