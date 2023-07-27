@@ -409,7 +409,7 @@ class Matcher
      * @return void
      * @throws CouldNotSaveException
      */
-    protected function saveConfidences(TempTransaction $tempTransaction, array $documentIds)
+    protected function saveConfidences(TempTransaction $tempTransaction, array $documentIds): void
     {
         foreach ($documentIds as $id => $confidence) {
             $matchObject = $this->matchConfidenceFactory->create()
@@ -427,7 +427,7 @@ class Matcher
      * @return void
      * @throws CouldNotDeleteExceptionAlias
      */
-    protected function deleteConfidences(TempTransaction $tempTransaction)
+    protected function deleteConfidences(TempTransaction $tempTransaction): void
     {
         $existingItems = $this->matchConfidenceCollectionFactory->create()
             ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
@@ -441,7 +441,7 @@ class Matcher
      * @return void
      * @throws CouldNotDeleteExceptionAlias
      */
-    protected function deleteAllConfidences()
+    protected function deleteAllConfidences(): void
     {
         $existingItems = $this->matchConfidenceCollectionFactory->create();
 

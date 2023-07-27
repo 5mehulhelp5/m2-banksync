@@ -92,6 +92,7 @@ class Booker
      */
     private function saveDocument(Invoice|Creditmemo $document, bool $isBanksynced): void
     {
+        /** @noinspection PhpUndefinedMethodInspection */
         $document->setIsBanksynced((int)$isBanksynced)
             ->setHasDataChanges(true);
         $this->resolveDocumentRepository($document)->save($document);
