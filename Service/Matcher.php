@@ -332,7 +332,7 @@ class Matcher
         if (!empty($confidences)) {
             $this->saveConfidences($tempTransaction, $confidences);
             $tempTransaction->setMatchConfidence(max($confidences));
-            $tempTransaction->setDirty(0);
+            $tempTransaction->setDirty(TempTransaction::NOT_DIRTY);
             $this->tempTransactionResource->save($tempTransaction);
         }
         return count($confidences);

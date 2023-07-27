@@ -140,7 +140,7 @@ class Booker
             $transaction->setPartialHash($tempTransaction->getHash());
 
             $tempTransaction->setAmount($tempTransaction->getAmount() - $document->getGrandTotal());
-            $tempTransaction->setDirty(1);
+            $tempTransaction->setDirty(TempTransaction::DIRTY);
             $tempTransaction->setPartialHash($tempTransaction->getHash());
             $tempTransaction->setHasDataChanges(true);
             $this->tempTransactionRepository->save($tempTransaction);
@@ -183,7 +183,7 @@ class Booker
                 /** @var TempTransaction $tempTransaction */
                 $tempTransaction = $tempTransactionCollection->getFirstItem();
                 $tempTransaction->setAmount($tempTransaction->getAmount() + $transaction->getAmount());
-                $tempTransaction->setDirty(1);
+                $tempTransaction->setDirty(TempTransaction::DIRTY);
 
                 $transactionCollection = $this->transactionCollectionFactory->create()
                     ->addFieldToFilter('partial_hash', $transaction->getPartialHash())
@@ -197,7 +197,7 @@ class Booker
 
         if (!$tempTransaction) {
             $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
-            $tempTransaction->setDirty(true);
+            $tempTransaction->setDirty(TempTransaction::DIRTY);
         }
         $tempTransaction->setHasDataChanges(true);
 
