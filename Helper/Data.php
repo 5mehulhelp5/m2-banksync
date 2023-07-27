@@ -152,6 +152,35 @@ class Data extends AbstractHelper
     }
 
     /**
+     * Aggregate scores using a dynamically weighted sum
+     *
+     * @param float[] $scores The array of scores, each in [0, 1].
+     * @return float The aggregated result, in [0, 1].
+     */
+    protected function aggregateScores(array $scores)
+    {
+        if (empty($scores)) {
+            return 0;
+        }
+        rsort($scores);
+        $result = 0;
+        foreach ($scores as $value) {
+            if ($value > 1) {
+                $this->_logger->warning("Match value is greater than 1: $value");
+                $value = 1;
+            }
+            if ($value <= 0 || $result >= 1) {
+                // exit early if the calculation is done
+                break;
+            }
+            // The result is the sum of the scores, but the score is multiplied by (1 - the current result)
+            // This means all matches are aggregated while still returning a value between 0 and 1.
+            $result += $value * (1 - $result);
+        }
+        return $result;
+    }
+
+    /**
      * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      *
@@ -159,8 +188,7 @@ class Data extends AbstractHelper
      */
     protected function compareName(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
-        $nameMatches = $this->getNameMatches($tempTransaction, $document);
-        return !empty($nameMatches) ? max($nameMatches) : 0;
+        return $this->aggregateScores($this->getNameMatches($tempTransaction, $document));
     }
 
     protected function getIncrementIdPattern(string $type, string $incrementId): string
@@ -251,12 +279,14 @@ class Data extends AbstractHelper
     }
 
     /**
-     * Returns:
+     * Returns an aggregated score for the purpose:
      * 1 if the purpose contains the document IncrementId,
      * 0.5 if the purpose contains the order IncrementId,
      * 0.5 if the purpose contains the customer IncrementId,
      * 0.25 if the purpose contains the customer IncrementId without leading zeros,
      * 0 otherwise.
+     *
+     * The weighted aggregation makes sure the resulting score is between 0 and 1.
      *
      * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
@@ -265,11 +295,7 @@ class Data extends AbstractHelper
      */
     protected function comparePurpose(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
-        $purposeMatches = $this->getPurposeMatches($tempTransaction, $document);
-        if (empty($purposeMatches)) {
-            return 0;
-        }
-        return max($purposeMatches);
+        return $this->aggregateScores($this->getPurposeMatches($tempTransaction, $document));
     }
 
     /**
