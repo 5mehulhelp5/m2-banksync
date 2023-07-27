@@ -169,6 +169,28 @@ class Data extends AbstractHelper
         return str_replace('{{value}}', $incrementId, $template);
     }
 
+    /**
+     * Adds a score to the matches array.
+     * It makes sure the score is only added if it's greater than the current score for the key.
+     *
+     * @param array  $matches The array of matches.
+     * @param string $key The key of the match to add the score to.
+     * @param float  $score The score to be added.
+     * @return array The updated array of matches with the added score.
+     */
+    public function addScore(array $matches, string $key, float $score)
+    {
+        if ($score > $matches[$key] ?? 0) {
+            $matches[$key] = $score;
+        }
+        return $matches;
+    }
+
+    /**
+     * @param TempTransaction    $tempTransaction
+     * @param Invoice|Creditmemo $document
+     * @return array
+     */
     public function getPurposeMatches(TempTransaction $tempTransaction, Invoice|Creditmemo $document): array
     {
         $purpose = trim($tempTransaction->getPurpose() ?? "");
@@ -181,13 +203,13 @@ class Data extends AbstractHelper
         $documentIncrementId = $document->getIncrementId();
         $pattern = $this->getIncrementIdPattern("document", $documentIncrementId);
         if (preg_match($pattern, $purpose)) {
-            $results[$documentIncrementId] = 1;
+            $results = $this->addScore($results, $documentIncrementId, 1);
         }
 
         $orderIncrementId = $document->getOrder()->getIncrementId();
         $pattern = $this->getIncrementIdPattern("order", $orderIncrementId);
-        if (preg_match($pattern, $purpose)) {
-            $results[$orderIncrementId] = 0.5;
+        if (preg_match($pattern, $purpose) && !isset($results[$orderIncrementId])) {
+            $results = $this->addScore($results, $orderIncrementId, 0.5);
         }
 
         $nameScores = $this->getNameComparisonScores($document->getOrder());
@@ -197,13 +219,9 @@ class Data extends AbstractHelper
             if (empty($textNormalized)) {
                 continue;
             }
-            try {
-                $pattern = '/\b' . preg_quote($textNormalized, '/') . '\b/i';
-                if (preg_match($pattern, $purpose)) {
-                    $results[$text] = $score / 2;
-                }
-            } catch (Exception $e) {
-                $this->_logger->error($e);
+            $pattern = '/\b' . preg_quote($textNormalized, '/') . '\b/i';
+            if (preg_match($pattern, $purpose)) {
+                $results = $this->addScore($results, $text, $score / 2);
             }
         }
 
@@ -214,11 +232,11 @@ class Data extends AbstractHelper
             if (!empty($customerIncrementId)) {
                 $pattern = $this->getIncrementIdPattern("customer", $customerIncrementId);
                 if (preg_match($pattern, $purpose)) {
-                    $results[$customerIncrementId] = 0.5;
+                    $results = $this->addScore($results, $customerIncrementId, 0.5);
                 }
                 $pattern = $this->getIncrementIdPattern("customer", trim($customerIncrementId, '0'));
                 if (preg_match($pattern, $purpose)) {
-                    $results[trim($customerIncrementId, '0')] = 0.25;
+                    $results = $this->addScore($results, trim($customerIncrementId, '0'), 0.25);
                 }
             }
         }
