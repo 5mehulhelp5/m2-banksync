@@ -11,6 +11,7 @@ use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Invoice;
 
@@ -67,21 +68,50 @@ class Data extends AbstractHelper
         return trim($name);
     }
 
-    protected function getNameComparisonScores($order): array
+    /**
+     * @param array        $nameScores
+     * @param array        $halfScoreKeys
+     * @param Address|null $address
+     * @return void
+     */
+    protected function addAddressScores(array &$nameScores, array &$halfScoreKeys, ?Order\Address $address): void
+    {
+        if (!$address) {
+            return;
+        }
+        $nameScores = array_merge($nameScores, [
+            $address->getFirstname() . ' ' . $address->getLastname() => 1,
+            $address->getCompany() => 1,
+        ]);
+        $halfScoreKeys = array_merge($halfScoreKeys, [
+            $address->getFirstname(),
+            $address->getLastname(),
+        ]);
+    }
+
+    /**
+     * @param Order $order
+     * @return float[]
+     */
+    protected function getNameComparisonScores(Order $order): array
     {
         $nameScores = [
             $order->getCustomerName() => 1,
-            $order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname() => 1,
-            $order->getShippingAddress()->getFirstname() . ' ' . $order->getShippingAddress()->getLastname() => 1,
-            $order->getBillingAddress()->getCompany() => 1,
-            $order->getShippingAddress()->getCompany() => 1,
-            $order->getCustomerFirstname() => 0.5,
-            $order->getCustomerLastname() => 0.5,
-            $order->getBillingAddress()->getFirstname() => 0.5,
-            $order->getBillingAddress()->getLastname() => 0.5,
-            $order->getShippingAddress()->getFirstname() => 0.5,
-            $order->getShippingAddress()->getLastname() => 0.5,
         ];
+        $halfScoreKeys = [
+            $order->getCustomerFirstname(),
+            $order->getCustomerLastname(),
+        ];
+
+        $this->addAddressScores($nameScores, $halfScoreKeys, $order->getBillingAddress());
+        $this->addAddressScores($nameScores, $halfScoreKeys, $order->getShippingAddress());
+
+        foreach ($halfScoreKeys as $key) {
+            // Only set the score to 0.5 if it's not already set (i.e., it's not in the $nameScores array)
+            if (!isset($nameScores[$key])) {
+                $nameScores[$key] = 0.5;
+            }
+        }
         arsort($nameScores, SORT_NUMERIC);
         return $nameScores;
     }
