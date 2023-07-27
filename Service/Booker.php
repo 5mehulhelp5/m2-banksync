@@ -69,6 +69,35 @@ class Booker
     }
 
     /**
+     * @param Transaction|TempTransaction|Invoice|Creditmemo $object
+     * @return InvoiceRepository|CreditmemoRepository
+     */
+    protected function resolveDocumentRepository(
+        Transaction|TempTransaction|Invoice|Creditmemo $object,
+    ): InvoiceRepository|CreditmemoRepository {
+        return match (get_class($object)) {
+            Invoice::class => $this->invoiceRepository,
+            Creditmemo::class => $this->creditmemoRepository,
+            default => $object->getDocumentType() == 'invoice'
+                ? $this->invoiceRepository
+                : $this->creditmemoRepository
+        };
+    }
+
+    /**
+     * @param Invoice|Creditmemo $document
+     * @param bool               $isBanksynced
+     * @return void
+     * @throws CouldNotSaveException
+     */
+    private function saveDocument(Invoice|Creditmemo $document, bool $isBanksynced): void
+    {
+        $document->setIsBanksynced((int)$isBanksynced)
+            ->setHasDataChanges(true);
+        $this->resolveDocumentRepository($document)->save($document);
+    }
+
+    /**
      * @param TempTransaction|int    $tempTransaction
      * @param Invoice|Creditmemo|int $document
      * @param bool                   $partial
@@ -88,19 +117,12 @@ class Booker
         if (is_int($tempTransaction)) {
             $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
         }
+
         if (is_int($document)) {
-            $document = $tempTransaction->getDocumentType() === 'invoice'
-                ? $this->invoiceRepository->get($document)
-                : $this->creditmemoRepository->get($document);
+            $document = $this->resolveDocumentRepository($tempTransaction)->get($document);
         }
 
-        $document->setIsBanksynced(1);
-        $document->setHasDataChanges(true);
-
-        $repository = $tempTransaction->getDocumentType() === 'invoice'
-            ? $this->invoiceRepository
-            : $this->creditmemoRepository;
-        $repository->save($document);
+        $this->saveDocument($document, true);
 
         $transaction = $this->transactionResource->fromTempTransaction($tempTransaction)
             ->setDocumentId($document->getId())
@@ -147,13 +169,8 @@ class Booker
             $transaction = $this->transactionRepository->getById($transaction);
         }
 
-        $repository = $transaction->getDocumentType() === 'invoice'
-            ? $this->invoiceRepository
-            : $this->creditmemoRepository;
-        $document = $repository->get($transaction->getDocumentId());
-        $document->setIsBanksynced(0);
-        $document->setHasDataChanges(true);
-        $repository->save($document);
+        $document = $this->resolveDocumentRepository($transaction)->get($transaction->getDocumentId());
+        $this->saveDocument($document, false);
 
         $tempTransaction = null;
         if ($transaction->getPartialHash()) {
@@ -234,9 +251,7 @@ class Booker
             $documentId = $allMatches[0]->getDocumentId();
 
             try {
-                $document = $tempTransaction->getDocumentType() === 'invoice'
-                    ? $this->invoiceRepository->get($documentId)
-                    : $this->creditmemoRepository->get($documentId);
+                $document = $this->resolveDocumentRepository($tempTransaction)->get($documentId);
 
                 $confidence = $this->helper->getMatchConfidence($tempTransaction, $document);
                 if ($confidence < $minThreshold) {
