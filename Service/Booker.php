@@ -75,9 +75,9 @@ class Booker
     protected function resolveDocumentRepository(
         Transaction|TempTransaction|Invoice|Creditmemo $object,
     ): InvoiceRepository|CreditmemoRepository {
-        return match (get_class($object)) {
-            Invoice::class => $this->invoiceRepository,
-            Creditmemo::class => $this->creditmemoRepository,
+        return match (true) {
+            $object instanceof Invoice => $this->invoiceRepository,
+            $object instanceof Creditmemo => $this->creditmemoRepository,
             default => $object->getDocumentType() == 'invoice'
                 ? $this->invoiceRepository
                 : $this->creditmemoRepository
