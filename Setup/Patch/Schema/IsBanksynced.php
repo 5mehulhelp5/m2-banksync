@@ -42,6 +42,8 @@ class IsBanksynced implements DataPatchInterface, PatchRevertableInterface
                 'type' => 'int',
                 'label' => 'Is banksynced',
                 'comment' => 'Has transaction',
+                'default' => 0,
+                'required' => true,
                 'grid' => true,
             ]
         );
