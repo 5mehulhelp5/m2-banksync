@@ -132,10 +132,10 @@ class Matcher
     }
 
     /**
-     * @param string $purpose
+     * @param ?string $purpose
      * @return array
      */
-    protected function extractDocumentNumbersFromPurpose(string $purpose): array
+    protected function extractDocumentNumbersFromPurpose(?string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('document');
         if (empty($purpose) || empty($pattern)) {
@@ -170,10 +170,10 @@ class Matcher
     }
 
     /**
-     * @param string $purpose
+     * @param ?string $purpose
      * @return array
      */
-    protected function extractOrderNumbersFromPurpose(string $purpose): array
+    protected function extractOrderNumbersFromPurpose(?string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('order');
         if (empty($purpose) || empty($pattern)) {
@@ -215,10 +215,10 @@ class Matcher
     }
 
     /**
-     * @param string $purpose
+     * @param ?string $purpose
      * @return array
      */
-    protected function extractCustomerNumbersFromPurpose(string $purpose): array
+    protected function extractCustomerNumbersFromPurpose(?string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('customer');
         if (empty($purpose) || empty($pattern)) {
