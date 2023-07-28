@@ -213,7 +213,7 @@ class Data extends AbstractHelper
      */
     public function addScore(array $matches, string $key, float $score)
     {
-        if ($score > $matches[$key] ?? 0) {
+        if ($score > ($matches[$key] ?? 0)) {
             $matches[$key] = $score;
         }
         return $matches;
