@@ -171,7 +171,12 @@ class Booker
         }
 
         $document = $this->resolveDocumentRepository($transaction)->get($transaction->getDocumentId());
-        $this->saveDocument($document, false);
+        $isStillPaid = $this->transactionCollectionFactory->create()
+                ->addFieldToFilter('document_id', $document->getId())
+                ->addFieldToFilter('document_type', $transaction->getDocumentType())
+                ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()])
+                ->getSize() > 0;
+        $this->saveDocument($document, !$isStillPaid);
 
         $tempTransaction = null;
         if ($transaction->getPartialHash()) {
