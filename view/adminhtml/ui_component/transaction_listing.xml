@@ -76,7 +76,6 @@
         </column>
         <column name="created_at" sortOrder="30">
             <settings>
-                <sortable>false</sortable>
                 <label translate="true">Booking Date</label>
             </settings>
         </column>
@@ -125,6 +124,7 @@
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Document Amount</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="payment_method" sortOrder="110">
