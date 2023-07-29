@@ -135,7 +135,7 @@ class Matcher
      * @param ?string $purpose
      * @return array
      */
-    protected function extractDocumentNumbersFromPurpose(?string $purpose): array
+    public function extractDocumentNumbersFromPurpose(?string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('document');
         if (empty($purpose) || empty($pattern)) {
@@ -156,7 +156,7 @@ class Matcher
      * @return array
      * @throws LocalizedException
      */
-    protected function getDocumentsViaDocumentNumbers(TempTransaction $tempTransaction): array
+    public function getDocumentsViaDocumentNumbers(TempTransaction $tempTransaction): array
     {
         $numbers = $this->extractDocumentNumbersFromPurpose($tempTransaction->getPurpose());
         if (empty($numbers)) {
@@ -173,7 +173,7 @@ class Matcher
      * @param ?string $purpose
      * @return array
      */
-    protected function extractOrderNumbersFromPurpose(?string $purpose): array
+    public function extractOrderNumbersFromPurpose(?string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('order');
         if (empty($purpose) || empty($pattern)) {
@@ -218,7 +218,7 @@ class Matcher
      * @param ?string $purpose
      * @return array
      */
-    protected function extractCustomerNumbersFromPurpose(?string $purpose): array
+    public function extractCustomerNumbersFromPurpose(?string $purpose): array
     {
         $pattern = $this->helper->getNrFilterPattern('customer');
         if (empty($purpose) || empty($pattern)) {
