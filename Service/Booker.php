@@ -176,7 +176,7 @@ class Booker
                 ->addFieldToFilter('document_type', $transaction->getDocumentType())
                 ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()])
                 ->getSize() > 0;
-        $this->saveDocument($document, !$isStillPaid);
+        $this->saveDocument($document, $isStillPaid);
 
         $tempTransaction = null;
         if ($transaction->getPartialHash()) {
