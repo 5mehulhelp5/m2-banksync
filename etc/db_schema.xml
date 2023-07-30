@@ -1,5 +1,22 @@
 <?xml version="1.0"?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="banksync_dunning" resource="default" engine="innodb">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Record ID"/>
+        <column xsi:type="int" name="invoice_id" unsigned="true" nullable="false" comment="Invoice ID"/>
+        <column xsi:type="varchar" name="dunning_type" nullable="false" length="20" comment="Dunning Type"/>
+        <column xsi:type="datetime" name="sent_at" nullable="true" comment="Sent Time"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="BANKSYNC_DUNNING_ENTITY_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+        <index referenceId="BANKSYNC_DUNNING_INVOICE_ID" indexType="btree">
+            <column name="invoice_id"/>
+        </index>
+    </table>
     <table name="banksync_temp_transaction" resource="default" engine="innodb" comment="BankSync Temporary Transactions">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="datetime" name="transaction_date" nullable="false" comment="Transaction Date"/>

@@ -45,6 +45,29 @@
                     <amount>amount</amount>
                 </fields>
             </csv_settings>
+            <dunnings>
+                <enabled>0</enabled>
+                <auto_send_mail>0</auto_send_mail>
+                <email_identity>general</email_identity>
+                <types>
+                    <reminder_1>
+                        <delay>21</delay>
+                        <label>Payment reminder</label>
+                    </reminder_1>
+                    <reminder_2>
+                        <delay>42</delay>
+                        <label>Second payment reminder</label>
+                    </reminder_2>
+                    <dunning_1>
+                        <delay>63</delay>
+                        <label>Dunning</label>
+                    </dunning_1>
+                    <dunning_2>
+                        <delay>84</delay>
+                        <label>Second dunning</label>
+                    </dunning_2>
+                </types>
+            </dunnings>
         </banksync>
     </default>
 </config>

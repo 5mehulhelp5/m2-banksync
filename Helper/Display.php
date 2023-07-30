@@ -78,7 +78,7 @@ class Display extends AbstractHelper
      * @param array      $matchedTexts
      * @return string
      */
-    public function getObjectLink(DataObject $object, array $matchedTexts): string
+    public function getObjectLink(DataObject $object, array $matchedTexts = []): string
     {
         $url = $this->getUrl($object);
         if (empty($url)) {

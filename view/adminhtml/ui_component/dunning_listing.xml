@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">dunning_listing.dunning_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>dunning_listing.dunning_listing_data_source</dep>
+        </deps>
+        <spinner>dunning_columns</spinner>
+    </settings>
+    <dataSource name="dunning_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+             <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\DunningListing</argument>
+            <argument name="name" xsi:type="string">dunning_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">entity_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <paging name="listing_paging"/>
+        <filters name="listing_filters"/>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
+        </massaction>
+    </listingToolbar>
+    <columns name="dunning_columns">
+        <selectionsColumn name="ids" sortOrder="0">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <draggable>false</draggable>
+            </settings>
+        </selectionsColumn>
+        <column name="invoice_increment_id" sortOrder="10">
+            <settings>
+                <filter>text</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Invoice</label>
+            </settings>
+        </column>
+        <column name="email_address" sortOrder="20">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Email address</label>
+            </settings>
+        </column>
+        <column name="dunning_type" sortOrder="30">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Type</label>
+            </settings>
+        </column>
+        <column name="created_at" sortOrder="40">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Created At</label>
+            </settings>
+        </column>
+        <column name="sent_at" sortOrder="50">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Sent At</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Dunning\Actions"
+                       sortOrder="120">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+                <draggable>false</draggable>
+            </settings>
+        </actionsColumn>
+    </columns>
+
+</listing>

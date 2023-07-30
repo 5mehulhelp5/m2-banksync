@@ -4,5 +4,8 @@
         <job name="ibertrand_banksync_run_matching" instance="Ibertrand\BankSync\Cron\RunMatching" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+        <job name="ibertrand_banksync_create_dunnings" instance="Ibertrand\BankSync\Cron\CreateDunnings" method="execute">
+            <schedule>5 3 * * *</schedule>
+        </job>
     </group>
 </config>

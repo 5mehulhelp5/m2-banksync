@@ -1,0 +1,18 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="banksync_dunnings_types_reminder_1_mail_template"
+              label="Reminder 1 Mail Template"
+              file="reminder_1_template.html"
+              type="html" module="Ibertrand_BankSync" area="frontend"/>
+    <template id="banksync_dunnings_types_reminder_2_mail_template"
+              label="Reminder 2 Mail Template"
+              file="reminder_2_template.html"
+              type="html" module="Ibertrand_BankSync" area="frontend"/>
+    <template id="banksync_dunnings_types_dunning_1_mail_template"
+              label="Dunning 1 Mail Template"
+              file="dunning_1_template.html"
+              type="html" module="Ibertrand_BankSync" area="frontend"/>
+    <template id="banksync_dunnings_types_dunning_2_mail_template"
+              label="Dunning 2 Mail Template"
+              file="dunning_2_template.html"
+              type="html" module="Ibertrand_BankSync" area="frontend"/>
+</config>

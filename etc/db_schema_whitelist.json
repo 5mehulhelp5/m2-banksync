@@ -1,4 +1,20 @@
 {
+    "banksync_dunning": {
+        "column": {
+            "entity_id": true,
+            "invoice_id": true,
+            "dunning_type": true,
+            "sent_at": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "BANKSYNC_DUNNING_ENTITY_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
     "banksync_temp_transaction": {
         "column": {
             "entity_id": true,

@@ -122,4 +122,81 @@ class Config extends AbstractHelper
     {
         return $this->scopeConfig->getValue("banksync/matching/filter/{$type}_nr_pattern") ?? "";
     }
+
+    /**
+     * @param int $storeId
+     * @return bool
+     */
+    public function isDunningsEnabled(int $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag('banksync/dunnings/enabled', 'store', $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     * @return bool
+     */
+    public function isAutoSendDunningsMailEnabled(int $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag('banksync/dunnings/auto_send_mail', 'store', $storeId);
+    }
+
+    /**
+     * @param string $type
+     * @param int    $storeId
+     * @return mixed
+     */
+    public function getDunningEmailTemplate(string $type, int $storeId): mixed
+    {
+        return $this->scopeConfig->getValue("banksync/dunnings/types/$type/email_template", 'store', $storeId);
+    }
+
+    /**
+     * @param string $type
+     * @param int    $storeId
+     * @return bool
+     */
+    public function isDunningEnabled(string $type, int $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag("banksync/dunnings/types/$type/enabled", 'store', $storeId);
+    }
+
+    /**
+     * @param string $type
+     * @param int    $storeId
+     * @return int
+     */
+    public function getDunningTypeDelay(string $type, int $storeId): int
+    {
+        return (int)$this->scopeConfig->getValue("banksync/dunnings/types/$type/delay", 'store', $storeId);
+    }
+
+    /**
+     * @param string $type
+     * @param int    $storeId
+     * @return bool
+     */
+    public function isAttacheTypePdf(string $type, int $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag("banksync/dunnings/types/$type/attach_pdf", 'store', $storeId);
+    }
+
+    /**
+     * @param string $type
+     * @param int    $storeId
+     * @return mixed
+     */
+    public function getDunningTypeLabel(string $type, int $storeId): mixed
+    {
+        return $this->scopeConfig->getValue("banksync/dunnings/types/$type/label", 'store', $storeId);
+    }
+
+    /**
+     * @param int $storeId
+     * @return mixed
+     */
+    public function getDunningSenderIdentity(int $storeId): mixed
+    {
+        return $this->scopeConfig->getValue("banksync/dunnings/sender_identity", 'store', $storeId);
+    }
 }

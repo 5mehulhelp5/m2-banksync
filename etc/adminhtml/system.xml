@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="banksync" translate="label,comment" type="text" sortOrder="1000" showInDefault="1" showInWebsite="0" showInStore="0">
+        <section id="banksync" translate="label,comment" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>BankSync</label>
             <tab>sales</tab>
             <resource>Ibertrand_BankSync::config_banksync</resource>
@@ -139,6 +139,120 @@
                     <field id="amount" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Amount</label>
                     </field>
+                </group>
+            </group>
+            <group id="dunnings" translate="label,comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Dunnings</label>
+                <field id="enabled" translate="label,comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="auto_send_mail" translate="label,comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Automatically send dunnings via mail</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="email_identity" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <group id="types" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Types</label>
+                    <group id="reminder_1" translate="label,comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Reminder 1</label>
+                        <field id="enabled" translate="label,comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="label" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Label</label>
+                            <comment>The label of the type, will be printed onto the PDF</comment>
+                        </field>
+                        <field id="delay" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Delay</label>
+                            <validate>validate-greater-than-zero validate-number required-entry</validate>
+                            <comment>Delay in days</comment>
+                        </field>
+                        <field id="mail_template" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Mail Template</label>
+                            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                        </field>
+                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Attach PDF to mail</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                    </group>
+                    <group id="reminder_2" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Reminder 2</label>
+                        <field id="enabled" translate="label,comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="label" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Label</label>
+                            <comment>The label of the type, will be printed onto the PDF</comment>
+                        </field>
+                        <field id="delay" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Delay</label>
+                            <validate>validate-greater-than-zero validate-number required-entry</validate>
+                            <comment>Delay in days</comment>
+                        </field>
+                        <field id="mail_template" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Mail Template</label>
+                            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                        </field>
+                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Attach PDF to mail</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                    </group>
+                    <group id="dunning_1" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Dunning 1</label>
+                        <field id="enabled" translate="label,comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="label" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Label</label>
+                            <comment>The label of the type, will be printed onto the PDF</comment>
+                        </field>
+                        <field id="delay" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Delay</label>
+                            <validate>validate-greater-than-zero validate-number required-entry</validate>
+                            <comment>Delay in days</comment>
+                        </field>
+                        <field id="mail_template" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Mail Template</label>
+                            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                        </field>
+                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Attach PDF to mail</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                    </group>
+                    <group id="dunning_2" translate="label,comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Dunning 2</label>
+                        <field id="enabled" translate="label,comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                        <field id="label" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Label</label>
+                            <comment>The label of the type, will be printed onto the PDF</comment>
+                        </field>
+                        <field id="delay" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Delay</label>
+                            <validate>validate-greater-than-zero validate-number required-entry</validate>
+                            <comment>Delay in days</comment>
+                        </field>
+                        <field id="mail_template" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Mail Template</label>
+                            <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                        </field>
+                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Attach PDF to mail</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        </field>
+                    </group>
                 </group>
             </group>
         </section>
