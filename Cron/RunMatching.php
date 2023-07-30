@@ -3,7 +3,7 @@
 namespace Ibertrand\BankSync\Cron;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Service\Matcher;
 use Magento\Cron\Model\Schedule;
 use Psr\Log\LoggerInterface;
@@ -12,16 +12,16 @@ class RunMatching
 {
     protected LoggerInterface $logger;
     protected Matcher $matcher;
-    protected Data $helper;
+    protected Config $config;
 
     public function __construct(
         LoggerInterface $logger,
         Matcher         $matcher,
-        Data            $helper
+        Config          $config,
     ) {
         $this->logger = $logger;
         $this->matcher = $matcher;
-        $this->helper = $helper;
+        $this->config = $config;
     }
 
     /**
@@ -31,12 +31,12 @@ class RunMatching
      */
     public function execute(Schedule $schedule): void
     {
-        if (!$this->helper->isEnabled()) {
+        if (!$this->config->isEnabled()) {
             $schedule->setMessages("BankSync is disabled");
             return;
         }
 
-        if (!$this->helper->isAsyncMatching()) {
+        if (!$this->config->isAsyncMatching()) {
             $schedule->setMessages("Async matching is disabled");
             return;
         }

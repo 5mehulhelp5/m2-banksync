@@ -3,19 +3,18 @@
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Helper\Display;
+use Ibertrand\BankSync\Helper\Matching;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
-use Magento\Framework\DataObject;
+use Magento\Framework\Pricing\Helper\Data;
 use Magento\Framework\UrlInterface;
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoRepository;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use Psr\Log\LoggerInterface;
@@ -27,10 +26,12 @@ class TempTransactionListing extends AbstractDataProvider
     protected InvoiceRepository $invoiceRepository;
     protected LoggerInterface $logger;
     protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
-    protected Data $helper;
     protected CustomerFactory $customerFactory;
     protected CustomerResource $customerResource;
-    protected \Magento\Framework\Pricing\Helper\Data $priceHelper;
+    protected Data $priceHelper;
+    protected Matching $matching;
+    protected Display $display;
+    protected Config $config;
 
     public function __construct(
         $name,
@@ -43,9 +44,11 @@ class TempTransactionListing extends AbstractDataProvider
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
         CustomerFactory $customerFactory,
         CustomerResource $customerResource,
-        Data $helper,
+        Matching $matching,
+        Display $displayHelper,
+        Config $config,
         LoggerInterface $logger,
-        \Magento\Framework\Pricing\Helper\Data $priceHelper,
+        Data $priceHelper,
         array $meta = [],
         array $data = [],
     ) {
@@ -56,7 +59,9 @@ class TempTransactionListing extends AbstractDataProvider
         $this->matchConfidenceCollectionFactory = $matchConfidenceCollectionFactory;
         $this->customerFactory = $customerFactory;
         $this->customerResource = $customerResource;
-        $this->helper = $helper;
+        $this->matching = $matching;
+        $this->display = $displayHelper;
+        $this->config = $config;
         $this->logger = $logger;
         $this->priceHelper = $priceHelper;
         parent::__construct(
@@ -80,35 +85,12 @@ class TempTransactionListing extends AbstractDataProvider
         return $customer;
     }
 
-    protected function getObjectLink(DataObject $object, array $matchedTexts): string
-    {
-        if ($object instanceof Invoice) {
-            $url = $this->urlBuilder->getUrl('sales/invoice/view', ['invoice_id' => $object->getId()]);
-        } elseif ($object instanceof Creditmemo) {
-            $url = $this->urlBuilder->getUrl('sales/creditmemo/view', ['creditmemo_id' => $object->getId()]);
-        } elseif ($object instanceof Order) {
-            $url = $this->urlBuilder->getUrl('sales/order/view', ['order_id' => $object->getId()]);
-        } elseif ($object instanceof Customer) {
-            $url = $this->urlBuilder->getUrl('customer/index/edit', ['id' => $object->getId()]);
-        } else {
-            return '';
-        }
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $incrementId = $object->getIncrementId();
-        $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
-        if ($class == '' && str_ends_with($incrementId, '00')) {
-            $incrementId = substr($incrementId, 0, -2);
-            $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
-        }
-        return "<a class='$class' href='$url'>$incrementId</a>";
-    }
-
     public function getData()
     {
         $data = parent::getData();
 
-        $acceptanceThreshold = $this->helper->getAcceptConfidenceThreshold();
-        $absoluteThreshold = $this->helper->getAbsoluteConfidenceThreshold();
+        $acceptanceThreshold = $this->config->getAcceptConfidenceThreshold();
+        $absoluteThreshold = $this->config->getAbsoluteConfidenceThreshold();
 
         $allConfidences = $this->matchConfidenceCollectionFactory->create()
             ->addFieldToFilter('temp_transaction_id', ['in' => array_column($data['items'], 'entity_id')]);
@@ -138,10 +120,10 @@ class TempTransactionListing extends AbstractDataProvider
                     $payerName = $tempTransaction->getPayerName();
 
                     $order = $document->getOrder();
-                    $documentName = $this->helper->getCustomerNamesForListing($order);
+                    $documentName = $this->display->getCustomerNamesForListing($order);
 
                     if (count($matches) == 1 || count($confidentMatches) == 1 || count($absoluteMatches) == 1) {
-                        $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
+                        $purposeMatches = $this->matching->getPurposeMatches($tempTransaction, $document);
                         $purpose = $tempTransaction->getPurpose();
                         foreach ($purposeMatches as $match => $score) {
                             $purpose = str_replace($match, "<span class='banksync-matched-text'>$match</span>", $purpose);
@@ -149,7 +131,7 @@ class TempTransactionListing extends AbstractDataProvider
                         }
                         $item['purpose'] = $purpose;
 
-                        $nameMatches = $this->helper->getNameMatches($tempTransaction, $document);
+                        $nameMatches = $this->matching->getNameMatches($tempTransaction, $document);
 
                         $payerName = $tempTransaction->getPayerName();
                         foreach (array_keys($nameMatches) as $match) {
@@ -167,15 +149,15 @@ class TempTransactionListing extends AbstractDataProvider
                     $item['document_amount'] = "<span class='$amountClass'>{$this->priceHelper->currency($document->getGrandTotal())}</span>";
 
                     $item['document_date'] = $document->getCreatedAt();
-                    $item['document'] = $this->getObjectLink($document, $purposeMatches);
-                    $item['order_increment_id'] = $this->getObjectLink($document->getOrder(), $purposeMatches);
+                    $item['document'] = $this->display->getObjectLink($document, $purposeMatches);
+                    $item['order_increment_id'] = $this->display->getObjectLink($document->getOrder(), $purposeMatches);
                     $item['payer_name'] = $payerName;
                     $item['document_name'] = $documentName;
 
                     $customerId = $document->getOrder()->getCustomerId();
                     if ($customerId) {
                         $customer = $this->loadCustomer($customerId);
-                        $item['customer_increment_id'] = $this->getObjectLink($customer, $purposeMatches);
+                        $item['customer_increment_id'] = $this->display->getObjectLink($customer, $purposeMatches);
                     } else {
                         $item['customer_increment_id'] = '-';
                     }

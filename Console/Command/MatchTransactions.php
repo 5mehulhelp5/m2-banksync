@@ -2,7 +2,7 @@
 
 namespace Ibertrand\BankSync\Console\Command;
 
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Service\Matcher;
 use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Command\Command;
@@ -17,18 +17,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MatchTransactions extends Command
 {
     protected Matcher $matcher;
-    protected Data $helper;
     protected ProgressBarFactory $progressBarFactory;
+    protected Config $config;
 
     public function __construct(
         Matcher            $matcher,
-        Data               $helper,
+        Config             $config,
         ProgressBarFactory $progressBarFactory,
         string             $name = null,
     ) {
         parent::__construct($name);
         $this->matcher = $matcher;
-        $this->helper = $helper;
+        $this->config = $config;
         $this->progressBarFactory = $progressBarFactory;
     }
 
@@ -48,7 +48,7 @@ class MatchTransactions extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->helper->isEnabled()) {
+        if (!$this->config->isEnabled()) {
             $output->writeln('BankSync is disabled');
             return Cli::RETURN_FAILURE;
         }

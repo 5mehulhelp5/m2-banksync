@@ -3,7 +3,6 @@
 namespace Ibertrand\BankSync\Helper;
 
 use Ibertrand\BankSync\Model\TempTransaction;
-use Ibertrand\BankSync\Model\Transaction;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
@@ -14,46 +13,25 @@ use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Invoice;
 
-class Data extends AbstractHelper
+class Matching extends AbstractHelper
 {
+
     protected CustomerResource $customerResource;
     protected CustomerFactory $customerFactory;
+    private Config $config;
 
     public function __construct(
         Context          $context,
         CustomerFactory  $customerFactory,
         CustomerResource $customerResource,
+        Config           $config,
     ) {
         $this->customerFactory = $customerFactory;
         $this->customerResource = $customerResource;
+        $this->config = $config;
 
         parent::__construct($context);
     }
-
-    /**
-     * @return bool
-     */
-    public function isEnabled(): bool
-    {
-        return $this->scopeConfig->isSetFlag('banksync/general/enabled');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAsyncMatching(): bool
-    {
-        return (bool)$this->scopeConfig->getValue('banksync/general/async_matching');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isSupportCreditmemos(): bool
-    {
-        return $this->scopeConfig->isSetFlag('banksync/general/support_creditmemos');
-    }
-
 
     /**
      * @param string $name
@@ -156,10 +134,10 @@ class Data extends AbstractHelper
      * @param float[] $scores The array of scores, each in [0, 1].
      * @return float The aggregated result, in [0, 1].
      */
-    protected function aggregateScores(array $scores)
+    protected function aggregateScores(array $scores): float
     {
         if (empty($scores)) {
-            return 0;
+            return 0.0;
         }
         rsort($scores);
         $result = 0;
@@ -192,7 +170,7 @@ class Data extends AbstractHelper
 
     protected function getIncrementIdPattern(string $type, string $incrementId): string
     {
-        $template = $this->scopeConfig->getValue("banksync/matching/patterns/{$type}_increment_id") ?? "";
+        $template = $this->config->getMatchingPattern($type);
         $pattern = str_replace('{{value}}', preg_quote($incrementId), $template);
 
         if (preg_match($pattern, '') === false) {
@@ -211,7 +189,7 @@ class Data extends AbstractHelper
      * @param float  $score The score to be added.
      * @return array The updated array of matches with the added score.
      */
-    public function addScore(array $matches, string $key, float $score)
+    protected function addScore(array $matches, string $key, float $score): array
     {
         if ($score > ($matches[$key] ?? 0)) {
             $matches[$key] = $score;
@@ -298,77 +276,6 @@ class Data extends AbstractHelper
     }
 
     /**
-     * @return float
-     */
-    public function getAmountThreshold(): float
-    {
-        return (float)$this->scopeConfig->getValue('banksync/matching/filter/amount');
-    }
-
-    /**
-     * @return float
-     */
-    public function getAcceptConfidenceThreshold(): float
-    {
-        return (float)$this->scopeConfig->getValue('banksync/matching/confidence_thresholds/acceptance');
-    }
-
-    /**
-     * @return float
-     */
-    public function getAbsoluteConfidenceThreshold(): float
-    {
-        return $this->getWeightconfig('amount')
-            + $this->getWeightconfig('purpose')
-            + $this->getWeightconfig('payer_name');
-    }
-
-    /**
-     * @param string $type
-     * @return float
-     */
-    public function getWeightConfig(string $type): float
-    {
-        return (float)$this->scopeConfig->getValue("banksync/matching/weights/$type");
-    }
-
-    /**
-     * @return float
-     */
-    public function getMinConfidenceThreshold(): float
-    {
-        return (float)$this->scopeConfig->getValue('banksync/matching/confidence_thresholds/minimum');
-    }
-
-    /**
-     * @return float
-     */
-    public function getDateThreshold(): float
-    {
-        return (int)$this->scopeConfig->getValue('banksync/matching/filter/date');
-    }
-
-    /**
-     * @return string
-     */
-    public function getStartDate(): string
-    {
-        $config = $this->scopeConfig->getValue('banksync/matching/filter/start_date');
-        $timestamp = strtotime($config);
-        return $timestamp !== false
-            ? date('Y-m-d', strtotime($config))
-            : '2000-01-01';
-    }
-
-    /**
-     * @return bool
-     */
-    public function useStrictAmountMatching(): bool
-    {
-        return $this->scopeConfig->isSetFlag('banksync/matching/weights/strict_amount');
-    }
-
-    /**
      * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      *
@@ -376,15 +283,15 @@ class Data extends AbstractHelper
      */
     public function getMatchConfidence(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
-        $weightAmount = $this->getWeightConfig('amount');
-        $weightPurpose = $this->getWeightConfig('purpose');
-        $weightName = $this->getWeightConfig('payer_name');
+        $weightAmount = $this->config->getWeightConfig('amount');
+        $weightPurpose = $this->config->getWeightConfig('purpose');
+        $weightName = $this->config->getWeightConfig('payer_name');
 
         $amountDif = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal());
 
-        $amountScore = $this->useStrictAmountMatching()
+        $amountScore = $this->config->useStrictAmountMatching()
             ? $amountDif < 0.01 ? $weightAmount : 0
-            : $weightAmount * ($amountDif < 0.01 ? 1 : (1 - $amountDif / $this->getAmountThreshold()));
+            : $weightAmount * ($amountDif < 0.01 ? 1 : (1 - $amountDif / $this->config->getAmountThreshold()));
         $purposeScore = $weightPurpose * $this->comparePurpose($tempTransaction, $document);
         $nameScore = $weightName * $this->compareName($tempTransaction, $document);
 
@@ -404,58 +311,10 @@ class Data extends AbstractHelper
      *
      * @return Customer
      */
-    public function loadCustomer(int $customerId): Customer
+    private function loadCustomer(int $customerId): Customer
     {
         $customer = $this->customerFactory->create();
         $this->customerResource->load($customer, $customerId);
         return $customer;
-    }
-
-    /**
-     * @param TempTransaction|Transaction $transaction
-     * @return string
-     */
-    public function calculateHash(TempTransaction|Transaction $transaction): string
-    {
-        return sha1(
-            implode(
-                '|',
-                [
-                    $transaction->getPayerName(),
-                    number_format($transaction->getAmount(), 2, '.', ''),
-                    $transaction->getPurpose(),
-                    date('Y-m-d H:i:s', strtotime($transaction->getTransactionDate())),
-                ]
-            )
-        );
-    }
-
-    /**
-     * @param string $type
-     * @return string
-     */
-    public function getNrFilterPattern(string $type): string
-    {
-        return $this->scopeConfig->getValue("banksync/matching/filter/{$type}_nr_pattern") ?? "";
-    }
-
-    /**
-     * @param Order $order
-     * @return string
-     */
-    public function getCustomerNamesForListing(Order $order): string
-    {
-        $billing = $order->getBillingAddress();
-        $shipping = $order->getShippingAddress();
-        return implode(
-            '<br>',
-            array_filter(array_unique([
-                trim($order->getCustomerName() ?? ""),
-                trim(($billing->getFirstname() ?? "") . ' ' . ($billing->getLastname() ?? "")),
-                trim($billing->getCompany() ?? ""),
-                trim(($shipping->getFirstname() ?? "") . ' ' . ($shipping->getLastname() ?? "")),
-                trim($shipping->getCompany() ?? ""),
-            ]))
-        );
     }
 }

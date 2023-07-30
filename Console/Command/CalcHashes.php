@@ -3,7 +3,8 @@
 namespace Ibertrand\BankSync\Console\Command;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Helper\Hashes;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory as TransactionCollectionFactory;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
@@ -20,7 +21,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CalcHashes extends Command
 {
-    protected Data $helper;
+    protected Hashes $hashes;
+    protected Config $config;
     protected ProgressBarFactory $progressBarFactory;
     protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
     protected TransactionCollectionFactory $transactionCollectionFactory;
@@ -28,7 +30,8 @@ class CalcHashes extends Command
     protected TransactionRepository $transactionRepository;
 
     public function __construct(
-        Data                             $helper,
+        Hashes                           $hashes,
+        Config                           $config,
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
         TransactionCollectionFactory     $transactionCollectionFactory,
         TempTransactionRepository        $tempTransactionRepository,
@@ -37,7 +40,8 @@ class CalcHashes extends Command
         string                           $name = null,
     ) {
         parent::__construct($name);
-        $this->helper = $helper;
+        $this->hashes = $hashes;
+        $this->config = $config;
         $this->tempTransactionCollectionFactory = $tempTransactionCollectionFactory;
         $this->transactionCollectionFactory = $transactionCollectionFactory;
         $this->tempTransactionRepository = $tempTransactionRepository;
@@ -61,7 +65,7 @@ class CalcHashes extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->helper->isEnabled()) {
+        if (!$this->config->isEnabled()) {
             $output->writeln('BankSync is disabled');
             return Cli::RETURN_FAILURE;
         }
@@ -79,7 +83,7 @@ class CalcHashes extends Command
 
         $progressBar->start();
         foreach ($tempTransactions as $tempTransaction) {
-            $newHash = $this->helper->calculateHash($tempTransaction);
+            $newHash = $this->hashes->calculateHash($tempTransaction);
             if ($newHash !== $tempTransaction->getHash()) {
                 $tempTransaction->setHash($newHash);
                 try {
@@ -92,7 +96,7 @@ class CalcHashes extends Command
             $progressBar->advance();
         }
         foreach ($transactions as $transaction) {
-            $newHash = $this->helper->calculateHash($transaction);
+            $newHash = $this->hashes->calculateHash($transaction);
             if ($newHash !== $transaction->getHash()) {
                 $transaction->setHash($newHash);
                 try {

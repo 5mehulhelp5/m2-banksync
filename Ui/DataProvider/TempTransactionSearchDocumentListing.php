@@ -2,7 +2,8 @@
 
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
-use Ibertrand\BankSync\Helper\Data as BankSyncHelper;
+use Ibertrand\BankSync\Helper\Display;
+use Ibertrand\BankSync\Helper\Matching;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
 use Magento\Customer\Model\Customer;
@@ -11,7 +12,6 @@ use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\App\Request\Http;
-use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\Helper\Data as PriceHelper;
@@ -34,9 +34,10 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
     protected OrderCollectionFactory $orderCollectionFactory;
     protected CustomerResource $customerResource;
     protected CustomerFactory $customerFactory;
-    protected BankSyncHelper $helper;
+    protected Display $display;
     protected CustomerCollectionFactory $customerCollectionFactory;
     protected PriceHelper $priceHelper;
+    protected Matching $matching;
 
     /**
      * @param string                      $name
@@ -50,9 +51,10 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
      * @param CustomerFactory             $customerFactory
      * @param CustomerResource            $customerResource
      * @param Http                        $request
-     * @param BankSyncHelper              $helper
      * @param CustomerCollectionFactory   $customerCollectionFactory
      * @param PriceHelper                 $priceHelper
+     * @param Display                     $displayHelper
+     * @param Matching                    $matching
      * @param array                       $meta
      * @param array                       $data
      *
@@ -71,9 +73,10 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         CustomerFactory $customerFactory,
         CustomerResource $customerResource,
         Http $request,
-        BankSyncHelper $helper,
         CustomerCollectionFactory $customerCollectionFactory,
         PriceHelper $priceHelper,
+        Display $displayHelper,
+        Matching $matching,
         array $meta = [],
         array $data = [],
     ) {
@@ -84,7 +87,8 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->customerFactory = $customerFactory;
         $this->customerResource = $customerResource;
-        $this->helper = $helper;
+        $this->display = $displayHelper;
+        $this->matching = $matching;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->priceHelper = $priceHelper;
 
@@ -137,25 +141,6 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         return $document;
     }
 
-    protected function getObjectLink(DataObject $object, array $matchedTexts): string
-    {
-        if ($object instanceof Invoice) {
-            $url = $this->urlBuilder->getUrl('sales/invoice/view', ['invoice_id' => $object->getId()]);
-        } elseif ($object instanceof Creditmemo) {
-            $url = $this->urlBuilder->getUrl('sales/creditmemo/view', ['creditmemo_id' => $object->getId()]);
-        } elseif ($object instanceof Order) {
-            $url = $this->urlBuilder->getUrl('sales/order/view', ['order_id' => $object->getId()]);
-        } elseif ($object instanceof Customer) {
-            $url = $this->urlBuilder->getUrl('customer/index/edit', ['id' => $object->getId()]);
-        } else {
-            return '';
-        }
-        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        $incrementId = $object->getIncrementId();
-        $class = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
-        return "<a class='$class' href='$url'>$incrementId</a>";
-    }
-
     /**
      * @return array
      * @throws LocalizedException
@@ -170,17 +155,18 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
         foreach ($data['items'] as &$item) {
             $document = $this->getDocument($item['entity_id']);
             $order = $document->getOrder();
-            $purposeMatches = $this->helper->getPurposeMatches($tempTransaction, $document);
+            $purposeMatches = $this->matching->getPurposeMatches($tempTransaction, $document);
 
             $item['document_type'] = $tempTransaction->getDocumentType();
             $item['transaction_date'] = $tempTransaction->getTransactionDate();
             $item['transaction_id'] = $tempTransaction->getId();
-            $item['increment_id'] = $this->getObjectLink($document, $purposeMatches);
-            $item['order_increment_id'] = $this->getObjectLink($document->getOrder(), $purposeMatches);
+            $item['increment_id'] = $this->display->getObjectLink($document, $purposeMatches);
+            $item['order_increment_id'] = $this->display->getObjectLink($document->getOrder(), $purposeMatches);
 
             $amountIsMatched = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal()) < 0.01;
             $amountClass = $amountIsMatched ? 'banksync-matched-text' : '';
-            $item['transaction_amount'] = "<span class='$amountClass'>{$this->priceHelper->currency($tempTransaction->getAmount())}</span>";
+            $item['transaction_amount'] = "<span class='$amountClass'>" .
+                $this->priceHelper->currency($tempTransaction->getAmount()) . "</span>";
             $item['grand_total'] = "<span class='$amountClass'>{$this->priceHelper->currency($document->getGrandTotal())}</span>";
 
             $item['transaction_amount_raw'] = $tempTransaction->getAmount();
@@ -190,14 +176,14 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             if ($customerId) {
                 $customer = $this->customerFactory->create();
                 $this->customerResource->load($customer, $customerId);
-                $item['customer_increment_id'] = $this->getObjectLink($customer, $purposeMatches);
+                $item['customer_increment_id'] = $this->display->getObjectLink($customer, $purposeMatches);
             } else {
                 $item['customer_increment_id'] = "-";
             }
 
-            $nameMatches = $this->helper->getNameMatches($tempTransaction, $document);
+            $nameMatches = $this->matching->getNameMatches($tempTransaction, $document);
 
-            $documentName = $this->helper->getCustomerNamesForListing($order);
+            $documentName = $this->display->getCustomerNamesForListing($order);
             $purpose = $tempTransaction->getPurpose();
             $payerName = $tempTransaction->getPayerName();
 

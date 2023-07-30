@@ -3,7 +3,8 @@
 namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data as Helper;
+use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Helper\Hashes;
 use Ibertrand\BankSync\Lib\NamedCsv;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
@@ -27,11 +28,12 @@ class ImportFile extends Action
     protected TempTransactionResource $tempTransactionResource;
     protected LoggerInterface $logger;
     protected ScopeConfigInterface $scopeConfig;
-    protected Helper $helper;
     protected Matcher $matcher;
     protected TempTransactionRepository $tempTransactionRepository;
     protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
     protected TransactionCollectionFactory $transactionCollectionFactory;
+    protected Config $config;
+    protected Hashes $hashes;
 
     public function __construct(
         Action\Context                   $context,
@@ -43,8 +45,9 @@ class ImportFile extends Action
         TransactionCollectionFactory     $transactionCollectionFactory,
         LoggerInterface                  $logger,
         ScopeConfigInterface             $scopeConfig,
-        Helper                           $helper,
         Matcher                          $matcher,
+        Config                           $config,
+        Hashes                           $hashes,
     ) {
         parent::__construct($context);
         $this->csvProcessor = $csvProcessor;
@@ -55,8 +58,9 @@ class ImportFile extends Action
         $this->transactionCollectionFactory = $transactionCollectionFactory;
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
-        $this->helper = $helper;
         $this->matcher = $matcher;
+        $this->config = $config;
+        $this->hashes = $hashes;
     }
 
     /**
@@ -130,7 +134,7 @@ class ImportFile extends Action
                 $this->tempTransactionRepository->deleteAll();
             }
 
-            $useNegativeAmounts = $this->helper->isSupportCreditmemos();
+            $useNegativeAmounts = $this->config->isSupportCreditmemos();
 
             $newTransactions = [];
             foreach ($csvRows as $csvRow) {
@@ -148,7 +152,7 @@ class ImportFile extends Action
                 ];
                 $transaction = $this->tempTransactionFactory->create(['data' => $data]);
                 $transaction->setHasDataChanges(true);
-                $transaction->setHash($this->helper->calculateHash($transaction));
+                $transaction->setHash($this->hashes->calculateHash($transaction));
                 $newTransactions[$transaction->getHash()] = $transaction;
             }
 
@@ -172,7 +176,7 @@ class ImportFile extends Action
             unlink($csvFilePath);
 
             $this->messageManager->addSuccessMessage(__('CSV file has been imported successfully.'));
-            if (!$this->helper->isAsyncMatching()) {
+            if (!$this->config->isAsyncMatching()) {
                 try {
                     $matchMsg = $this->matcher->matchNewTransactions();
                     $this->messageManager->addNoticeMessage($matchMsg);

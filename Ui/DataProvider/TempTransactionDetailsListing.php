@@ -2,7 +2,8 @@
 
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
-use Ibertrand\BankSync\Helper\Data as BankSyncHelper;
+use Ibertrand\BankSync\Helper\Display;
+use Ibertrand\BankSync\Helper\Matching;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
@@ -35,11 +36,12 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
      * @param CustomerFactory                  $customerFactory
      * @param CustomerResource                 $customerResource
      * @param Http                             $request
-     * @param BankSyncHelper                   $helper
      * @param CustomerCollectionFactory        $customerCollectionFactory
      * @param PriceHelper                      $priceHelper
      * @param MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory
      * @param MatchConfidence                  $matchConfidenceResource
+     * @param Display                          $display
+     * @param Matching                         $matching
      * @param array                            $meta
      * @param array                            $data
      *
@@ -58,11 +60,12 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
         CustomerFactory $customerFactory,
         CustomerResource $customerResource,
         Http $request,
-        BankSyncHelper $helper,
         CustomerCollectionFactory $customerCollectionFactory,
         PriceHelper $priceHelper,
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
         MatchConfidence $matchConfidenceResource,
+        Display $display,
+        Matching $matching,
         array $meta = [],
         array $data = [],
     ) {
@@ -81,9 +84,10 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
             $customerFactory,
             $customerResource,
             $request,
-            $helper,
             $customerCollectionFactory,
             $priceHelper,
+            $display,
+            $matching,
             $meta,
             $data
         );

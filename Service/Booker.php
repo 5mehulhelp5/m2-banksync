@@ -2,7 +2,9 @@
 
 namespace Ibertrand\BankSync\Service;
 
-use Ibertrand\BankSync\Helper\Data as Helper;
+use Exception;
+use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Helper\Matching;
 use Ibertrand\BankSync\Model\MatchConfidence;
 use Ibertrand\BankSync\Model\MatchConfidenceRepository;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
@@ -32,12 +34,13 @@ class Booker
     protected TempTransactionRepository $tempTransactionRepository;
     protected InvoiceRepository $invoiceRepository;
     protected CreditmemoRepository $creditmemoRepository;
-    protected Helper $helper;
     protected TransactionRepository $transactionRepository;
     protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
     protected TransactionCollectionFactory $transactionCollectionFactory;
     protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
     protected MatchConfidenceRepository $matchConfidenceRepository;
+    protected Config $config;
+    protected Matching $matching;
     protected LoggerInterface $logger;
 
     public function __construct(
@@ -51,7 +54,8 @@ class Booker
         MatchConfidenceRepository        $matchConfidenceRepository,
         InvoiceRepository                $invoiceRepository,
         CreditmemoRepository             $creditmemoRepository,
-        Helper                           $helper,
+        Config                           $config,
+        Matching                         $matching,
         LoggerInterface                  $logger,
     ) {
         $this->tempTransactionResource = $tempTransactionResource;
@@ -64,7 +68,8 @@ class Booker
         $this->matchConfidenceRepository = $matchConfidenceRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->creditmemoRepository = $creditmemoRepository;
-        $this->helper = $helper;
+        $this->config = $config;
+        $this->matching = $matching;
         $this->logger = $logger;
     }
 
@@ -127,7 +132,7 @@ class Booker
 
         $transaction = $this->transactionResource->fromTempTransaction($tempTransaction)
             ->setDocumentId($document->getId())
-            ->setMatchConfidence($this->helper->getMatchConfidence($tempTransaction, $document));
+            ->setMatchConfidence($this->matching->getMatchConfidence($tempTransaction, $document));
         $transaction->setHasDataChanges(true);
 
         $confidences = $this->matchConfidenceCollectionFactory->create()
@@ -223,11 +228,11 @@ class Booker
             'error' => [],
         ];
         if ($minThreshold === null) {
-            $minThreshold = $this->helper->getAcceptConfidenceThreshold();
+            $minThreshold = $this->config->getAcceptConfidenceThreshold();
         }
 
-        $absoluteThreshold = $this->helper->getAbsoluteConfidenceThreshold();
-        $acceptanceThreshold = $this->helper->getAcceptConfidenceThreshold();
+        $absoluteThreshold = $this->config->getAbsoluteConfidenceThreshold();
+        $acceptanceThreshold = $this->config->getAcceptConfidenceThreshold();
 
         $tempTransactions = $this->tempTransactionCollectionFactory->create()
             ->addFieldToFilter('match_confidence', ['gteq' => $minThreshold]);
@@ -259,7 +264,7 @@ class Booker
             try {
                 $document = $this->resolveDocumentRepository($tempTransaction)->get($documentId);
 
-                $confidence = $this->helper->getMatchConfidence($tempTransaction, $document);
+                $confidence = $this->matching->getMatchConfidence($tempTransaction, $document);
                 if ($confidence < $minThreshold) {
                     echo "Transaction {$tempTransaction->getId()} has low confidence: $confidence\n";
                     continue;
@@ -268,7 +273,7 @@ class Booker
                 $this->book($tempTransaction, $document);
 
                 $result['success'][] = $tempTransaction->getId();
-            } catch (AlreadyExistsException|CouldNotDeleteException|InputException|NoSuchEntityException $e) {
+            } catch (Exception $e) {
                 $result['error'][] = $tempTransaction->getId();
                 $this->logger->error($e);
                 continue;

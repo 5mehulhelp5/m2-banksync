@@ -3,7 +3,8 @@
 namespace Ibertrand\BankSync\Ui\DataProvider;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Helper\Display;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
@@ -21,7 +22,8 @@ use Psr\Log\LoggerInterface;
 class TransactionListing extends AbstractDataProvider
 {
     protected UrlInterface $urlBuilder;
-    protected Data $helper;
+    protected Config $config;
+    protected Display $display;
     protected InvoiceRepository $invoiceRepository;
     protected CreditmemoRepository $creditmemoRepository;
     protected LoggerInterface $logger;
@@ -36,7 +38,8 @@ class TransactionListing extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
-        Data $helper,
+        Config $config,
+        Display $display,
         UrlInterface $urlBuilder,
         InvoiceRepository $invoiceRepository,
         CreditmemoRepository $creditmemoRepository,
@@ -50,7 +53,8 @@ class TransactionListing extends AbstractDataProvider
         array $data = [],
     ) {
         $this->collection = $collectionFactory->create();
-        $this->helper = $helper;
+        $this->config = $config;
+        $this->display = $display;
         $this->urlBuilder = $urlBuilder;
         $this->invoiceRepository = $invoiceRepository;
         $this->creditmemoRepository = $creditmemoRepository;
@@ -87,7 +91,7 @@ class TransactionListing extends AbstractDataProvider
                 )->get($item['document_id']);
 
                 $item['document'] = "<a href='$url'>" . $document->getIncrementId() . "</a>";
-                $item['document_name'] = $this->helper->getCustomerNamesForListing($document->getOrder());
+                $item['document_name'] = $this->display->getCustomerNamesForListing($document->getOrder());
                 $item['document_amount'] = $document->getGrandTotal();
                 $item['document_date'] = $document->getCreatedAt();
                 $orderUrl = $this->urlBuilder->getUrl(
@@ -111,7 +115,7 @@ class TransactionListing extends AbstractDataProvider
      */
     protected function setFilterByOrderIds(Filter $filter, array $orderIds): void
     {
-        $creditMemoIds = $this->helper->isSupportCreditmemos()
+        $creditMemoIds = $this->config->isSupportCreditmemos()
             ? $this->creditmemoCollectionFactory->create()
                 ->addFieldToFilter('order_id', ['in' => $orderIds])
                 ->getAllIds()
@@ -142,7 +146,7 @@ class TransactionListing extends AbstractDataProvider
         }
 
         if ($filter->getField() === 'document') {
-            $creditMemoIds = $this->helper->isSupportCreditmemos()
+            $creditMemoIds = $this->config->isSupportCreditmemos()
                 ? $this->creditmemoCollectionFactory->create()
                     ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
                     ->getAllIds()

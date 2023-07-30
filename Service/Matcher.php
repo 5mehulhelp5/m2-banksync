@@ -3,7 +3,8 @@
 namespace Ibertrand\BankSync\Service;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data;
+use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Helper\Matching;
 use Ibertrand\BankSync\Model\MatchConfidenceFactory;
 use Ibertrand\BankSync\Model\MatchConfidenceRepository;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
@@ -33,7 +34,6 @@ class Matcher
     protected LoggerInterface $logger;
     protected InvoiceCollectionFactory $invoiceCollectionFactory;
     protected CreditmemoCollectionFactory $creditmemoCollectionFactory;
-    protected Data $helper;
     protected MatchConfidenceFactory $matchConfidenceFactory;
     protected MatchConfidenceRepository $matchConfidenceRepository;
     protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
@@ -44,6 +44,8 @@ class Matcher
     protected $progressCallBack;
     protected CustomerCollectionFactory $customerCollectionFactory;
     protected OrderCollectionFactory $orderCollectionFactory;
+    protected Config $config;
+    protected Matching $matching;
 
     public function __construct(
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
@@ -57,7 +59,8 @@ class Matcher
         CustomerCollectionFactory        $customerCollectionFactory,
         OrderCollectionFactory           $orderCollectionFactory,
         Payment                          $paymentResource,
-        Data                             $helper,
+        Config                           $config,
+        Matching                         $matching,
     ) {
         $this->tempTransactionCollectionFactory = $tempTransactionCollectionFactory;
         $this->tempTransactionResource = $transactionResource;
@@ -70,7 +73,8 @@ class Matcher
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->paymentResource = $paymentResource;
-        $this->helper = $helper;
+        $this->config = $config;
+        $this->matching = $matching;
     }
 
     /**
@@ -117,7 +121,7 @@ class Matcher
         $collection->getSelect()->joinLeft(['tt' => 'banksync_transaction'], $condition, '');
         $collection->getSelect()->where('tt.document_id is null');
 
-        $paymentMethods = $this->helper->getPaymentMethods();
+        $paymentMethods = $this->config->getPaymentMethods();
         if (!empty($paymentMethods)) {
             $collection->getSelect()->joinLeft(
                 ['p' => $this->paymentResource->getMainTable()],
@@ -137,7 +141,7 @@ class Matcher
      */
     public function extractDocumentNumbersFromPurpose(?string $purpose): array
     {
-        $pattern = $this->helper->getNrFilterPattern('document');
+        $pattern = $this->config->getNrFilterPattern('document');
         if (empty($purpose) || empty($pattern)) {
             return [];
         }
@@ -175,7 +179,7 @@ class Matcher
      */
     public function extractOrderNumbersFromPurpose(?string $purpose): array
     {
-        $pattern = $this->helper->getNrFilterPattern('order');
+        $pattern = $this->config->getNrFilterPattern('order');
         if (empty($purpose) || empty($pattern)) {
             return [];
         }
@@ -220,7 +224,7 @@ class Matcher
      */
     public function extractCustomerNumbersFromPurpose(?string $purpose): array
     {
-        $pattern = $this->helper->getNrFilterPattern('customer');
+        $pattern = $this->config->getNrFilterPattern('customer');
         if (empty($purpose) || empty($pattern)) {
             return [];
         }
@@ -275,14 +279,14 @@ class Matcher
     protected function getDocumentsViaAmount(TempTransaction $tempTransaction): array
     {
         $amount = abs($tempTransaction->getAmount());
-        $amountThreshold = $this->helper->getAmountThreshold();
+        $amountThreshold = $this->config->getAmountThreshold();
         $latestDate = date(
             'Y-m-d H:i:s',
-            strtotime($tempTransaction->getTransactionDate()) + $this->helper->getDateThreshold() * 86400
+            strtotime($tempTransaction->getTransactionDate()) + $this->config->getDateThreshold() * 86400
         );
 
         $collection = $this->getBaseDocumentCollection($tempTransaction)
-            ->addFieldToFilter('main_table.created_at', ['gteq' => $this->helper->getStartDate()])
+            ->addFieldToFilter('main_table.created_at', ['gteq' => $this->config->getStartDate()])
             ->addFieldToFilter('main_table.created_at', ['lteq' => $latestDate])
             ->addFieldToFilter('grand_total', ['gteq' => $amount - $amountThreshold])
             ->addFieldToFilter('grand_total', ['lteq' => $amount + $amountThreshold]);
@@ -300,11 +304,11 @@ class Matcher
     {
         $documents = $this->getDocuments($tempTransaction);
 
-        $minConfidence = $this->helper->getMinConfidenceThreshold();
+        $minConfidence = $this->config->getMinConfidenceThreshold();
         $confidences = [];
         foreach ($documents as $document) {
             /** @var Invoice|Creditmemo $document */
-            $confidence = $this->helper->getMatchConfidence($tempTransaction, $document);
+            $confidence = $this->matching->getMatchConfidence($tempTransaction, $document);
             if ($confidence >= $minConfidence) {
                 $confidences[$document->getId()] = $confidence;
             }

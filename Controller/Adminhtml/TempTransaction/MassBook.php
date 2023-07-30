@@ -3,7 +3,7 @@
 namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 
 use Exception;
-use Ibertrand\BankSync\Helper\Data as Helper;
+use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory;
 use Ibertrand\BankSync\Service\Booker;
 use Ibertrand\BankSync\Service\Matcher;
@@ -19,11 +19,11 @@ use Psr\Log\LoggerInterface;
 class MassBook extends Action
 {
     protected LoggerInterface $logger;
-    protected Helper $helper;
     protected Matcher $matcher;
     protected Booker $booker;
     protected Filter $filter;
     protected CollectionFactory $collectionFactory;
+    protected Config $config;
 
     public function __construct(
         Action\Context    $context,
@@ -32,7 +32,7 @@ class MassBook extends Action
         Matcher           $matcher,
         Booker            $booker,
         LoggerInterface   $logger,
-        Helper            $helper,
+        Config            $config,
     ) {
         parent::__construct($context);
         $this->filter = $filter;
@@ -40,7 +40,7 @@ class MassBook extends Action
         $this->matcher = $matcher;
         $this->booker = $booker;
         $this->logger = $logger;
-        $this->helper = $helper;
+        $this->config = $config;
     }
 
     /**
@@ -66,7 +66,7 @@ class MassBook extends Action
         $successCount = count($results['success']);
         $errorCount = count($results['error']);
 
-        if ($errorCount && !$this->helper->isAsyncMatching()) {
+        if ($errorCount && !$this->config->isAsyncMatching()) {
             try {
                 $this->matcher->matchTransactions($results['error']);
             } catch (Exception $e) {
