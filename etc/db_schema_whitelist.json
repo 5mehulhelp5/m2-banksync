@@ -18,8 +18,7 @@
             "BANKSYNC_TEMP_TRANSACTION_HASH": true
         },
         "constraint": {
-            "PRIMARY": true,
-            "BANKSYNC_TEMP_TRANSACTION_HASH": true
+            "PRIMARY": true
         }
     },
     "banksync_transaction": {
