@@ -3,6 +3,7 @@
 namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 
 use Exception;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\Collection;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
@@ -13,11 +14,10 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
-use Psr\Log\LoggerInterface;
 
 class Delete extends Action
 {
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected TempTransactionRepository $tempTransactionRepository;
     protected Filter $filter;
     protected CollectionFactory $collectionFactory;
@@ -27,7 +27,7 @@ class Delete extends Action
         TempTransactionRepository $tempTransactionRepository,
         Filter                    $filter,
         CollectionFactory         $collectionFactory,
-        LoggerInterface           $logger,
+        Logger                    $logger,
     ) {
         parent::__construct($context);
         $this->tempTransactionRepository = $tempTransactionRepository;

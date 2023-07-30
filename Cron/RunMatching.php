@@ -4,20 +4,20 @@ namespace Ibertrand\BankSync\Cron;
 
 use Exception;
 use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Service\Matcher;
 use Magento\Cron\Model\Schedule;
-use Psr\Log\LoggerInterface;
 
 class RunMatching
 {
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected Matcher $matcher;
     protected Config $config;
 
     public function __construct(
-        LoggerInterface $logger,
-        Matcher         $matcher,
-        Config          $config,
+        Logger  $logger,
+        Matcher $matcher,
+        Config  $config,
     ) {
         $this->logger = $logger;
         $this->matcher = $matcher;
@@ -40,6 +40,8 @@ class RunMatching
             $schedule->setMessages("Async matching is disabled");
             return;
         }
+
+        $this->logger->info("Matching new transactions");
 
         try {
             $schedule->setMessages($this->matcher->matchNewTransactions());

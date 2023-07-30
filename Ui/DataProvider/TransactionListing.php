@@ -5,6 +5,7 @@ namespace Ibertrand\BankSync\Ui\DataProvider;
 use Exception;
 use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Display;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
@@ -17,7 +18,6 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollection
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\CollectionFactory as CreditmemoCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Psr\Log\LoggerInterface;
 
 class TransactionListing extends AbstractDataProvider
 {
@@ -26,7 +26,7 @@ class TransactionListing extends AbstractDataProvider
     protected Display $display;
     protected InvoiceRepository $invoiceRepository;
     protected CreditmemoRepository $creditmemoRepository;
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected InvoiceCollectionFactory $invoiceCollectionFactory;
     protected CreditmemoCollectionFactory $creditmemoCollectionFactory;
     protected OrderCollectionFactory $orderCollectionFactory;
@@ -48,7 +48,7 @@ class TransactionListing extends AbstractDataProvider
         OrderCollectionFactory $orderCollectionFactory,
         CustomerCollectionFactory $customerCollectionFactory,
         OrderAddressCollectionFactory $orderAddressCollectionFactory,
-        LoggerInterface $logger,
+        Logger $logger,
         array $meta = [],
         array $data = [],
     ) {

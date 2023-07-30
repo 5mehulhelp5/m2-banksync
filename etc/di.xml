@@ -19,4 +19,19 @@
         </arguments>
     </virtualType>
 
+    <type name="Ibertrand\BankSync\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+            <argument name="fileName" xsi:type="string">/var/log/banksync.log</argument>
+        </arguments>
+    </type>
+    <type name="Ibertrand\BankSync\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">banksyncLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Ibertrand\BankSync\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
 </config>

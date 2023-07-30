@@ -3,21 +3,21 @@
 namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 
 use Exception;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Service\Booker;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
-use Psr\Log\LoggerInterface;
 
 class Book extends Action
 {
     protected Booker $booker;
-    protected LoggerInterface $logger;
+    protected Logger $logger;
 
     public function __construct(
-        Context         $context,
-        Booker          $booker,
-        LoggerInterface $logger,
+        Context $context,
+        Booker  $booker,
+        Logger  $logger,
     ) {
         $this->booker = $booker;
         $this->logger = $logger;

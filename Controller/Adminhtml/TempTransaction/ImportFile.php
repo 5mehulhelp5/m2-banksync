@@ -6,6 +6,7 @@ use Exception;
 use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Hashes;
 use Ibertrand\BankSync\Lib\NamedCsv;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory as TransactionCollectionFactory;
@@ -19,14 +20,13 @@ use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Psr\Log\LoggerInterface;
 
 class ImportFile extends Action
 {
     protected NamedCsv $csvProcessor;
     protected TempTransactionFactory $tempTransactionFactory;
     protected TempTransactionResource $tempTransactionResource;
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected ScopeConfigInterface $scopeConfig;
     protected Matcher $matcher;
     protected TempTransactionRepository $tempTransactionRepository;
@@ -43,7 +43,7 @@ class ImportFile extends Action
         TempTransactionRepository        $tempTransactionRepository,
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
         TransactionCollectionFactory     $transactionCollectionFactory,
-        LoggerInterface                  $logger,
+        Logger                           $logger,
         ScopeConfigInterface             $scopeConfig,
         Matcher                          $matcher,
         Config                           $config,

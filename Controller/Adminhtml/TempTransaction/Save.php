@@ -3,21 +3,21 @@
 namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 
 use Exception;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
 use Magento\Backend\App\Action;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Psr\Log\LoggerInterface;
 
 class Save extends Action
 {
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected TempTransactionRepository $tempTransactionRepository;
 
     public function __construct(
         Action\Context            $context,
         TempTransactionRepository $tempTransactionRepository,
-        LoggerInterface           $logger,
+        Logger                    $logger,
     ) {
         parent::__construct($context);
         $this->tempTransactionRepository = $tempTransactionRepository;

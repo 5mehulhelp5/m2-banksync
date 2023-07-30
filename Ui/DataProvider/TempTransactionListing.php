@@ -6,6 +6,7 @@ use Exception;
 use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Display;
 use Ibertrand\BankSync\Helper\Matching;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory;
 use Ibertrand\BankSync\Model\TempTransaction;
@@ -17,14 +18,13 @@ use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use Psr\Log\LoggerInterface;
 
 class TempTransactionListing extends AbstractDataProvider
 {
     protected UrlInterface $urlBuilder;
     protected CreditmemoRepository $creditmemoRepository;
     protected InvoiceRepository $invoiceRepository;
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
     protected CustomerFactory $customerFactory;
     protected CustomerResource $customerResource;
@@ -47,7 +47,7 @@ class TempTransactionListing extends AbstractDataProvider
         Matching $matching,
         Display $displayHelper,
         Config $config,
-        LoggerInterface $logger,
+        Logger $logger,
         Data $priceHelper,
         array $meta = [],
         array $data = [],

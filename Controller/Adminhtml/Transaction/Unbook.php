@@ -3,6 +3,7 @@
 namespace Ibertrand\BankSync\Controller\Adminhtml\Transaction;
 
 use Exception;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory;
 use Ibertrand\BankSync\Service\Booker;
 use Magento\Backend\App\Action;
@@ -12,11 +13,10 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
-use Psr\Log\LoggerInterface;
 
 class Unbook extends Action
 {
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected Booker $booker;
     protected Filter $filter;
     protected CollectionFactory $collectionFactory;
@@ -26,7 +26,7 @@ class Unbook extends Action
         Filter            $filter,
         CollectionFactory $collectionFactory,
         Booker            $booker,
-        LoggerInterface   $logger,
+        Logger            $logger,
     ) {
         parent::__construct($context);
         $this->filter = $filter;

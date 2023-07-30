@@ -4,6 +4,7 @@ namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 
 use Exception;
 use Ibertrand\BankSync\Helper\Config;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory;
 use Ibertrand\BankSync\Service\Booker;
 use Ibertrand\BankSync\Service\Matcher;
@@ -14,11 +15,10 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
-use Psr\Log\LoggerInterface;
 
 class MassBook extends Action
 {
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected Matcher $matcher;
     protected Booker $booker;
     protected Filter $filter;
@@ -31,7 +31,7 @@ class MassBook extends Action
         CollectionFactory $collectionFactory,
         Matcher           $matcher,
         Booker            $booker,
-        LoggerInterface   $logger,
+        Logger            $logger,
         Config            $config,
     ) {
         parent::__construct($context);

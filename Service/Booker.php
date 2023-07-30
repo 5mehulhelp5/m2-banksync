@@ -5,6 +5,7 @@ namespace Ibertrand\BankSync\Service;
 use Exception;
 use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Matching;
+use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\MatchConfidence;
 use Ibertrand\BankSync\Model\MatchConfidenceRepository;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
@@ -25,7 +26,6 @@ use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
-use Psr\Log\LoggerInterface;
 
 class Booker
 {
@@ -41,7 +41,7 @@ class Booker
     protected MatchConfidenceRepository $matchConfidenceRepository;
     protected Config $config;
     protected Matching $matching;
-    protected LoggerInterface $logger;
+    protected Logger $logger;
 
     public function __construct(
         TempTransactionResource          $tempTransactionResource,
@@ -56,7 +56,7 @@ class Booker
         CreditmemoRepository             $creditmemoRepository,
         Config                           $config,
         Matching                         $matching,
-        LoggerInterface                  $logger,
+        Logger                           $logger,
     ) {
         $this->tempTransactionResource = $tempTransactionResource;
         $this->transactionResource = $transactionResource;

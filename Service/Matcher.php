@@ -25,13 +25,13 @@ use Magento\Sales\Model\ResourceModel\Order\Creditmemo\CollectionFactory as Cred
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection as InvoiceCollection;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Payment;
-use Psr\Log\LoggerInterface;
+use Ibertrand\BankSync\Logger\Logger;
 
 class Matcher
 {
     protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
     protected TempTransactionResource $tempTransactionResource;
-    protected LoggerInterface $logger;
+    protected Logger $logger;
     protected InvoiceCollectionFactory $invoiceCollectionFactory;
     protected CreditmemoCollectionFactory $creditmemoCollectionFactory;
     protected MatchConfidenceFactory $matchConfidenceFactory;
@@ -50,7 +50,7 @@ class Matcher
     public function __construct(
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
         TempTransactionResource          $transactionResource,
-        LoggerInterface                  $logger,
+        Logger                   $logger,
         InvoiceCollectionFactory         $invoiceCollectionFactory,
         CreditmemoCollectionFactory      $creditmemoCollectionFactory,
         MatchConfidenceFactory           $matchConfidenceFactory,
@@ -404,6 +404,8 @@ class Matcher
      */
     public function matchAllTransactions(): string
     {
+        $this->logger->info('Matching all transactions');
+
         $this->matchConfidenceRepository->deleteAll();
         $tempTransactions = $this->tempTransactionCollectionFactory->create();
         foreach ($tempTransactions as $tempTransaction) {
