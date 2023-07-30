@@ -24,7 +24,6 @@ use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoC
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\CollectionFactory as CreditmemoCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection as InvoiceCollection;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
-use Magento\Sales\Model\ResourceModel\Order\Payment;
 use Ibertrand\BankSync\Logger\Logger;
 
 class Matcher
@@ -37,7 +36,6 @@ class Matcher
     protected MatchConfidenceFactory $matchConfidenceFactory;
     protected MatchConfidenceRepository $matchConfidenceRepository;
     protected MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory;
-    protected Payment $paymentResource;
     /**
      * @var callable
      */
@@ -58,7 +56,6 @@ class Matcher
         MatchConfidenceCollectionFactory $matchConfidenceCollectionFactory,
         CustomerCollectionFactory        $customerCollectionFactory,
         OrderCollectionFactory           $orderCollectionFactory,
-        Payment                          $paymentResource,
         Config                           $config,
         Matching                         $matching,
     ) {
@@ -72,7 +69,6 @@ class Matcher
         $this->matchConfidenceCollectionFactory = $matchConfidenceCollectionFactory;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
-        $this->paymentResource = $paymentResource;
         $this->config = $config;
         $this->matching = $matching;
     }
@@ -123,13 +119,11 @@ class Matcher
 
         $paymentMethods = $this->config->getPaymentMethods();
         if (!empty($paymentMethods)) {
-            $collection->getSelect()->joinLeft(
-                ['p' => $this->paymentResource->getMainTable()],
-                'main_table.order_id = p.parent_id',
-                ''
-            );
-            $where = $collection->getConnection()->quoteInto('p.method in (?)', $paymentMethods);
-            $collection->getSelect()->where($where);
+            $collection->join(
+                ['payment' => 'sales_order_payment'],
+                'main_table.order_id = payment.parent_id',
+                []
+            )->addFieldToFilter('payment.method', ['in' => $paymentMethods]);
         }
 
         return $collection;
