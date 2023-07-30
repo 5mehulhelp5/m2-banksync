@@ -12,7 +12,7 @@ use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 use Magento\Sales\Model\Order\InvoiceRepository;
-use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory as orderAddressCollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory as OrderAddressCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\CollectionFactory as CreditmemoCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
@@ -31,7 +31,7 @@ class TransactionListing extends AbstractDataProvider
     protected CreditmemoCollectionFactory $creditmemoCollectionFactory;
     protected OrderCollectionFactory $orderCollectionFactory;
     protected CustomerCollectionFactory $customerCollectionFactory;
-    protected orderAddressCollectionFactory $orderAddressCollectionFactory;
+    protected OrderAddressCollectionFactory $orderAddressCollectionFactory;
 
     public function __construct(
         $name,
@@ -47,7 +47,7 @@ class TransactionListing extends AbstractDataProvider
         CreditmemoCollectionFactory $creditmemoCollectionFactory,
         OrderCollectionFactory $orderCollectionFactory,
         CustomerCollectionFactory $customerCollectionFactory,
-        orderAddressCollectionFactory $orderAddressCollectionFactory,
+        OrderAddressCollectionFactory $orderAddressCollectionFactory,
         LoggerInterface $logger,
         array $meta = [],
         array $data = [],
