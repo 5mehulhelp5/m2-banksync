@@ -122,7 +122,15 @@
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
-        <column name="comment" sortOrder="130">
+        <column name="is_banksynced" sortOrder="130" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <dataType>select</dataType>
+                <label translate="true">BankSynced</label>
+            </settings>
+        </column>
+        <column name="comment" sortOrder="135">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Comment</label>
