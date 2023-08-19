@@ -108,7 +108,7 @@ class Booker
      * @param Invoice|Creditmemo|int $document
      * @param bool                   $partial
      *
-     * @return void
+     * @return Transaction
      *
      * @throws CouldNotDeleteException
      * @throws InputException
@@ -119,7 +119,7 @@ class Booker
         TempTransaction|int    $tempTransaction,
         Invoice|Creditmemo|int $document,
         bool                   $partial = false,
-    ): void {
+    ): Transaction {
         if (is_int($tempTransaction)) {
             $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
         }
@@ -135,7 +135,7 @@ class Booker
             ->setMatchConfidence($this->matching->getMatchConfidence($tempTransaction, $document));
         $transaction->setHasDataChanges(true);
 
-        $confidences = $this->matchConfidenceCollectionFactory->create()
+        $tempTransactionConfidences = $this->matchConfidenceCollectionFactory->create()
             ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
 
         if (!$partial) {
@@ -150,13 +150,45 @@ class Booker
             $tempTransaction->setHasDataChanges(true);
             $this->tempTransactionRepository->save($tempTransaction);
 
-            $confidences->addFieldToFilter('document_id', $document->getId());
+            $tempTransactionConfidences->addFieldToFilter('document_id', $document->getId());
         }
 
-        foreach ($confidences as $confidence) {
+        foreach ($tempTransactionConfidences as $confidence) {
             $this->matchConfidenceRepository->delete($confidence);
         }
+
+        $documentConfidences = $this->matchConfidenceCollectionFactory->create()
+            ->addFieldToFilter('document_id', $document->getId());
+
+        // Remove all confidences for this document and recalculate temp transaction confidences if necessary
+        foreach ($documentConfidences as $documentConfidence) {
+            /** @var MatchConfidence $documentConfidence */
+            $documentTempTransactionId = $documentConfidence->getTempTransactionId();
+            $documentTempTransaction = $this->tempTransactionRepository->getById($documentTempTransactionId);
+            if ($documentTempTransaction->getDocumentType() !== $tempTransaction->getDocumentType()) {
+                continue;
+            }
+
+            $tempTransactionConfidence = $this->matchConfidenceCollectionFactory->create()
+                ->addFieldToFilter('temp_transaction_id', $documentTempTransactionId)
+                ->setOrder('confidence', 'DESC')
+                ->getFirstItem();
+            $needsUpdate = $tempTransactionConfidence->getDocumentId() == $document->getId();
+            $this->matchConfidenceRepository->delete($documentConfidence);
+            if ($needsUpdate) {
+                /** @var MatchConfidence $bestConfidence */
+                $bestConfidence = $this->matchConfidenceCollectionFactory->create()
+                    ->addFieldToFilter('temp_transaction_id', $documentTempTransactionId)
+                    ->setOrder('confidence', 'DESC')
+                    ->getFirstItem();
+                $tempTransaction->setMatchConfidence($bestConfidence->getConfidence());
+                $tempTransaction->setDirty(TempTransaction::DIRTY);
+                $this->tempTransactionRepository->save($tempTransaction);
+            }
+        }
+
         $this->transactionRepository->save($transaction);
+        return $transaction;
     }
 
     /**
@@ -241,6 +273,10 @@ class Booker
             $tempTransactions->addFieldToFilter('entity_id', ['in' => $ids]);
         }
 
+        $allRelatedBookedTransaction = $this->transactionCollectionFactory->create()
+            ->addFieldToFilter('document_id', ['in' => $tempTransactions->getColumnValues('document_id')])
+            ->getItems();
+
         foreach ($tempTransactions as $tempTransaction) {
             /** @var TempTransaction $tempTransaction */
             /** @var MatchConfidence[] $allMatches */
@@ -260,6 +296,15 @@ class Booker
             usort($allMatches, fn ($a, $b) => $b->getConfidence() <=> $a->getConfidence());
 
             $documentId = $allMatches[0]->getDocumentId();
+            foreach ($allRelatedBookedTransaction as $bookedTransaction) {
+                if ($bookedTransaction->getDocumentId() == $documentId && $bookedTransaction->getDocumentType() == $tempTransaction->getDocumentType()) {
+                    $tempTransaction->setDirty(TempTransaction::DIRTY);
+                    $tempTransaction->setMatchConfidence(null);
+                    $this->tempTransactionRepository->save($tempTransaction);
+                    $result['error'][] = $tempTransaction->getId();
+                    continue 2;
+                }
+            }
 
             try {
                 $document = $this->resolveDocumentRepository($tempTransaction)->get($documentId);
@@ -270,7 +315,7 @@ class Booker
                     continue;
                 }
 
-                $this->book($tempTransaction, $document);
+                $allRelatedBookedTransaction[] = $this->book($tempTransaction, $document);
 
                 $result['success'][] = $tempTransaction->getId();
             } catch (Exception $e) {
