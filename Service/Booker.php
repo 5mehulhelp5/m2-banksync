@@ -120,74 +120,82 @@ class Booker
         Invoice|Creditmemo|int $document,
         bool                   $partial = false,
     ): Transaction {
-        if (is_int($tempTransaction)) {
-            $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
-        }
-
-        if (is_int($document)) {
-            $document = $this->resolveDocumentRepository($tempTransaction)->get($document);
-        }
-
-        $this->saveDocument($document, true);
-
-        $transaction = $this->transactionResource->fromTempTransaction($tempTransaction)
-            ->setDocumentId($document->getId())
-            ->setMatchConfidence($this->matching->getMatchConfidence($tempTransaction, $document));
-        $transaction->setHasDataChanges(true);
-
-        $tempTransactionConfidences = $this->matchConfidenceCollectionFactory->create()
-            ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
-
-        if (!$partial) {
-            $this->tempTransactionRepository->delete($tempTransaction);
-        } else {
-            $transaction->setAmount($document->getGrandTotal());
-            $transaction->setPartialHash($tempTransaction->getHash());
-
-            $tempTransaction->setAmount($tempTransaction->getAmount() - $document->getGrandTotal());
-            $tempTransaction->setDirty(TempTransaction::DIRTY);
-            $tempTransaction->setPartialHash($tempTransaction->getHash());
-            $tempTransaction->setHasDataChanges(true);
-            $this->tempTransactionRepository->save($tempTransaction);
-
-            $tempTransactionConfidences->addFieldToFilter('document_id', $document->getId());
-        }
-
-        foreach ($tempTransactionConfidences as $confidence) {
-            $this->matchConfidenceRepository->delete($confidence);
-        }
-
-        $documentConfidences = $this->matchConfidenceCollectionFactory->create()
-            ->addFieldToFilter('document_id', $document->getId());
-
-        // Remove all confidences for this document and recalculate temp transaction confidences if necessary
-        foreach ($documentConfidences as $documentConfidence) {
-            /** @var MatchConfidence $documentConfidence */
-            $documentTempTransactionId = $documentConfidence->getTempTransactionId();
-            $documentTempTransaction = $this->tempTransactionRepository->getById($documentTempTransactionId);
-            if ($documentTempTransaction->getDocumentType() !== $tempTransaction->getDocumentType()) {
-                continue;
+        $db = $this->tempTransactionResource->getConnection();
+        $db->beginTransaction();
+        try {
+            if (is_int($tempTransaction)) {
+                $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
             }
 
-            $tempTransactionConfidence = $this->matchConfidenceCollectionFactory->create()
-                ->addFieldToFilter('temp_transaction_id', $documentTempTransactionId)
-                ->setOrder('confidence', 'DESC')
-                ->getFirstItem();
-            $needsUpdate = $tempTransactionConfidence->getDocumentId() == $document->getId();
-            $this->matchConfidenceRepository->delete($documentConfidence);
-            if ($needsUpdate) {
-                /** @var MatchConfidence $bestConfidence */
-                $bestConfidence = $this->matchConfidenceCollectionFactory->create()
+            if (is_int($document)) {
+                $document = $this->resolveDocumentRepository($tempTransaction)->get($document);
+            }
+
+            $this->saveDocument($document, true);
+
+            $transaction = $this->transactionResource->fromTempTransaction($tempTransaction)
+                ->setDocumentId($document->getId())
+                ->setMatchConfidence($this->matching->getMatchConfidence($tempTransaction, $document));
+            $transaction->setHasDataChanges(true);
+
+            $tempTransactionConfidences = $this->matchConfidenceCollectionFactory->create()
+                ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
+
+            if (!$partial) {
+                $this->tempTransactionRepository->delete($tempTransaction);
+            } else {
+                $transaction->setAmount($document->getGrandTotal());
+                $transaction->setPartialHash($tempTransaction->getHash());
+
+                $tempTransaction->setAmount($tempTransaction->getAmount() - $document->getGrandTotal());
+                $tempTransaction->setDirty(TempTransaction::DIRTY);
+                $tempTransaction->setPartialHash($tempTransaction->getHash());
+                $tempTransaction->setHasDataChanges(true);
+                $this->tempTransactionRepository->save($tempTransaction);
+
+                $tempTransactionConfidences->addFieldToFilter('document_id', $document->getId());
+            }
+
+            foreach ($tempTransactionConfidences as $confidence) {
+                $this->matchConfidenceRepository->delete($confidence);
+            }
+
+            $documentConfidences = $this->matchConfidenceCollectionFactory->create()
+                ->addFieldToFilter('document_id', $document->getId());
+
+            // Remove all confidences for this document and recalculate temp transaction confidences if necessary
+            foreach ($documentConfidences as $documentConfidence) {
+                /** @var MatchConfidence $documentConfidence */
+                $documentTempTransactionId = $documentConfidence->getTempTransactionId();
+                $documentTempTransaction = $this->tempTransactionRepository->getById($documentTempTransactionId);
+                if ($documentTempTransaction->getDocumentType() !== $tempTransaction->getDocumentType()) {
+                    continue;
+                }
+
+                $tempTransactionConfidence = $this->matchConfidenceCollectionFactory->create()
                     ->addFieldToFilter('temp_transaction_id', $documentTempTransactionId)
                     ->setOrder('confidence', 'DESC')
                     ->getFirstItem();
-                $tempTransaction->setMatchConfidence($bestConfidence->getConfidence());
-                $tempTransaction->setDirty(TempTransaction::DIRTY);
-                $this->tempTransactionRepository->save($tempTransaction);
+                $needsUpdate = $tempTransactionConfidence->getDocumentId() == $document->getId();
+                $this->matchConfidenceRepository->delete($documentConfidence);
+                if ($needsUpdate) {
+                    /** @var MatchConfidence $bestConfidence */
+                    $bestConfidence = $this->matchConfidenceCollectionFactory->create()
+                        ->addFieldToFilter('temp_transaction_id', $documentTempTransactionId)
+                        ->setOrder('confidence', 'DESC')
+                        ->getFirstItem();
+                    $tempTransaction->setMatchConfidence($bestConfidence->getConfidence());
+                    $tempTransaction->setDirty(TempTransaction::DIRTY);
+                    $this->tempTransactionRepository->save($tempTransaction);
+                }
             }
-        }
 
-        $this->transactionRepository->save($transaction);
+            $this->transactionRepository->save($transaction);
+            $db->commit();
+        } catch (Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
         return $transaction;
     }
 
@@ -203,48 +211,56 @@ class Booker
      */
     public function unbook(Transaction|int $transaction): void
     {
-        if (is_int($transaction)) {
-            $transaction = $this->transactionRepository->getById($transaction);
-        }
+        $db = $this->transactionResource->getConnection();
+        $db->beginTransaction();
+        try {
+            if (is_int($transaction)) {
+                $transaction = $this->transactionRepository->getById($transaction);
+            }
 
-        $document = $this->resolveDocumentRepository($transaction)->get($transaction->getDocumentId());
-        $isStillPaid = $this->transactionCollectionFactory->create()
-                ->addFieldToFilter('document_id', $document->getId())
-                ->addFieldToFilter('document_type', $transaction->getDocumentType())
-                ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()])
-                ->getSize() > 0;
-        $this->saveDocument($document, $isStillPaid);
+            $document = $this->resolveDocumentRepository($transaction)->get($transaction->getDocumentId());
+            $isStillPaid = $this->transactionCollectionFactory->create()
+                    ->addFieldToFilter('document_id', $document->getId())
+                    ->addFieldToFilter('document_type', $transaction->getDocumentType())
+                    ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()])
+                    ->getSize() > 0;
+            $this->saveDocument($document, $isStillPaid);
 
-        $tempTransaction = null;
-        if ($transaction->getPartialHash()) {
-            $tempTransactionCollection = $this->tempTransactionCollectionFactory->create()
-                ->addFieldToFilter('partial_hash', $transaction->getPartialHash());
+            $tempTransaction = null;
+            if ($transaction->getPartialHash()) {
+                $tempTransactionCollection = $this->tempTransactionCollectionFactory->create()
+                    ->addFieldToFilter('partial_hash', $transaction->getPartialHash());
 
 
-            if ($tempTransactionCollection->getSize() > 0) {
-                /** @var TempTransaction $tempTransaction */
-                $tempTransaction = $tempTransactionCollection->getFirstItem();
-                $tempTransaction->setAmount($tempTransaction->getAmount() + $transaction->getAmount());
-                $tempTransaction->setDirty(TempTransaction::DIRTY);
+                if ($tempTransactionCollection->getSize() > 0) {
+                    /** @var TempTransaction $tempTransaction */
+                    $tempTransaction = $tempTransactionCollection->getFirstItem();
+                    $tempTransaction->setAmount($tempTransaction->getAmount() + $transaction->getAmount());
+                    $tempTransaction->setDirty(TempTransaction::DIRTY);
 
-                $transactionCollection = $this->transactionCollectionFactory->create()
-                    ->addFieldToFilter('partial_hash', $transaction->getPartialHash())
-                    ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()]);
+                    $transactionCollection = $this->transactionCollectionFactory->create()
+                        ->addFieldToFilter('partial_hash', $transaction->getPartialHash())
+                        ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()]);
 
-                if ($transactionCollection->getSize() == 0) {
-                    $tempTransaction->setPartialHash(null);
+                    if ($transactionCollection->getSize() == 0) {
+                        $tempTransaction->setPartialHash(null);
+                    }
                 }
             }
-        }
 
-        if (!$tempTransaction) {
-            $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
-            $tempTransaction->setDirty(TempTransaction::DIRTY);
-        }
-        $tempTransaction->setHasDataChanges(true);
+            if (!$tempTransaction) {
+                $tempTransaction = $this->tempTransactionResource->fromTransaction($transaction);
+                $tempTransaction->setDirty(TempTransaction::DIRTY);
+            }
+            $tempTransaction->setHasDataChanges(true);
 
-        $this->tempTransactionResource->save($tempTransaction);
-        $this->transactionRepository->delete($transaction);
+            $this->tempTransactionResource->save($tempTransaction);
+            $this->transactionRepository->delete($transaction);
+            $db->commit();
+        } catch (Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
     }
 
     /**
