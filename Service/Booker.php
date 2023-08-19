@@ -172,6 +172,7 @@ class Booker
                     continue;
                 }
 
+                /** @var MatchConfidence $tempTransactionConfidence */
                 $tempTransactionConfidence = $this->matchConfidenceCollectionFactory->create()
                     ->addFieldToFilter('temp_transaction_id', $documentTempTransactionId)
                     ->setOrder('confidence', 'DESC')
@@ -313,6 +314,7 @@ class Booker
 
             $documentId = $allMatches[0]->getDocumentId();
             foreach ($allRelatedBookedTransaction as $bookedTransaction) {
+                /** @var Transaction $bookedTransaction */
                 if ($bookedTransaction->getDocumentId() == $documentId && $bookedTransaction->getDocumentType() == $tempTransaction->getDocumentType()) {
                     $tempTransaction->setDirty(TempTransaction::DIRTY);
                     $tempTransaction->setMatchConfidence(null);
