@@ -2,7 +2,7 @@
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
     <table name="banksync_temp_transaction" resource="default" engine="innodb" comment="BankSync Temporary Transactions">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
-        <column xsi:type="timestamp" name="transaction_date" nullable="false" comment="Transaction Date"/>
+        <column xsi:type="datetime" name="transaction_date" nullable="false" comment="Transaction Date"/>
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
         <column xsi:type="varchar" name="hash" nullable="true" length="40" comment="Hash"/>
@@ -22,7 +22,7 @@
     </table>
     <table name="banksync_transaction" resource="default" engine="innodb" comment="BankSync Transactions">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
-        <column xsi:type="timestamp" name="transaction_date" nullable="false" comment="Transaction Date"/>
+        <column xsi:type="datetime" name="transaction_date" nullable="false" comment="Transaction Date"/>
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
         <column xsi:type="decimal" name="amount" precision="12" scale="4" nullable="true" comment="Amount"/>
