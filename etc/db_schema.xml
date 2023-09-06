@@ -11,7 +11,7 @@
         <column xsi:type="float" name="match_confidence" nullable="true" comment="Match Confidence"/>
         <column xsi:type="varchar" name="partial_hash" nullable="true" length="40" comment="Partial reference"/>
         <column xsi:type="int" name="dirty" nullable="true" comment="Needs rematching"/>
-        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
@@ -32,7 +32,7 @@
         <column xsi:type="int" name="document_id" nullable="false" comment="Document ID"/>
         <column xsi:type="float" name="match_confidence" nullable="true" comment="Document ID"/>
         <column xsi:type="varchar" name="partial_hash" nullable="true" length="40" comment="Partial reference"/>
-        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
@@ -46,7 +46,7 @@
         <column xsi:type="int" name="temp_transaction_id" unsigned="true" nullable="false" comment="TempTransaction ID"/>
         <column xsi:type="int" name="document_id" unsigned="true" nullable="false" comment="Document Id"/>
         <column xsi:type="float" name="confidence" nullable="false" comment="Match Confidence"/>
-        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
