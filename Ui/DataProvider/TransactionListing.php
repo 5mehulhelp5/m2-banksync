@@ -8,6 +8,8 @@ use Ibertrand\BankSync\Helper\Display;
 use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory;
 use Magento\Customer\Model\Customer;
+use Magento\Customer\Model\CustomerFactory;
+use Magento\Customer\Model\ResourceModel\Customer as CustomerResource;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\UrlInterface;
@@ -32,6 +34,8 @@ class TransactionListing extends AbstractDataProvider
     protected OrderCollectionFactory $orderCollectionFactory;
     protected CustomerCollectionFactory $customerCollectionFactory;
     protected OrderAddressCollectionFactory $orderAddressCollectionFactory;
+    private CustomerFactory $customerFactory;
+    private CustomerResource $customerResource;
 
     public function __construct(
         $name,
@@ -48,6 +52,8 @@ class TransactionListing extends AbstractDataProvider
         OrderCollectionFactory $orderCollectionFactory,
         CustomerCollectionFactory $customerCollectionFactory,
         OrderAddressCollectionFactory $orderAddressCollectionFactory,
+        CustomerFactory $customerFactory,
+        CustomerResource $customerResource,
         Logger $logger,
         array $meta = [],
         array $data = [],
@@ -63,6 +69,8 @@ class TransactionListing extends AbstractDataProvider
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->orderAddressCollectionFactory = $orderAddressCollectionFactory;
+        $this->customerFactory = $customerFactory;
+        $this->customerResource = $customerResource;
         $this->logger = $logger;
         parent::__construct(
             $name,
@@ -100,6 +108,20 @@ class TransactionListing extends AbstractDataProvider
                 );
                 $item['order_increment_id'] = "<a href='$orderUrl'>{$document->getOrder()->getIncrementId()}</a>";
                 $item['payment_method'] = $document->getOrder()->getPayment()->getMethodInstance()->getTitle();
+
+                $customerId = $document->getOrder()->getCustomerId();
+                if ($customerId) {
+                    $customer = $this->customerFactory->create();
+                    $this->customerResource->load($customer, $customerId);
+                    $customerUrl = $this->urlBuilder->getUrl(
+                        'customer/index/edit',
+                        ['id' => $customerId]
+                    );
+                    $item['customer_increment_id'] = "<a href='$customerUrl'>{$customer->getIncrementId()}</a>";
+                } else {
+                    $item['customer_increment_id'] = "-";
+                }
+
             } catch (Exception $e) {
                 $this->logger->error($e);
                 $item['document'] = "[Not found]";

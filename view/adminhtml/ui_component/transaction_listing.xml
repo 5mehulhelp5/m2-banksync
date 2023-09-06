@@ -114,6 +114,14 @@
                 <sortable>false</sortable>
             </settings>
         </column>
+        <column name="customer_increment_id" sortOrder="85">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Customer Increment Id</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <sortable>false</sortable>
+            </settings>
+        </column>
         <column name="amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
             <settings>
                 <filter>textRange</filter>
