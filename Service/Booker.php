@@ -257,6 +257,16 @@ class Booker
 
             $this->tempTransactionResource->save($tempTransaction);
             $this->transactionRepository->delete($transaction);
+
+            // With unbooking, the document is now free to be matched again, which can potentially affect other
+            // temp transactions. Therefore, we need to recalculate the match confidence for all temp transactions.
+            $allTempTransactions = $this->tempTransactionCollectionFactory->create();
+            foreach ($allTempTransactions as $tempTransaction) {
+                $tempTransaction->setIsDirty(TempTransaction::DIRTY);
+                $tempTransaction->setHasDataChanges(true);
+                $this->tempTransactionRepository->save($tempTransaction);
+            }
+
             $db->commit();
         } catch (Exception $e) {
             $db->rollBack();
