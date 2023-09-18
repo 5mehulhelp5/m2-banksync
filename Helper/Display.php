@@ -17,8 +17,8 @@ class Display extends AbstractHelper
     private UrlInterface $urlBuilder;
 
     public function __construct(
-        Context                         $context,
-        UrlInterface $urlBuilder
+        Context      $context,
+        UrlInterface $urlBuilder,
     ) {
         parent::__construct($context);
         $this->urlBuilder = $urlBuilder;
@@ -44,27 +44,54 @@ class Display extends AbstractHelper
         );
     }
 
-
-    public function getObjectLink(DataObject $object, array $matchedTexts): string
+    /**
+     * @param DataObject $object
+     * @return string
+     */
+    public function getUrl(DataObject $object): string
     {
-        if ($object instanceof Invoice) {
-            $url = $this->urlBuilder->getUrl('sales/invoice/view', ['invoice_id' => $object->getId()]);
-        } elseif ($object instanceof Creditmemo) {
-            $url = $this->urlBuilder->getUrl('sales/creditmemo/view', ['creditmemo_id' => $object->getId()]);
-        } elseif ($object instanceof Order) {
-            $url = $this->urlBuilder->getUrl('sales/order/view', ['order_id' => $object->getId()]);
-        } elseif ($object instanceof Customer) {
-            $url = $this->urlBuilder->getUrl('customer/index/edit', ['id' => $object->getId()]);
-        } else {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        $id = $object->getId();
+        if (empty($id)) {
             return '';
         }
+
+        $classMappings = [
+            Invoice::class => ['invoice_id', 'sales/invoice/view'],
+            Creditmemo::class => ['creditmemo_id', 'sales/creditmemo/view'],
+            Order::class => ['order_id', 'sales/order/view'],
+            Customer::class => ['id', 'customer/index/edit'],
+        ];
+
+        foreach ($classMappings as $class => [$idName, $route]) {
+            if ($object instanceof $class) {
+                return $this->urlBuilder->getUrl($route, [$idName => $id]);
+            }
+        }
+
+        return '';
+    }
+
+
+    /**
+     * @param DataObject $object
+     * @param array      $matchedTexts
+     * @return string
+     */
+    public function getObjectLink(DataObject $object, array $matchedTexts): string
+    {
+        $url = $this->getUrl($object);
+        if (empty($url)) {
+            return '';
+        }
+
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         $incrementId = $object->getIncrementId();
-        $cssClass = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
-        if ($cssClass == '' && str_ends_with($incrementId, '00')) {
-            $incrementId = substr($incrementId, 0, -2);
-            $cssClass = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
+        if (empty($incrementId)) {
+            return '';
         }
+
+        $cssClass = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
         return "<a class='$cssClass' href='$url'>$incrementId</a>";
     }
 }
