@@ -339,7 +339,6 @@ class Booker
 
                 $confidence = $this->matching->getMatchConfidence($tempTransaction, $document);
                 if ($confidence < $minThreshold) {
-                    echo "Transaction {$tempTransaction->getId()} has low confidence: $confidence\n";
                     continue;
                 }
 
