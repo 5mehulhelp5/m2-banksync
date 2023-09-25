@@ -147,15 +147,20 @@
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="auto_send_mail" translate="label,comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="auto_send_mail" translate="label,comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Automatically send dunnings via mail</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="email_identity" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <field id="email_identity" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Email Sender</label>
                     <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
                 </field>
-                <group id="types" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="due_days" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Payment due date</label>
+                    <validate>validate-greater-than-zero validate-number required-entry</validate>
+                    <comment>In days after invoice creation</comment>
+                </field>
+                <group id="types" translate="label,comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Types</label>
                     <group id="reminder_1" translate="label,comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Reminder 1</label>
@@ -175,10 +180,6 @@
                         <field id="mail_template" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                             <label>Mail Template</label>
                             <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
-                        </field>
-                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Attach PDF to mail</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         </field>
                     </group>
                     <group id="reminder_2" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -200,10 +201,6 @@
                             <label>Mail Template</label>
                             <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
                         </field>
-                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Attach PDF to mail</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field>
                     </group>
                     <group id="dunning_1" translate="label,comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Dunning 1</label>
@@ -224,10 +221,6 @@
                             <label>Mail Template</label>
                             <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
                         </field>
-                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Attach PDF to mail</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        </field>
                     </group>
                     <group id="dunning_2" translate="label,comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Dunning 2</label>
@@ -247,10 +240,6 @@
                         <field id="mail_template" translate="label,comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                             <label>Mail Template</label>
                             <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
-                        </field>
-                        <field id="attach_pdf" translate="label,comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-                            <label>Attach PDF to mail</label>
-                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         </field>
                     </group>
                 </group>

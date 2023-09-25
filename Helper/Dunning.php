@@ -295,4 +295,9 @@ class Dunning extends AbstractHelper
         return $collection;
     }
 
+    public function getInvoiceDueDays(): int
+    {
+        return $this->config->getInvoiceDueDays();
+    }
+
 }

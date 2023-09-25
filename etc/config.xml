@@ -49,6 +49,7 @@
                 <enabled>0</enabled>
                 <auto_send_mail>0</auto_send_mail>
                 <email_identity>general</email_identity>
+                <due_days>14</due_days>
                 <types>
                     <reminder_1>
                         <delay>21</delay>

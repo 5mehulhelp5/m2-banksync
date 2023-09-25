@@ -148,7 +148,7 @@ class Config extends AbstractHelper
      */
     public function getDunningEmailTemplate(string $type, int $storeId): mixed
     {
-        return $this->scopeConfig->getValue("banksync/dunnings/types/$type/email_template", 'store', $storeId);
+        return $this->scopeConfig->getValue("banksync/dunnings/types/$type/mail_template", 'store', $storeId);
     }
 
     /**
@@ -197,6 +197,11 @@ class Config extends AbstractHelper
      */
     public function getDunningSenderIdentity(int $storeId): mixed
     {
-        return $this->scopeConfig->getValue("banksync/dunnings/sender_identity", 'store', $storeId);
+        return $this->scopeConfig->getValue("banksync/dunnings/email_identity", 'store', $storeId);
+    }
+
+    public function getInvoiceDueDays():int
+    {
+        return (int)$this->scopeConfig->getValue('banksync/dunnings/due_days');
     }
 }

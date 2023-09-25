@@ -3,6 +3,7 @@
 namespace Ibertrand\BankSync\Model;
 
 use Exception;
+use Ibertrand\BankSync\Helper\Dunning as DunningHelper;
 use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\Dunning as ResourceModel;
 use Magento\Framework\Data\Collection\AbstractDb;
@@ -41,21 +42,21 @@ class Dunning extends AbstractModel
      * @var string
      */
     protected $_eventPrefix = 'banksync_dunning_model';
-    protected \Ibertrand\BankSync\Helper\Dunning $dunningHelper;
+    protected DunningHelper $dunningHelper;
     protected InvoiceRepository $invoiceRepository;
     protected TransportBuilder $transportBuilder;
-    private Logger $logger;
+    protected Logger $logger;
 
     public function __construct(
-        Context                            $context,
-        Registry                           $registry,
-        \Ibertrand\BankSync\Helper\Dunning $dunningHelper,
-        InvoiceRepository                  $invoiceRepository,
-        TransportBuilder                   $transportBuilder,
-        Logger                             $logger,
-        AbstractResource                   $resource = null,
-        AbstractDb                         $resourceCollection = null,
-        array                              $data = [],
+        Context           $context,
+        Registry          $registry,
+        DunningHelper     $dunningHelper,
+        InvoiceRepository $invoiceRepository,
+        TransportBuilder  $transportBuilder,
+        Logger            $logger,
+        AbstractResource  $resource = null,
+        AbstractDb        $resourceCollection = null,
+        array             $data = [],
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
         $this->dunningHelper = $dunningHelper;
@@ -137,16 +138,22 @@ class Dunning extends AbstractModel
         $invoice = $this->getInvoice();
         $order = $invoice->getOrder();
         $storeId = $invoice->getStoreId();
+        $this->logger->info("Store ID: $storeId");
         $templateCode = $this->getEmailTemplate();
+        $dueDays = $this->dunningHelper->getInvoiceDueDays();
+        $invoiceDueDate = strtotime($invoice->getCreatedAt()) + $dueDays * 86400;
+
+        $this->logger->info('Sending dunning mail to ' . $order->getCustomerEmail());
 
         $emailTemplateVariables = [
-            'invoice' => $invoice,
-            'order' => $invoice->getOrder(),
-            'dunning' => $this,
+            'invoice_id' => $invoice->getIncrementId(),
+            'due_date' => date('d.m.Y', $invoiceDueDate),
+            'store_name' => $invoice->getStore()->getFrontendName(),
+            'customer_name' => $order->getCustomerName(),
         ];
 
         $transport = $this->transportBuilder->setTemplateIdentifier($templateCode)
-            ->setTemplateOptions(['area' => 'frontend', 'store' => $invoice->getId()])
+            ->setTemplateOptions(['area' => 'frontend', 'store' => $storeId])
             ->addTo($order->getCustomerEmail(), $order->getCustomerName())
             ->setFromByScope($this->dunningHelper->getSenderIdentity($storeId), $storeId)
             ->setTemplateVars($emailTemplateVariables)
@@ -157,7 +164,7 @@ class Dunning extends AbstractModel
             $this->setSentAt(date('Y-m-d H:i:s'));
             return true;
         } catch (Exception $e) {
-            $this->logger->error('Failed to send dunning mail: ' . $e->getMessage());
+            $this->logger->error('Failed to send dunning mail: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return false;
         }
     }

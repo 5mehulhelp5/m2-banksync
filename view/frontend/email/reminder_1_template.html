@@ -1,0 +1,14 @@
+<!--@subject {{trans "Payment reminder"}} @-->
+<!--@vars {
+"var invoice_id": "Invoice Identifier",
+"var due_date": "Invoice due date",
+"var store_name": "Store name",
+"var customer_name": "Customer Name"
+} @-->
+<p>Dear {{var customer_name}},</p>
+<p>We noticed that we have yet to receive payment for Invoice #{{var invoice_id}} which was due on {{var due_date}}.<br>
+   We would appreciate if you could check this matter and make the payment as early as possible.<br>
+   If you have already sent the payment, please disregard this reminder.</p>
+<p>Should you need more information on this, please feel free to get in touch with us.</p>
+<p>Thank you for your prompt attention to this matter.</p>
+<p>Best Regards,<br>{{var store_name}}</p>
