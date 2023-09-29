@@ -29,6 +29,8 @@ use Magento\Sales\Model\Order\InvoiceRepository;
  * @method $this setInvoiceId(int $id)
  * @method string getDunningType()
  * @method $this setDunningType(string $type)
+ * @method bool getIsPaid()
+ * @method $this setIsPaid(bool $value)
  * @method string getSentAt()
  * @method $this setSentAt(string $date)
  * @method string getCreatedAt()
@@ -167,5 +169,18 @@ class Dunning extends AbstractModel
             $this->logger->error('Failed to send dunning mail: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
             return false;
         }
+    }
+
+    /**
+     * @return bool
+     * @throws InputException
+     * @throws NoSuchEntityException
+     */
+    public function updatePaidStatus(): bool
+    {
+        $oldStatus = (int)$this->getIsPaid();
+        /** @noinspection PhpUndefinedMethodInspection */
+        $this->setIsPaid($this->getInvoice()->getIsBanksynced());
+        return $oldStatus !== (int)$this->getIsPaid();
     }
 }

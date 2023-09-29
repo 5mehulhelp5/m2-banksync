@@ -6,8 +6,11 @@ use Exception;
 use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Matching;
 use Ibertrand\BankSync\Logger\Logger;
+use Ibertrand\BankSync\Model\Dunning;
+use Ibertrand\BankSync\Model\DunningRepository;
 use Ibertrand\BankSync\Model\MatchConfidence;
 use Ibertrand\BankSync\Model\MatchConfidenceRepository;
+use Ibertrand\BankSync\Model\ResourceModel\Dunning\CollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\MatchConfidence\CollectionFactory as MatchConfidenceCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
@@ -42,6 +45,8 @@ class Booker
     protected Config $config;
     protected Matching $matching;
     protected Logger $logger;
+    protected CollectionFactory $dunningCollectionFactory;
+    protected DunningRepository $dunningRepository;
 
     public function __construct(
         TempTransactionResource          $tempTransactionResource,
@@ -54,6 +59,8 @@ class Booker
         MatchConfidenceRepository        $matchConfidenceRepository,
         InvoiceRepository                $invoiceRepository,
         CreditmemoRepository             $creditmemoRepository,
+        CollectionFactory                $dunningCollectionFactory,
+        DunningRepository                $dunningRepository,
         Config                           $config,
         Matching                         $matching,
         Logger                           $logger,
@@ -68,6 +75,8 @@ class Booker
         $this->matchConfidenceRepository = $matchConfidenceRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->creditmemoRepository = $creditmemoRepository;
+        $this->dunningCollectionFactory = $dunningCollectionFactory;
+        $this->dunningRepository = $dunningRepository;
         $this->config = $config;
         $this->matching = $matching;
         $this->logger = $logger;
@@ -101,6 +110,22 @@ class Booker
         $document->setIsBanksynced((int)$isBanksynced)
             ->setHasDataChanges(true);
         $this->resolveDocumentRepository($document)->save($document);
+
+        if ($document instanceof Invoice) {
+            $dunnings = $this->dunningCollectionFactory->create()
+                ->addFieldToFilter('invoice_id', $document->getId());
+            foreach ($dunnings as $dunning) {
+                /** @var Dunning $dunning */
+                try {
+                    if ($dunning->updatePaidStatus()) {
+                        $dunning->setHasDataChanges(true);
+                        $this->dunningRepository->save($dunning);
+                    }
+                } catch (Exception $e) {
+                    $this->logger->error($e->getMessage() . "\n" . $e->getTraceAsString());
+                }
+            }
+        }
     }
 
     /**

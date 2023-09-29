@@ -82,6 +82,14 @@
                 <label translate="true">Sent At</label>
             </settings>
         </column>
+        <column name="is_paid" sortOrder="60" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <label translate="true">Is paid</label>
+                <dataType>select</dataType>
+            </settings>
+        </column>
         <actionsColumn name="actions" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Dunning\Actions"
                        sortOrder="120">
             <settings>
