@@ -144,19 +144,21 @@ class Dunning extends AbstractModel
         $templateCode = $this->getEmailTemplate();
         $dueDays = $this->dunningHelper->getInvoiceDueDays();
         $invoiceDueDate = strtotime($invoice->getCreatedAt()) + $dueDays * 86400;
+        $customerName = trim($order->getCustomerName());
 
         $this->logger->info('Sending dunning mail to ' . $order->getCustomerEmail());
+
 
         $emailTemplateVariables = [
             'invoice_id' => $invoice->getIncrementId(),
             'due_date' => date('d.m.Y', $invoiceDueDate),
             'store_name' => $invoice->getStore()->getFrontendName(),
-            'customer_name' => $order->getCustomerName(),
+            'customer_name' => $customerName,
         ];
 
         $transport = $this->transportBuilder->setTemplateIdentifier($templateCode)
             ->setTemplateOptions(['area' => 'frontend', 'store' => $storeId])
-            ->addTo($order->getCustomerEmail(), $order->getCustomerName())
+            ->addTo($order->getCustomerEmail(), $customerName)
             ->setFromByScope($this->dunningHelper->getSenderIdentity($storeId), $storeId)
             ->setTemplateVars($emailTemplateVariables)
             ->getTransport();
