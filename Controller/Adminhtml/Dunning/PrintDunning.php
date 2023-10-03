@@ -41,6 +41,9 @@ class PrintDunning extends Action
         $dunningId = $this->getRequest()->getParam('id');
         if ($dunningId) {
             $dunning = $this->dunningRepository->getById($dunningId);
+            $dunning->setSentAt(date('Y-m-d H:i:s'));
+            $this->dunningRepository->save($dunning);
+
             $invoice = $dunning->getInvoice();
             $contents = $this->dunningPdf->getPdf([$dunning])->render();
             $fileContent = ['type' => 'string', 'value' => $contents, 'rm' => true];

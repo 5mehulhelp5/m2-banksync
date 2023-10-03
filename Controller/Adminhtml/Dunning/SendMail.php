@@ -39,6 +39,7 @@ class SendMail extends Action
         $dunning = $this->dunningRepository->getById($dunningId);
         try {
             if ($dunning->sendMail()) {
+                $this->dunningRepository->save($dunning);
                 $this->messageManager->addSuccessMessage(__('The mail has been sent.'));
             } else {
                 $this->messageManager->addErrorMessage(__('There was an error sending the mail.'));
