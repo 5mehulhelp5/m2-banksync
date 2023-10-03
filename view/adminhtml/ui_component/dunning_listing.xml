@@ -41,6 +41,28 @@
             <settings>
                 <indexField>entity_id</indexField>
             </settings>
+            <action name="mass_send">
+                <settings>
+                    <url path="banksync/dunning/massSend"/>
+                    <type>mass_send</type>
+                    <label translate="true">Send mails</label>
+                    <confirm>
+                        <title translate="true">Send Mails</title>
+                        <message translate="true">Are you want to send the selected dunnings via mail?</message>
+                    </confirm>
+                </settings>
+            </action>
+            <action name="mass_print">
+                <settings>
+                    <url path="banksync/dunning/massPrint"/>
+                    <type>mass_print</type>
+                    <label translate="true">Print</label>
+                    <confirm>
+                        <title translate="true">Print</title>
+                        <message translate="true">Are you want to print the selected?</message>
+                    </confirm>
+                </settings>
+            </action>
         </massaction>
     </listingToolbar>
     <columns name="dunning_columns">
