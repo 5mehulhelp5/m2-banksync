@@ -14,6 +14,8 @@ use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory as OrderAd
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
 use Magento\Ui\DataProvider\AbstractDataProvider;
+use Zend_Db;
+use Zend_Db_Select;
 
 class DunningListing extends AbstractDataProvider
 {
@@ -26,6 +28,7 @@ class DunningListing extends AbstractDataProvider
     protected OrderCollectionFactory $orderCollectionFactory;
     protected CustomerCollectionFactory $customerCollectionFactory;
     protected OrderAddressCollectionFactory $orderAddressCollectionFactory;
+    protected CollectionFactory $dunningCollectionFactory;
 
     public function __construct(
         $name,
@@ -40,6 +43,7 @@ class DunningListing extends AbstractDataProvider
         OrderCollectionFactory $orderCollectionFactory,
         CustomerCollectionFactory $customerCollectionFactory,
         OrderAddressCollectionFactory $orderAddressCollectionFactory,
+        CollectionFactory $dunningCollectionFactory,
         Logger $logger,
         array $meta = [],
         array $data = [],
@@ -53,6 +57,8 @@ class DunningListing extends AbstractDataProvider
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->orderAddressCollectionFactory = $orderAddressCollectionFactory;
+        $this->dunningCollectionFactory = $dunningCollectionFactory;
+
         $this->logger = $logger;
         parent::__construct(
             $name,
@@ -72,6 +78,7 @@ class DunningListing extends AbstractDataProvider
             $item['invoice_increment_id'] = $this->display->getObjectLink($invoice);
             $item['dunning_type'] = $this->config->getDunningTypeLabel($item['dunning_type'], $invoice->getStoreId());
             $item['email_address'] = $invoice->getOrder()->getCustomerEmail();
+            $item['is_sent'] = (int)!empty($item['sent_at']);
 
             $data['items'][$key] = $item;
         }
@@ -87,8 +94,57 @@ class DunningListing extends AbstractDataProvider
      */
     public function addFilter(Filter $filter)
     {
+        if ($filter->getField() === 'is_sent') {
+            $filter->setField('sent_at')
+                ->setConditionType($filter->getValue() ? 'notnull' : 'null')
+                ->setValue(true);
+        }
 
+        if ($filter->getField() === 'invoice_increment_id') {
+            $invoiceCollection = $this->invoiceCollectionFactory->create()
+                ->addFieldToFilter('increment_id', [$filter->getConditionType() => $filter->getValue()])
+                ->getAllIds();
+            $filter->setField('invoice_id')
+                ->setConditionType('in')
+                ->setValue(implode(',', $invoiceCollection));
+        }
+
+        if ($filter->getField() === 'email_address') {
+            $relevantInvoiceIds = $this->dunningCollectionFactory->create()
+                ->join(['invoice' => 'sales_invoice'], 'invoice.entity_id = main_table.invoice_id', [])
+                ->getSelect()
+                ->reset(Zend_Db_Select::COLUMNS)
+                ->columns('invoice.entity_id')
+                ->query()
+                ->fetchAll(Zend_Db::FETCH_COLUMN);
+            $invoiceCollection = $this->invoiceCollectionFactory->create()
+                ->join(['order' => 'sales_order'], 'order.entity_id = main_table.order_id', [])
+                ->addFieldToFilter('main_table.entity_id', ['in' => $relevantInvoiceIds])
+                ->addFieldToFilter('order.customer_email', [$filter->getConditionType() => $filter->getValue()]);
+            $this->logger->info($invoiceCollection->getSelect()->__toString());
+            $invoiceCollection = $invoiceCollection->getAllIds();
+
+            $filter->setField('invoice_id')
+                ->setConditionType('in')
+                ->setValue(implode(',', $invoiceCollection));
+        }
 
         parent::addFilter($filter);
+    }
+
+    /**
+     * @param $field
+     * @param $direction
+     * @return void
+     */
+    public function addOrder($field, $direction)
+    {
+        if ($field === 'invoice_increment_id') {
+            $field = 'invoice_id';
+        }
+        if ($field === 'is_sent') {
+            $field = 'sent_at';
+        }
+        parent::addOrder($field, $direction);
     }
 }

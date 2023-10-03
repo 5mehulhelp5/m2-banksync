@@ -14,7 +14,7 @@
     </settings>
     <dataSource name="dunning_listing_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
-             <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\DunningListing</argument>
+            <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\DunningListing</argument>
             <argument name="name" xsi:type="string">dunning_listing_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
             <argument name="requestFieldName" xsi:type="string">id</argument>
@@ -62,6 +62,7 @@
             <settings>
                 <filter>text</filter>
                 <label translate="true">Email address</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="dunning_type" sortOrder="30">
@@ -80,6 +81,14 @@
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Sent At</label>
+            </settings>
+        </column>
+        <column name="is_sent" sortOrder="55" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <dataType>select</dataType>
+                <label translate="true">Sent</label>
             </settings>
         </column>
         <column name="is_paid" sortOrder="60" component="Magento_Ui/js/grid/columns/select">
