@@ -75,22 +75,30 @@
         </selectionsColumn>
         <column name="invoice_increment_id" sortOrder="10">
             <settings>
+                <dataScope>invoice_increment_id</dataScope>
                 <filter>text</filter>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
                 <label translate="true">Invoice</label>
+            </settings>
+        </column>
+        <column name="invoice_date" sortOrder="15">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Invoice Date</label>
             </settings>
         </column>
         <column name="email_address" sortOrder="20">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Email address</label>
-                <sortable>false</sortable>
             </settings>
         </column>
-        <column name="dunning_type" sortOrder="30">
+        <column name="dunning_type" sortOrder="30" component="Magento_Ui/js/grid/columns/select">
             <settings>
-                <filter>text</filter>
+                <filter>select</filter>
                 <label translate="true">Type</label>
+                <dataType>select</dataType>
+                <options class="Ibertrand\BankSync\Model\Config\Source\DunningTypes"/>
             </settings>
         </column>
         <column name="created_at" sortOrder="40">
