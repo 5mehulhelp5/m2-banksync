@@ -30,6 +30,7 @@ class TempTransactionEditForm extends AbstractDataProvider
         $data = [];
         foreach ($this->collection as $item) {
             $data[$item->getId()] = $item->getData();
+            $data[$item->getId()]['archive'] = false;
         }
 
         $persistedData = $this->dataPersistor->get('banksync_temptransaction');

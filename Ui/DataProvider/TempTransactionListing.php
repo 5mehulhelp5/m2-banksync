@@ -163,7 +163,7 @@ class TempTransactionListing extends AbstractDataProvider
                     }
                 } catch (Exception $e) {
                     $this->logger->error($e);
-                    $item['document'] = "[Not found]";
+                    $item['document'] = "[ERROR]";
                 }
             }
 

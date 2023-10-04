@@ -16,7 +16,7 @@ class Actions extends Column
         UiComponentFactory $uiComponentFactory,
         UrlInterface       $urlBuilder,
         array              $components = [],
-        array              $data = []
+        array              $data = [],
     ) {
         $this->urlBuilder = $urlBuilder;
         parent::__construct($context, $uiComponentFactory, $components, $data);
@@ -66,6 +66,22 @@ class Actions extends Column
                         ),
                         'label' => __('🖉 Edit comment'),
                         'hidden' => false,
+                    ];
+
+                    $item[$name]['archive'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            'banksync/temptransaction/archive',
+                            ['id' => $item['entity_id']]
+                        ),
+                        'label' => __('📁 Archive'),
+                        'hidden' => false,
+                        'confirm' => [
+                            'title' => __('Archive "%1"', $item['entity_id']),
+                            'message' => __(
+                                'Are you sure you want to archive the record "%1"?',
+                                $item['entity_id']
+                            ),
+                        ],
                     ];
 
                     $item[$name]['delete'] = [

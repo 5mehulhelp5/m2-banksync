@@ -92,39 +92,51 @@ class TransactionListing extends AbstractDataProvider
                     'sales/' . $item['document_type'] . '/view',
                     ['invoice_id' => $item['document_id']]
                 );
-                $document = (
-                    $item['document_type'] == 'invoice'
-                    ? $this->invoiceRepository
-                    : $this->creditmemoRepository
-                )->get($item['document_id']);
+                $hasDocument = !empty($item['document_id']);
+                if ($hasDocument) {
+                    $document = (
+                        $item['document_type'] == 'invoice'
+                        ? $this->invoiceRepository
+                        : $this->creditmemoRepository
+                    )->get($item['document_id']);
 
-                $item['document'] = "<a href='$url'>" . $document->getIncrementId() . "</a>";
-                $item['document_name'] = $this->display->getCustomerNamesForListing($document->getOrder());
-                $item['document_amount'] = $document->getGrandTotal();
-                $item['document_date'] = $document->getCreatedAt();
-                $orderUrl = $this->urlBuilder->getUrl(
-                    'sales/order/view',
-                    ['order_id' => $document->getOrder()->getId()]
-                );
-                $item['order_increment_id'] = "<a href='$orderUrl'>{$document->getOrder()->getIncrementId()}</a>";
-                $item['payment_method'] = $document->getOrder()->getPayment()->getMethodInstance()->getTitle();
-
-                $customerId = $document->getOrder()->getCustomerId();
-                if ($customerId) {
-                    $customer = $this->customerFactory->create();
-                    $this->customerResource->load($customer, $customerId);
-                    $customerUrl = $this->urlBuilder->getUrl(
-                        'customer/index/edit',
-                        ['id' => $customerId]
+                    $item['document'] = "<a href='$url'>" . $document->getIncrementId() . "</a>";
+                    $item['document_name'] = $this->display->getCustomerNamesForListing($document->getOrder());
+                    $item['document_amount'] = $document->getGrandTotal();
+                    $item['document_date'] = $document->getCreatedAt();
+                    $orderUrl = $this->urlBuilder->getUrl(
+                        'sales/order/view',
+                        ['order_id' => $document->getOrder()->getId()]
                     );
-                    $item['customer_increment_id'] = "<a href='$customerUrl'>{$customer->getIncrementId()}</a>";
+                    $item['order_increment_id'] = "<a href='$orderUrl'>{$document->getOrder()->getIncrementId()}</a>";
+                    $item['payment_method'] = $document->getOrder()->getPayment()->getMethodInstance()->getTitle();
+
+                    $customerId = $document->getOrder()->getCustomerId();
+                    if ($customerId) {
+                        $customer = $this->customerFactory->create();
+                        $this->customerResource->load($customer, $customerId);
+                        $customerUrl = $this->urlBuilder->getUrl(
+                            'customer/index/edit',
+                            ['id' => $customerId]
+                        );
+                        $item['customer_increment_id'] = "<a href='$customerUrl'>{$customer->getIncrementId()}</a>";
+                    } else {
+                        $item['customer_increment_id'] = "-";
+                    }
                 } else {
-                    $item['customer_increment_id'] = "-";
+                    $item['document_type'] = "";
+                    $item['document'] = "";
+                    $item['document_name'] = "";
+                    $item['document_amount'] = "";
+                    $item['document_date'] = "";
+                    $item['order_increment_id'] = "";
+                    $item['payment_method'] = "";
+                    $item['customer_increment_id'] = "";
                 }
 
             } catch (Exception $e) {
                 $this->logger->error($e);
-                $item['document'] = "[Not found]";
+                $item['document'] = "[ERROR]";
             }
         }
 

@@ -154,3 +154,10 @@ Types,Typen
 Unbook,Rückgängig machen
 Weights,Gewichte
 Is paid,Ist bezahlt
+"Are you sure you want to archive the record ""%1""?",Sind Sie sicher, dass Sie den Eintrag ""%1"" archivieren wollen?
+Archive,Archivieren
+"📁 Archive","📁 Archivieren"
+Archive transaction,Transaktion archivieren
+"Archive ""%1""","""%1"" archivieren"
+Transaction archived.,Transaktion archiviert.
+Transaction archived,Transaktion archiviert

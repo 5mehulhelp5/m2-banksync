@@ -87,5 +87,17 @@
             </settings>
         </textarea>
 
+        <checkbox name="archive">
+            <settings>
+                <dataScope>archive</dataScope>
+                <label>Archive transaction</label>
+                <dataType>boolean</dataType>
+                <prefer>toggle</prefer>
+                <valueMap>
+                    <map name="false" xsi:type="number">0</map>
+                    <map name="true" xsi:type="number">1</map>
+                </valueMap>
+            </settings>
+        </checkbox>
     </fieldset>
 </form>

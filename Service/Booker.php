@@ -129,6 +129,46 @@ class Booker
     }
 
     /**
+     * Transforms a temp transaction into a transaction and deletes the temp transaction.
+     * This is used to archive temp transactions and move them to the transaction table,
+     * without actually booking them.
+     *
+     * @param TempTransaction|int $tempTransaction
+     *
+     * @return Transaction
+     * @throws CouldNotDeleteException
+     * @throws CouldNotSaveException
+     * @throws NoSuchEntityException
+     */
+    public function archive(TempTransaction|int $tempTransaction): Transaction
+    {
+        $db = $this->tempTransactionResource->getConnection();
+        $db->beginTransaction();
+        try {
+
+            if (is_int($tempTransaction)) {
+                $tempTransaction = $this->tempTransactionRepository->getById($tempTransaction);
+            }
+            $tempTransactionConfidences = $this->matchConfidenceCollectionFactory->create()
+                ->addFieldToFilter('temp_transaction_id', $tempTransaction->getId());
+            foreach ($tempTransactionConfidences as $confidence) {
+                $this->matchConfidenceRepository->delete($confidence);
+            }
+
+            $transaction = $this->transactionResource->fromTempTransaction($tempTransaction);
+            $this->transactionRepository->save($transaction);
+
+            $this->tempTransactionRepository->delete($tempTransaction);
+            $db->commit();
+
+            return $transaction;
+        } catch (Exception $e) {
+            $db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
      * @param TempTransaction|int    $tempTransaction
      * @param Invoice|Creditmemo|int $document
      * @param bool                   $partial
@@ -218,24 +258,26 @@ class Booker
 
             $this->transactionRepository->save($transaction);
             $db->commit();
+
+            return $transaction;
         } catch (Exception $e) {
             $db->rollBack();
             throw $e;
         }
-        return $transaction;
     }
 
     /**
      * @param Transaction|int $transaction
      *
-     * @return void
+     * @return TempTransaction
+     *
      * @throws AlreadyExistsException
      * @throws CouldNotDeleteException
      * @throws NoSuchEntityException
      * @throws InputException
      * @throws CouldNotSaveException
      */
-    public function unbook(Transaction|int $transaction): void
+    public function unbook(Transaction|int $transaction): TempTransaction
     {
         $db = $this->transactionResource->getConnection();
         $db->beginTransaction();
@@ -243,14 +285,17 @@ class Booker
             if (is_int($transaction)) {
                 $transaction = $this->transactionRepository->getById($transaction);
             }
+            $hasDocument = !empty($transaction->getDocumentId());
 
-            $document = $this->resolveDocumentRepository($transaction)->get($transaction->getDocumentId());
-            $isStillPaid = $this->transactionCollectionFactory->create()
-                    ->addFieldToFilter('document_id', $document->getId())
-                    ->addFieldToFilter('document_type', $transaction->getDocumentType())
-                    ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()])
-                    ->getSize() > 0;
-            $this->saveDocument($document, $isStillPaid);
+            if ($hasDocument) {
+                $document = $this->resolveDocumentRepository($transaction)->get($transaction->getDocumentId());
+                $isStillPaid = $this->transactionCollectionFactory->create()
+                        ->addFieldToFilter('document_id', $document->getId())
+                        ->addFieldToFilter('document_type', $transaction->getDocumentType())
+                        ->addFieldToFilter('entity_id', ['neq' => $transaction->getId()])
+                        ->getSize() > 0;
+                $this->saveDocument($document, $isStillPaid);
+            }
 
             $tempTransaction = null;
             if ($transaction->getPartialHash()) {
@@ -283,16 +328,20 @@ class Booker
             $this->tempTransactionResource->save($tempTransaction);
             $this->transactionRepository->delete($transaction);
 
-            // With unbooking, the document is now free to be matched again, which can potentially affect other
-            // temp transactions. Therefore, we need to recalculate the match confidence for all temp transactions.
-            $allTempTransactions = $this->tempTransactionCollectionFactory->create();
-            foreach ($allTempTransactions as $tempTransaction) {
-                $tempTransaction->setIsDirty(TempTransaction::DIRTY);
-                $tempTransaction->setHasDataChanges(true);
-                $this->tempTransactionRepository->save($tempTransaction);
+            if ($hasDocument) {
+                // With unbooking, the document is now free to be matched again, which can potentially affect other
+                // temp transactions. Therefore, we need to recalculate the match confidence for all temp transactions.
+                $allTempTransactions = $this->tempTransactionCollectionFactory->create();
+                foreach ($allTempTransactions as $tempTransaction) {
+                    $tempTransaction->setDirty(TempTransaction::DIRTY);
+                    $tempTransaction->setHasDataChanges(true);
+                    $this->tempTransactionRepository->save($tempTransaction);
+                }
             }
 
             $db->commit();
+
+            return $tempTransaction;
         } catch (Exception $e) {
             $db->rollBack();
             throw $e;

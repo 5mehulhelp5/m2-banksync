@@ -5,6 +5,7 @@ namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 use Exception;
 use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
+use Ibertrand\BankSync\Service\Booker;
 use Magento\Backend\App\Action;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -12,15 +13,18 @@ use Magento\Framework\Exception\NoSuchEntityException;
 class Save extends Action
 {
     protected Logger $logger;
+    protected Booker $booker;
     protected TempTransactionRepository $tempTransactionRepository;
 
     public function __construct(
         Action\Context            $context,
         TempTransactionRepository $tempTransactionRepository,
+        Booker                    $booker,
         Logger                    $logger,
     ) {
         parent::__construct($context);
         $this->tempTransactionRepository = $tempTransactionRepository;
+        $this->booker = $booker;
         $this->logger = $logger;
     }
 
@@ -30,12 +34,18 @@ class Save extends Action
     public function execute()
     {
         $comment = $this->getRequest()->getParam('comment');
+        $archive = !empty($this->getRequest()->getParam('archive'));
 
         try {
             $tempTransaction = $this->tempTransactionRepository->getById($this->getRequest()->getParam('entity_id'));
             $tempTransaction->setComment($comment);
             $this->tempTransactionRepository->save($tempTransaction);
-            $this->messageManager->addSuccessMessage(__('Transaction saved.'));
+            if ($archive) {
+                $this->booker->archive($tempTransaction);
+                $this->messageManager->addSuccessMessage(__('Transaction archived.'));
+            } else {
+                $this->messageManager->addSuccessMessage(__('Transaction saved.'));
+            }
         } catch (NoSuchEntityException) {
             $this->messageManager->addErrorMessage(__('Transaction not found.'));
         } catch (Exception $e) {
