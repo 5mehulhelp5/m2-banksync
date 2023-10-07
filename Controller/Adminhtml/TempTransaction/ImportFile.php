@@ -5,7 +5,7 @@ namespace Ibertrand\BankSync\Controller\Adminhtml\TempTransaction;
 use Exception;
 use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Hashes;
-use Ibertrand\BankSync\Lib\NamedCsv;
+use Ibertrand\BankSync\Lib\Csv;
 use Ibertrand\BankSync\Logger\Logger;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
@@ -23,7 +23,7 @@ use Magento\Framework\Exception\LocalizedException;
 
 class ImportFile extends Action
 {
-    protected NamedCsv $csvProcessor;
+    protected Csv $csvProcessor;
     protected TempTransactionFactory $tempTransactionFactory;
     protected TempTransactionResource $tempTransactionResource;
     protected Logger $logger;
@@ -37,7 +37,7 @@ class ImportFile extends Action
 
     public function __construct(
         Action\Context                   $context,
-        NamedCsv                         $csvProcessor,
+        Csv                              $csvProcessor,
         TempTransactionFactory           $tempTransactionFactory,
         TempTransactionResource          $tempTransactionResource,
         TempTransactionRepository        $tempTransactionRepository,
@@ -88,7 +88,8 @@ class ImportFile extends Action
         return $this->csvProcessor
             ->setDelimiter($this->scopeConfig->getValue('banksync/csv_settings/general/delimiter'))
             ->setEnclosure($this->scopeConfig->getValue('banksync/csv_settings/general/enclosure'))
-            ->getNamedData($file);
+            ->setHasHeaders(true)
+            ->getData($file);
     }
 
     /**
