@@ -2,7 +2,9 @@
 
 namespace Ibertrand\BankSync\Model\ResourceModel;
 
+use Ibertrand\BankSync\Model\TempTransaction as TempTransactionModel;
 use Ibertrand\BankSync\Model\TempTransactionFactory;
+use Ibertrand\BankSync\Model\Transaction;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\ResourceModel\Db\Context;
@@ -35,7 +37,11 @@ class TempTransaction extends AbstractDb
         $connection->truncateTable($this->getMainTable());
     }
 
-    public function fromTransaction(\Ibertrand\BankSync\Model\Transaction $transaction)
+    /**
+     * @param Transaction $transaction
+     * @return TempTransactionModel
+     */
+    public function fromTransaction(Transaction $transaction): TempTransactionModel
     {
         return $this->tempTransactionFactory->create()
             ->setPayerName($transaction->getPayerName())
@@ -43,6 +49,7 @@ class TempTransaction extends AbstractDb
             ->setPurpose($transaction->getPurpose())
             ->setAmount($transaction->getAmount())
             ->setComment($transaction->getComment())
+            ->setPartialHash($transaction->getPartialHash())
             ->setHash($transaction->getHash());
     }
 }
