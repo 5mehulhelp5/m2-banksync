@@ -31,20 +31,6 @@
                     <strict_amount>1</strict_amount>
                 </weights>
             </matching>
-            <csv_settings>
-                <general>
-                    <delimiter>;</delimiter>
-                    <enclosure>"</enclosure>
-                    <thousand_separator>.</thousand_separator>
-                    <decimal_separator>,</decimal_separator>
-                </general>
-                <fields>
-                    <payer_name>payer_name</payer_name>
-                    <transaction_date>transaction_date</transaction_date>
-                    <purpose>purpose</purpose>
-                    <amount>amount</amount>
-                </fields>
-            </csv_settings>
             <dunnings>
                 <enabled>0</enabled>
                 <auto_send_mail>0</auto_send_mail>

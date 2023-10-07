@@ -7,6 +7,8 @@ use Ibertrand\BankSync\Helper\Config;
 use Ibertrand\BankSync\Helper\Hashes;
 use Ibertrand\BankSync\Lib\Csv;
 use Ibertrand\BankSync\Logger\Logger;
+use Ibertrand\BankSync\Model\CsvFormat;
+use Ibertrand\BankSync\Model\CsvFormatRepository;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction as TempTransactionResource;
 use Ibertrand\BankSync\Model\ResourceModel\TempTransaction\CollectionFactory as TempTransactionCollectionFactory;
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory as TransactionCollectionFactory;
@@ -14,7 +16,6 @@ use Ibertrand\BankSync\Model\TempTransactionFactory;
 use Ibertrand\BankSync\Model\TempTransactionRepository;
 use Ibertrand\BankSync\Service\Matcher;
 use Magento\Backend\App\Action;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
@@ -23,15 +24,16 @@ use Magento\Framework\Exception\LocalizedException;
 
 class ImportFile extends Action
 {
+    const ADMIN_RESOURCE = 'Ibertrand_BankSync::sub_menu_import';
     protected Csv $csvProcessor;
     protected TempTransactionFactory $tempTransactionFactory;
     protected TempTransactionResource $tempTransactionResource;
     protected Logger $logger;
-    protected ScopeConfigInterface $scopeConfig;
     protected Matcher $matcher;
     protected TempTransactionRepository $tempTransactionRepository;
     protected TempTransactionCollectionFactory $tempTransactionCollectionFactory;
     protected TransactionCollectionFactory $transactionCollectionFactory;
+    protected CsvFormatRepository $csvFormatRepository;
     protected Config $config;
     protected Hashes $hashes;
 
@@ -43,8 +45,8 @@ class ImportFile extends Action
         TempTransactionRepository        $tempTransactionRepository,
         TempTransactionCollectionFactory $tempTransactionCollectionFactory,
         TransactionCollectionFactory     $transactionCollectionFactory,
+        CsvFormatRepository              $csvFormatRepository,
         Logger                           $logger,
-        ScopeConfigInterface             $scopeConfig,
         Matcher                          $matcher,
         Config                           $config,
         Hashes                           $hashes,
@@ -56,62 +58,25 @@ class ImportFile extends Action
         $this->tempTransactionRepository = $tempTransactionRepository;
         $this->tempTransactionCollectionFactory = $tempTransactionCollectionFactory;
         $this->transactionCollectionFactory = $transactionCollectionFactory;
+        $this->csvFormatRepository = $csvFormatRepository;
         $this->logger = $logger;
-        $this->scopeConfig = $scopeConfig;
         $this->matcher = $matcher;
         $this->config = $config;
         $this->hashes = $hashes;
     }
 
     /**
-     * @return string[]
-     */
-    protected function getColumnMap(): array
-    {
-        $fields = ['transaction_date', 'payer_name', 'purpose', 'amount'];
-        $configPrefix = 'banksync/csv_settings/fields/';
-        $columnMap = [];
-        foreach ($fields as $field) {
-            $columnMap[$field] = $this->scopeConfig->getValue($configPrefix . $field);
-        }
-        return $columnMap;
-    }
-
-    /**
-     * @param string $file
-     *
-     * @return array
-     * @throws Exception
-     */
-    protected function readData(string $file): array
-    {
-        return $this->csvProcessor
-            ->setDelimiter($this->scopeConfig->getValue('banksync/csv_settings/general/delimiter'))
-            ->setEnclosure($this->scopeConfig->getValue('banksync/csv_settings/general/enclosure'))
-            ->setHasHeaders(true)
-            ->getData($file);
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return float
+     * @return CsvFormat
      * @throws LocalizedException
      */
-    protected function parseFloat(string $value): float
+    protected function getCsvFormat(): CsvFormat
     {
-        $thousand = trim($this->scopeConfig->getValue('banksync/csv_settings/general/thousand_separator') ?? "");
-        $decimal = trim($this->scopeConfig->getValue('banksync/csv_settings/general/decimal_separator') ?? "");
-        if ($thousand === $decimal) {
-            throw new LocalizedException(__('Thousand separator and decimal separator must be different.'));
+        try {
+            return $this->csvFormatRepository->getById($this->getRequest()->getParam('csv_format'));
+        } catch (Exception $e) {
+            $this->logger->error($e);
+            throw new LocalizedException(__('CSV format not found.'));
         }
-        if (!empty($thousand)) {
-            $value = str_replace($thousand, '', $value);
-        }
-        if (!empty($decimal)) {
-            $value = str_replace($decimal, '.', $value);
-        }
-        return (float)$value;
     }
 
     /**
@@ -128,8 +93,8 @@ class ImportFile extends Action
                 throw new LocalizedException(__('File not found.'));
             }
 
-            $colMap = $this->getColumnMap();
-            $csvRows = $this->readData($csvFilePath);
+            $csvFormat = $this->getCsvFormat();
+            $csvRows = $csvFormat->loadFile($csvFilePath);
 
             if ($this->getRequest()->getParam('delete_old')) {
                 $this->tempTransactionRepository->deleteAll();
@@ -139,21 +104,19 @@ class ImportFile extends Action
 
             $newTransactions = [];
             foreach ($csvRows as $csvRow) {
-                $amount = $this->parseFloat($csvRow[$colMap['amount']] ?? "");
-                if (!$useNegativeAmounts && $amount < 0) {
+                if (!$useNegativeAmounts && $csvRow['amount'] < 0) {
                     continue;
                 }
 
-                $data = [
-                    'payer_name' => $csvRow[$colMap['payer_name']] ?? "",
-                    'purpose' => $csvRow[$colMap['purpose']] ?? "",
-                    'amount' => $amount,
-                    'transaction_date' => date('Y-m-d', strtotime($csvRow[$colMap['transaction_date']] ?? "")),
+                $transaction = $this->tempTransactionFactory->create(['data' => [
+                    'payer_name' => $csvRow['payer_name'],
+                    'purpose' => $csvRow['purpose'],
+                    'amount' => $csvRow['amount'],
+                    'transaction_date' => $csvRow['transaction_date'],
                     'dirty' => 1,
-                ];
-                $transaction = $this->tempTransactionFactory->create(['data' => $data]);
-                $transaction->setHasDataChanges(true);
+                ]]);
                 $transaction->setHash($this->hashes->calculateHash($transaction));
+                $transaction->setHasDataChanges(true);
                 $newTransactions[$transaction->getHash()] = $transaction;
             }
 
@@ -201,10 +164,5 @@ class ImportFile extends Action
         }
 
         return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('*/*/index');
-    }
-
-    protected function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Ibertrand_BankSync::sub_menu_import');
     }
 }

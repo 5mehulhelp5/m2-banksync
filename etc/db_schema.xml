@@ -81,4 +81,30 @@
             <column name="document_id"/>
         </constraint>
     </table>
+    <table name="banksync_csv_format">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" comment="Name"/>
+        <column xsi:type="boolean" name="has_header" nullable="false" default="1" comment="Has Header"/>
+        <column xsi:type="varchar" name="delimiter" nullable="false" comment="Delimiter"/>
+        <column xsi:type="varchar" name="enclosure" nullable="false" comment="Enclosure"/>
+        <column xsi:type="int" name="ignore_leading_lines" nullable="false" default="0" comment="Ignore Leading Lines"/>
+        <column xsi:type="int" name="ignore_tailing_lines" nullable="false" default="0" comment="Ignore Tailing Lines"/>
+        <column xsi:type="int" name="ignore_invalid_lines" nullable="false" default="0" comment="Ignore Invalid Lines"/>
+        <column xsi:type="varchar" name="thousands_separator" nullable="false" comment="Thousands Separator"/>
+        <column xsi:type="varchar" name="decimal_separator" nullable="false" comment="Decimal Separator"/>
+        <column xsi:type="varchar" name="date_format" nullable="false" comment="Date Format"/>
+        <column xsi:type="varchar" name="amount_column" nullable="false" comment="Amount Column"/>
+        <column xsi:type="varchar" name="amount_regex" nullable="false" comment="Amount Regex"/>
+        <column xsi:type="varchar" name="purpose_column" nullable="false" comment="Purpose Column"/>
+        <column xsi:type="varchar" name="purpose_regex" nullable="false" comment="Purpose Regex"/>
+        <column xsi:type="varchar" name="payer_name_column" nullable="false" comment="Payer Name Column"/>
+        <column xsi:type="varchar" name="payer_name_regex" nullable="false" comment="Payer Name Regex"/>
+        <column xsi:type="varchar" name="date_column" nullable="false" comment="Date Column"/>
+        <column xsi:type="varchar" name="date_regex" nullable="false" comment="Date Regex"/>
+        <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
 </schema>

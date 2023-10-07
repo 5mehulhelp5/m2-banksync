@@ -76,5 +76,31 @@
             "FK_FF9AB1298262BD318F5C3F452C851794": true,
             "UNQ_67A206559C555BF1F07E59B0E8F88773": true
         }
+    },
+    "banksync_csv_format": {
+        "column": {
+            "name": true,
+            "has_header": true,
+            "delimiter": true,
+            "enclosure": true,
+            "ignore_leading_lines": true,
+            "ignore_tailing_lines": true,
+            "thousands_separator": true,
+            "decimal_separator": true,
+            "date_format": true,
+            "amount_column": true,
+            "amount_regex": true,
+            "purpose_column": true,
+            "purpose_regex": true,
+            "payer_name_column": true,
+            "payer_name_regex": true,
+            "date_column": true,
+            "date_regex": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
     }
 }

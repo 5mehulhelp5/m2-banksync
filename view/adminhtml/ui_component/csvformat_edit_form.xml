@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">csvformat_edit_form.csvformat_edit_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Import Transaction</item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">csvformat_edit_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save">
+                <label translate="true">Save</label>
+                <class>primary</class>
+            </button>
+            <button name="back">
+                <label translate="true">Back</label>
+                <url path="*/*/index"/>
+                <class>secondary</class>
+            </button>
+        </buttons>
+        <deps>
+            <dep>csvformat_edit_form.csvformat_edit_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="csvformat_edit_form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\CsvFormatEditForm</argument>
+            <argument name="name" xsi:type="string">csvformat_edit_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="*/*/save"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+
+    <fieldset name="general">
+        <settings>
+            <collapsible>false</collapsible>
+            <label translate="true">Edit csv format</label>
+        </settings>
+
+        <input name="name">
+            <settings>
+                <label>Name of the Format</label>
+                <dataScope>name</dataScope>
+                <required>true</required>
+            </settings>
+        </input>
+
+        <checkbox name="has_header">
+            <settings>
+                <dataScope>has_header</dataScope>
+                <label>File contains headers</label>
+                <dataType>boolean</dataType>
+                <prefer>toggle</prefer>
+                <valueMap>
+                    <map name="false" xsi:type="number">0</map>
+                    <map name="true" xsi:type="number">1</map>
+                </valueMap>
+            </settings>
+        </checkbox>
+
+        <input name="delimiter">
+            <settings>
+                <label>CSV Field Delimiter</label>
+                <dataScope>delimiter</dataScope>
+                <required>true</required>
+            </settings>
+        </input>
+
+        <input name="enclosure">
+            <settings>
+                <label>CSV Text Encapsulation Character</label>
+                <dataScope>enclosure</dataScope>
+                <required>true</required>
+            </settings>
+        </input>
+
+        <input name="ignore_leading_lines">
+            <settings>
+                <label>Number of lines to ignore at the beginning of the file</label>
+                <dataScope>ignore_leading_lines</dataScope>
+                <dataType>int</dataType>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </input>
+        <input name="ignore_tailing_lines">
+            <settings>
+                <label>Number of lines to ignore at the end of the file</label>
+                <dataScope>ignore_tailing_lines</dataScope>
+                <dataType>int</dataType>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </input>
+        <checkbox name="ignore_invalid_lines">
+            <settings>
+                <dataScope>ignore_invalid_lines</dataScope>
+                <label>Ignore lines that do not match the format</label>
+                <notice>
+                    Otherwise, the import process will be stopped and the file
+                    will not be imported at all if there are invalid lines
+                </notice>
+                <dataType>boolean</dataType>
+                <prefer>toggle</prefer>
+                <valueMap>
+                    <map name="false" xsi:type="number">0</map>
+                    <map name="true" xsi:type="number">1</map>
+                </valueMap>
+            </settings>
+        </checkbox>
+        <input name="date_format">
+            <settings>
+                <label>Transaction Date Format</label>
+                <notice>PHP date() format</notice>
+                <placeholder>d.m.Y</placeholder>
+                <dataScope>date_format</dataScope>
+                <required>true</required>
+            </settings>
+        </input>
+
+        <input name="decimal_separator">
+            <settings>
+                <label>Decimal Separator for Figures</label>
+                <dataScope>decimal_separator</dataScope>
+                <required>true</required>
+            </settings>
+        </input>
+        <input name="thousands_separator">
+            <settings>
+                <label>Thousands Separator for Figures</label>
+                <dataScope>thousands_separator</dataScope>
+            </settings>
+        </input>
+
+        <input name="amount_column">
+            <settings>
+                <label>CSV column for Transaction Amount</label>
+                <dataScope>amount_column</dataScope>
+                <required>true</required>
+                <notice>Enter a column number or the column header</notice>
+            </settings>
+        </input>
+
+        <input name="date_column">
+            <settings>
+                <label>CSV column for Transaction Date</label>
+                <dataScope>date_column</dataScope>
+                <required>true</required>
+                <notice>Enter a column number or the column header</notice>
+            </settings>
+        </input>
+
+        <input name="payer_name_column">
+            <settings>
+                <label>CSV column for Payer's Name</label>
+                <dataScope>payer_name_column</dataScope>
+                <required>true</required>
+                <notice>Enter a column number or the column header</notice>
+            </settings>
+        </input>
+
+        <input name="purpose_column">
+            <settings>
+                <label>CSV column for Transaction Purpose</label>
+                <dataScope>purpose_column</dataScope>
+                <required>true</required>
+                <notice>Enter a column number or the column header</notice>
+            </settings>
+        </input>
+
+        <input name="amount_regex">
+            <settings>
+                <label>Regex Pattern for Transaction Amount</label>
+                <dataScope>amount_regex</dataScope>
+            </settings>
+        </input>
+
+        <input name="date_regex">
+            <settings>
+                <label>Regex Pattern for Transaction Date</label>
+                <dataScope>date_regex</dataScope>
+            </settings>
+        </input>
+
+        <input name="payer_name_regex">
+            <settings>
+                <label>Regex Pattern for Payer's Name</label>
+                <dataScope>payer_name_regex</dataScope>
+            </settings>
+        </input>
+
+        <input name="purpose_regex">
+            <settings>
+                <label>Regex Pattern for Transaction Purpose</label>
+                <dataScope>purpose_regex</dataScope>
+            </settings>
+        </input>
+
+    </fieldset>
+</form>

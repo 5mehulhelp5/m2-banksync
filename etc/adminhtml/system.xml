@@ -107,40 +107,6 @@
                     </field>
                 </group>
             </group>
-            <group id="csv_settings" translate="label,comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>CSV Settings</label>
-                <group id="general" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>General Configuration</label>
-                    <field id="delimiter" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Delimiter</label>
-                    </field>
-                    <field id="enclosure" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Enclosure</label>
-                    </field>
-                    <field id="thousand_separator" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Thousand Separator</label>
-                    </field>
-                    <field id="decimal_separator" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Decimal Separator</label>
-                    </field>
-                </group>
-                <group id="fields" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Fields</label>
-                    <comment>The headers of the CSV file.</comment>
-                    <field id="payer_name" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Payer Name</label>
-                    </field>
-                    <field id="transaction_date" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Payment date</label>
-                    </field>
-                    <field id="purpose" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Payment purpose</label>
-                    </field>
-                    <field id="amount" translate="label,comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Amount</label>
-                    </field>
-                </group>
-            </group>
             <group id="dunnings" translate="label,comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Dunnings</label>
                 <field id="enabled" translate="label,comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">

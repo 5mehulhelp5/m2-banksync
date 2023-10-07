@@ -3,11 +3,21 @@
 namespace Ibertrand\BankSync\Lib;
 
 use Exception;
+use Ibertrand\BankSync\Logger\Logger;
 use Magento\Framework\File\Csv as CoreCsv;
+use Magento\Framework\Filesystem\Driver\File;
+use ValueError;
 
 class Csv extends CoreCsv
 {
     private bool $_hasHeaders;
+    private Logger $logger;
+
+    public function __construct(File $file, Logger $logger)
+    {
+        parent::__construct($file);
+        $this->logger = $logger;
+    }
 
     public function setHasHeaders(bool $value): static
     {
@@ -23,8 +33,12 @@ class Csv extends CoreCsv
      * @return array
      * @throws Exception
      */
-    public function getData($file)
-    {
+    public function getData(
+        $file,
+        int $ignoreLeadingLines = 0,
+        int $ignoreTailingLines = 0,
+        bool $ignoreInvalidLines = false,
+    ) {
         $tempFilename = tempnam(sys_get_temp_dir(), 'csv');
         $contents = $this->file->fileGetContents($file);
 
@@ -39,11 +53,38 @@ class Csv extends CoreCsv
 
         $this->file->deleteFile($tempFilename);
 
+        if ($ignoreLeadingLines) {
+            $data = array_slice($data, $ignoreLeadingLines);
+        }
+        if ($ignoreTailingLines) {
+            $data = array_slice($data, 0, -$ignoreTailingLines);
+        }
+
         if ($this->_hasHeaders) {
             $header = array_shift($data);
-            return array_map(function ($row) use ($header) {
-                return array_combine($header, $row);
-            }, $data);
+            $result = [];
+            foreach ($data as $row) {
+                if (count($row) === 1 && $row[0] === null) {
+                    // Skip empty lines
+                    continue;
+                }
+                try {
+                    $result[] = array_combine($header, $row);
+                } catch (ValueError) {
+                    $this->logger->notice('Header: ' . var_export($header, true));
+                    $this->logger->notice('Row: ' . var_export($row, true));
+                    $this->logger->error(
+                        'Invalid line in CSV file (different number of cells compared to header): '
+                        . var_export($row, true)
+                    );
+
+                    if (!$ignoreInvalidLines) {
+                        throw new Exception('Invalid line in CSV file (different number of cells compared to header)');
+                    }
+                    continue;
+                }
+            }
+            return $result;
         }
 
         return $data;

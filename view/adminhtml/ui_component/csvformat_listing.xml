@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">csvformat_listing.csvformat_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>csvformat_listing.csvformat_listing_data_source</dep>
+        </deps>
+        <spinner>csvformat_columns</spinner>
+        <buttons>
+            <button name="create">
+                <label translate="true">Create</label>
+                <url path="*/*/edit"/>
+                <class>primary</class>
+            </button>
+            <button name="back">
+                <label translate="true">Back</label>
+                <url path="*/temptransaction/import"/>
+                <class>secondary</class>
+            </button>
+        </buttons>
+    </settings>
+    <dataSource name="csvformat_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Ibertrand\BankSync\Ui\DataProvider\CsvFormatListing</argument>
+            <argument name="name" xsi:type="string">csvformat_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="indexField" xsi:type="string">entity_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <paging name="listing_paging"/>
+        <filters name="listing_filters"/>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+    </listingToolbar>
+    <columns name="csvformat_columns">
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">csvformat_listing.csvformat_listing.csvformat_columns.actions</item>
+                    <item name="target" xsi:type="string">applyAction</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">edit</item>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <column name="name" sortOrder="10">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="created_at" sortOrder="20">
+            <settings>
+                <filter>dateRange</filter>
+                <label translate="true">Created At</label>
+            </settings>
+        </column>
+        <column name="updated_at" sortOrder="30">
+            <settings>
+                <filter>dateRange</filter>
+                <label translate="true">Updated At</label>
+            </settings>
+        </column>
+
+        <actionsColumn name="actions" class="\Ibertrand\BankSync\Ui\Component\Listing\Column\CsvFormat\Actions"
+                       sortOrder="100">
+            <settings>
+                <indexField>entity_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+                <draggable>false</draggable>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>
