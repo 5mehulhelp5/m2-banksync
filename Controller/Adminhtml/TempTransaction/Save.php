@@ -34,7 +34,7 @@ class Save extends Action
     public function execute()
     {
         $comment = $this->getRequest()->getParam('comment');
-        $archive = !empty($this->getRequest()->getParam('archive'));
+        $archive = $this->getRequest()->getParam('archive') === '1';
 
         try {
             $tempTransaction = $this->tempTransactionRepository->getById($this->getRequest()->getParam('entity_id'));
