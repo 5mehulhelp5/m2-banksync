@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
-
-
 namespace Ibertrand\BankSync\Setup\Patch\Data;
 
 use Ibertrand\BankSync\Model\ResourceModel\Transaction\CollectionFactory;
