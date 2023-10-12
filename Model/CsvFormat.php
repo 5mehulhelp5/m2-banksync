@@ -186,15 +186,30 @@ class CsvFormat extends AbstractModel
     }
 
     /**
+     * @param string $format
+     * @return bool
+     */
+    private function dateFormateContainsTimePart(string $format): bool
+    {
+        // Crude detection, but should work in 99% of use cases
+        return preg_match('/[His]/', $format) === 1;
+    }
+
+    /**
      * @param string $date
      * @return string
      * @throws Exception
      */
     private function parseDate(string $date): string
     {
-        $parsedDate = DateTime::createFromFormat($this->getDateFormat(), $date);
+        $format = $this->getDateFormat();
+        $parsedDate = DateTime::createFromFormat($format, $date);
         if (!$parsedDate) {
             throw new Exception('Invalid date format');
+        }
+        // If the format doesn't contain Time component, then set time to 00:00:00
+        if (!$this->dateFormateContainsTimePart($format)) {
+            $parsedDate->setTime(0, 0);
         }
         return $parsedDate->format('Y-m-d H:i:s');
     }
