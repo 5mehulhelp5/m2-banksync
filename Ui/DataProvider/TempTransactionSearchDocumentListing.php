@@ -134,7 +134,7 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
      *
      * @return Invoice|Creditmemo
      */
-    protected function getDocument(int $id): Invoice|Creditmemo
+    public function getDocument(int $id): Invoice|Creditmemo
     {
         /** @var Invoice|Creditmemo $document To silence IDE warnings about mismatching return value */
         $document = $this->collection->getItemById($id);

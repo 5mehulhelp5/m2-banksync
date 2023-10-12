@@ -162,6 +162,12 @@ class TempTransactionListing extends AbstractDataProvider
                     } else {
                         $item['customer_increment_id'] = '-';
                     }
+
+                    // For use in plugins
+                    $item['document_id'] = $document->getId();
+                    $item['document_type'] = $item['amount'] > 0 ? 'invoice' : 'creditmemo';
+                    $item['amount_raw'] = $tempTransaction->getAmount();
+                    $item['document_amount_raw'] = $document->getGrandTotal();
                 } catch (Exception $e) {
                     $this->logger->error($e);
                     $item['document'] = "[ERROR]";
