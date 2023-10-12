@@ -62,6 +62,12 @@
                 <draggable>false</draggable>
             </settings>
         </selectionsColumn>
+        <column name="csv_source" sortOrder="10">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Source</label>
+            </settings>
+        </column>
         <column name="transaction_date" sortOrder="10">
             <settings>
                 <filter>textRange</filter>

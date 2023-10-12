@@ -28,6 +28,7 @@ class Transaction extends AbstractDb
     public function fromTempTransaction(TempTransaction $tempTransaction): TransactionModel
     {
         return $this->transactionFactory->create()
+            ->setCsvSource($tempTransaction->getCsvSource())
             ->setPayerName($tempTransaction->getPayerName())
             ->setTransactionDate($tempTransaction->getTransactionDate())
             ->setPurpose($tempTransaction->getPurpose())
