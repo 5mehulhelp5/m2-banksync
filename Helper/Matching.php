@@ -40,8 +40,8 @@ class Matching extends AbstractHelper
      */
     protected function normalizeName(string $name): string
     {
-        $name = strtolower($name);
-        $name = preg_replace('/\s+/', ' ', $name);
+        $name = mb_strtolower($name);
+        $name = preg_replace('/\s+/u', ' ', $name);
         return trim($name);
     }
 
@@ -230,7 +230,7 @@ class Matching extends AbstractHelper
             if (empty($textNormalized)) {
                 continue;
             }
-            $pattern = '/\b' . preg_quote($textNormalized, '/') . '\b/i';
+            $pattern = '/\b' . preg_quote($textNormalized, '/') . '\b/iu';
             if (preg_match($pattern, $purpose)) {
                 $results = $this->addScore($results, $text, $score / 2);
             }

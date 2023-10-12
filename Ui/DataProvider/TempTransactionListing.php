@@ -127,8 +127,8 @@ class TempTransactionListing extends AbstractDataProvider
                         $purposeMatches = $this->matching->getPurposeMatches($tempTransaction, $document);
                         $purpose = $tempTransaction->getPurpose();
                         foreach ($purposeMatches as $match => $score) {
-                            $purpose = str_replace($match, "<span class='banksync-matched-text'>$match</span>", $purpose);
-                            $documentName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $documentName);
+                            $purpose = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class=\'banksync-matched-text\'>$0</span>', $purpose);
+                            $documentName = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class="banksync-matched-text">$0</span>', $documentName);
                         }
                         $item['purpose'] = $purpose;
 
@@ -136,8 +136,8 @@ class TempTransactionListing extends AbstractDataProvider
 
                         $payerName = $tempTransaction->getPayerName();
                         foreach (array_keys($nameMatches) as $match) {
-                            $payerName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $payerName);
-                            $documentName = preg_replace('/' . preg_quote($match, '/') . '/i', '<span class="banksync-matched-text">$0</span>', $documentName);
+                            $payerName = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class="banksync-matched-text">\0</span>', $payerName);
+                            $documentName = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class="banksync-matched-text">\0</span>', $documentName);
                         }
                         $amountIsMatched = abs(abs($tempTransaction->getAmount()) - $document->getGrandTotal()) < 0.01;
                         $amountClass = $amountIsMatched ? 'banksync-matched-text' : '';
