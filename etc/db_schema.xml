@@ -20,6 +20,7 @@
     </table>
     <table name="banksync_temp_transaction" resource="default" engine="innodb" comment="BankSync Temporary Transactions">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="csv_source" comment="CSV Source"/>
         <column xsi:type="datetime" name="transaction_date" nullable="false" comment="Transaction Date"/>
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>
@@ -40,6 +41,7 @@
     </table>
     <table name="banksync_transaction" resource="default" engine="innodb" comment="BankSync Transactions">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="csv_source" comment="CSV Source"/>
         <column xsi:type="datetime" name="transaction_date" nullable="false" comment="Transaction Date"/>
         <column xsi:type="varchar" name="payer_name" nullable="false" length="255" comment="Payer Name"/>
         <column xsi:type="text" name="purpose" nullable="true" comment="Purpose"/>

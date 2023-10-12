@@ -7,6 +7,8 @@ use Magento\Framework\Model\AbstractModel;
 /**
  * @method int getEntityId()
  * @method Transaction setEntityId(int $entityId)
+ * @method string getCsvSource()
+ * @method $this setCsvSource(string $csvSource)
  * @method string getTransactionDate()
  * @method Transaction setTransactionDate(string $transactionDate)
  * @method string getPayerName()

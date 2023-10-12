@@ -19,6 +19,7 @@
     "banksync_temp_transaction": {
         "column": {
             "entity_id": true,
+            "csv_source": true,
             "transaction_date": true,
             "payer_name": true,
             "purpose": true,
@@ -41,6 +42,7 @@
     "banksync_transaction": {
         "column": {
             "entity_id": true,
+            "csv_source": true,
             "transaction_date": true,
             "payer_name": true,
             "purpose": true,

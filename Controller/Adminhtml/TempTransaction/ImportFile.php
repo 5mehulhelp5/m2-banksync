@@ -113,6 +113,7 @@ class ImportFile extends Action
                     'purpose' => $csvRow['purpose'],
                     'amount' => $csvRow['amount'],
                     'transaction_date' => $csvRow['transaction_date'],
+                    'csv_source' => $csvFormat->getName(),
                     'dirty' => 1,
                 ]]);
                 $transaction->setHash($this->hashes->calculateHash($transaction));

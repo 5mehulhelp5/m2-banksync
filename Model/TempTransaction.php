@@ -15,6 +15,8 @@ use Magento\Sales\Model\Order\InvoiceRepository;
 /**
  * @method int getEntityId()
  * @method $this setEntityId(int $entityId)
+ * @method string getCsvSource()
+ * @method $this setCsvSource(string $csvSource)
  * @method string|null getTransactionDate()
  * @method $this setTransactionDate(string $transactionDate)
  * @method string|null getPayerName()
