@@ -168,7 +168,7 @@ class Matching extends AbstractHelper
         return $this->aggregateScores($this->getNameMatches($tempTransaction, $document));
     }
 
-    protected function getIncrementIdPattern(string $type, string $incrementId): string
+    public function getIncrementIdPattern(string $type, string $incrementId): string
     {
         $template = $this->config->getMatchingPattern($type);
         $pattern = str_replace('{{value}}', preg_quote($incrementId), $template);
