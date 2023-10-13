@@ -188,12 +188,12 @@ class TempTransactionSearchDocumentListing extends AbstractDataProvider
             $payerName = $tempTransaction->getPayerName();
 
             foreach (array_keys($purposeMatches) as $match) {
-                $purpose = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', "<span class='banksync-matched-text'>$0</span>", $purpose);
-                $documentName = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class="banksync-matched-text">$0</span>', $documentName);
+                $purpose = $this->display->highLightMatch($purpose, $match);
+                $documentName = $this->display->highLightMatch($documentName, $match);
             }
             foreach (array_keys($nameMatches) as $match) {
-                $payerName = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class="banksync-matched-text">$0</span>', $payerName);
-                $documentName = preg_replace('/\b' . preg_quote($match, '/') . '\b/iu', '<span class="banksync-matched-text">$0</span>', $documentName);
+                $payerName = $this->display->highLightMatch($payerName, $match);
+                $documentName = $this->display->highLightMatch($documentName, $match);
             }
 
             $item['transaction_purpose'] = $purpose;

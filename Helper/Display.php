@@ -94,4 +94,27 @@ class Display extends AbstractHelper
         $cssClass = in_array($incrementId, array_keys($matchedTexts)) ? 'banksync-matched-text' : '';
         return "<a class='$cssClass' href='$url'>$incrementId</a>";
     }
+
+    /**
+     * @param string $match
+     * @return string
+     */
+    public function getHighlightPattern(string $match): string
+    {
+        return '/' . preg_quote($match, '/') . '/iu';
+    }
+
+    /**
+     * @param string $fullText
+     * @param string $highlightPart
+     * @return string
+     */
+    public function highLightMatch(string $fullText, string $highlightPart): string
+    {
+        return preg_replace(
+            $this->getHighlightPattern($highlightPart),
+            '<span class="banksync-matched-text">$0</span>',
+            $fullText
+        );
+    }
 }
