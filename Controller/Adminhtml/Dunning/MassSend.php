@@ -11,7 +11,6 @@ use Ibertrand\BankSync\Model\ResourceModel\Dunning\CollectionFactory as DunningC
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
-use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
@@ -53,8 +52,7 @@ class MassSend extends Action
         DunningCollectionFactory $collectionFactory,
         DunningRepository        $dunningRepository,
         Logger                   $logger,
-    )
-    {
+    ) {
         $this->fileFactory = $fileFactory;
         $this->dateTime = $dateTime;
         $this->filter = $filter;
