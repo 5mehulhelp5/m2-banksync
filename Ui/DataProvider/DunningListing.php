@@ -29,6 +29,16 @@ class DunningListing extends AbstractDataProvider
     protected CustomerCollectionFactory $customerCollectionFactory;
     protected OrderAddressCollectionFactory $orderAddressCollectionFactory;
     protected CollectionFactory $dunningCollectionFactory;
+    const JOIN_CONFIG = [
+        'invoice' => ['table_name' => 'sales_invoice', 'on_clause' => 'invoice.entity_id = main_table.invoice_id', 'needed_joins' => []],
+        'order' => ['table_name' => 'sales_order', 'on_clause' => 'order.entity_id = invoice.order_id', 'needed_joins' => ['invoice']],
+    ];
+    const JOINS_NEEDED = [
+        'email_address' => ['order'],
+        'invoice_date' => ['invoice'],
+        'invoice_increment_id' => ['invoice'],
+    ];
+    protected $joinedTables = [];
 
     public function __construct(
         $name,
@@ -49,8 +59,6 @@ class DunningListing extends AbstractDataProvider
         array $data = [],
     ) {
         $this->collection = $collectionFactory->create();
-        $this->collection->join(['invoice' => 'sales_invoice'], 'invoice.entity_id = main_table.invoice_id', []);
-        $this->collection->join(['order' => 'sales_order'], 'order.entity_id = invoice.order_id', []);
 
         $this->config = $config;
         $this->display = $display;
@@ -106,12 +114,38 @@ class DunningListing extends AbstractDataProvider
     }
 
     /**
+     * @param string $joinIdent
+     * @return void
+     */
+    protected function join(string $joinIdent): void
+    {
+        if (isset($this->joinedTables[$joinIdent])) {
+            return;
+        }
+        $joinConfig = self::JOIN_CONFIG[$joinIdent];
+        foreach ($joinConfig['needed_joins'] ?? [] as $neededJoin) {
+            $this->join($neededJoin);
+        }
+
+        $this->collection->join(
+            [$joinIdent => $joinConfig['table_name']],
+            $joinConfig['on_clause'],
+            []
+        );
+        $this->joinedTables[$joinIdent] = true;
+    }
+
+    /**
      * @param Filter $filter
      *
      * @return void
      */
     public function addFilter(Filter $filter)
     {
+        foreach (self::JOINS_NEEDED[$filter->getField()] ?? [] as $join) {
+            $this->join($join);
+        }
+
         $processors = [
             'email_address' => 'order.customer_email',
             'invoice_date' => 'invoice.created_at',
@@ -136,6 +170,10 @@ class DunningListing extends AbstractDataProvider
      */
     public function addOrder($field, $direction)
     {
+        foreach (self::JOINS_NEEDED[$field] ?? [] as $join) {
+            $this->join($join);
+        }
+
         $changes = [
             'email_address' => 'order.customer_email',
             'invoice_date' => 'invoice.created_at',
