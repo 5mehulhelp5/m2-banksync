@@ -20,6 +20,19 @@ class Matching extends AbstractHelper
     protected CustomerFactory $customerFactory;
     private Config $config;
 
+    const SPECIAL_CHARACTERS = [
+        'ä' => '(?:ae|ä)',
+        'ö' => '(?:oe|ö)',
+        'ü' => '(?:ue|ü)',
+        'ß' => '(?:ss|ß)',
+        'ss' => '(?:ss|ß)',
+        'ae' => '(?:[aáà]e|ä|æ)',
+        'oe' => '(?:[oóò]e|ö|œ)',
+        'ue' => '(?:[uúù]e|ü)',
+        'ñ' => '(?:n|ñ)',
+        'ç' => '(?:c|ç)',
+    ];
+
     public function __construct(
         Context          $context,
         CustomerFactory  $customerFactory,
@@ -57,13 +70,15 @@ class Matching extends AbstractHelper
             return;
         }
         $nameScores = array_merge($nameScores, [
-            $address->getFirstname() . ' ' . $address->getLastname() => 1,
-            $address->getCompany() => 1,
+            trim(($address->getFirstname() ?? '') . ' ' . ($address->getLastname() ?? '')) => 1,
+            trim(($address->getCompany() ?? '')) => 1,
         ]);
         $halfScoreKeys = array_merge($halfScoreKeys, [
-            $address->getFirstname(),
-            $address->getLastname(),
+            trim($address->getFirstname() ?? ""),
+            trim($address->getLastname() ?? ""),
         ]);
+        unset($nameScores['']);
+        unset($halfScoreKeys['']);
     }
 
     /**
@@ -73,11 +88,14 @@ class Matching extends AbstractHelper
     protected function getNameComparisonScores(Order $order): array
     {
         $nameScores = [
-            $order->getCustomerName() => 1,
+            trim(($order->getCustomerName() ?? '')) => 1,
+            trim(($order->getCustomerFirstname() ?? '') . ' ' . ($order->getCustomerLastname() ?? '')) => 1,
+            trim(($order->getCustomerLastname() ?? '') . ' ' . ($order->getCustomerFirstname() ?? '')) => 1,
         ];
+
         $halfScoreKeys = [
-            $order->getCustomerFirstname(),
-            $order->getCustomerLastname(),
+            trim(($order->getCustomerFirstname() ?? '')),
+            trim(($order->getCustomerLastname() ?? '')),
         ];
 
         $this->addAddressScores($nameScores, $halfScoreKeys, $order->getBillingAddress());
@@ -93,6 +111,11 @@ class Matching extends AbstractHelper
         return $nameScores;
     }
 
+    /**
+     * @param TempTransaction    $tempTransaction
+     * @param Invoice|Creditmemo $document
+     * @return array
+     */
     public function getNameMatches(TempTransaction $tempTransaction, Invoice|Creditmemo $document): array
     {
         $transactionName = $tempTransaction->getPayerName();
@@ -120,7 +143,8 @@ class Matching extends AbstractHelper
                 continue;
             }
             foreach ($transactionNames as $transactionName) {
-                if (str_contains($transactionName, $name)) {
+                $pattern = $this->getMatchPattern($name);
+                if (preg_match($pattern, $transactionName)) {
                     $matches[$name] = $score;
                 }
             }
@@ -198,6 +222,20 @@ class Matching extends AbstractHelper
     }
 
     /**
+     * @param string $searchString
+     * @return string
+     */
+    public function getMatchPattern(string $searchString): string
+    {
+        $pattern = '/\b' . preg_quote($searchString, '/') . '\b/iu';
+        return str_replace(
+            array_keys(self::SPECIAL_CHARACTERS),
+            array_values(self::SPECIAL_CHARACTERS),
+            $pattern
+        );
+    }
+
+    /**
      * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      * @return array
@@ -230,7 +268,7 @@ class Matching extends AbstractHelper
             if (empty($textNormalized)) {
                 continue;
             }
-            $pattern = '/\b' . preg_quote($textNormalized, '/') . '\b/iu';
+            $pattern = $this->getMatchPattern($textNormalized);
             if (preg_match($pattern, $purpose)) {
                 $results = $this->addScore($results, $text, $score / 2);
             }

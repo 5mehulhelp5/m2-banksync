@@ -15,13 +15,16 @@ class Display extends AbstractHelper
 {
 
     private UrlInterface $urlBuilder;
+    private Matching $matching;
 
     public function __construct(
         Context      $context,
         UrlInterface $urlBuilder,
+        Matching     $matching,
     ) {
         parent::__construct($context);
         $this->urlBuilder = $urlBuilder;
+        $this->matching = $matching;
     }
 
     /**
@@ -101,7 +104,7 @@ class Display extends AbstractHelper
      */
     public function getHighlightPattern(string $match): string
     {
-        return '/' . preg_quote($match, '/') . '/iu';
+        return $this->matching->getMatchPattern($match);
     }
 
     /**
