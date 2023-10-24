@@ -45,7 +45,6 @@ Available options are:
 |                | Email Sender                                             | Select the email identity for dunning mails                 |
 |                | Payment due date                                         | Specify the due date for payments in days after invoice     |
 |                | Types > Reminder 1, 2, Dunning 1, 2, 3                   | Define individual dunning/reminder types with settings      |
-| -------------- | -------------------------------------------------------- | ----------------------------------------------------------- |
 
 ## CSV format settings
 
