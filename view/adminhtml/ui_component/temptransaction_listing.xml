@@ -94,7 +94,7 @@
         </column>
         <column name="transaction_date" sortOrder="10">
             <settings>
-                <filter>textRange</filter>
+                <filter>dateRange</filter>
                 <label translate="true">Transaction Date</label>
             </settings>
         </column>

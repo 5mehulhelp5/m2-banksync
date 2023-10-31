@@ -70,7 +70,7 @@
         </column>
         <column name="transaction_date" sortOrder="10">
             <settings>
-                <filter>textRange</filter>
+                <filter>dateRange</filter>
                 <label translate="true">Transaction Date</label>
             </settings>
         </column>
@@ -82,6 +82,7 @@
         </column>
         <column name="created_at" sortOrder="30">
             <settings>
+                <filter>dateRange</filter>
                 <label translate="true">Booking Date</label>
             </settings>
         </column>
@@ -131,7 +132,7 @@
         <column name="amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="90">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">Amount</label>
+                <label translate="true">Paid Amount</label>
             </settings>
         </column>
         <column name="document_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
