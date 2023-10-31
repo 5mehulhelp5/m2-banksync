@@ -280,7 +280,8 @@ class Dunning extends AbstractHelper
             ->addFieldToFilter('main_table.created_at', ['gt' => $minCreationDate])
             ->addFieldToFilter('main_table.created_at', ['lt' => $latestCreationDate])
             ->addFieldToFilter('main_table.store_id', $storeId)
-            ->addFieldToFilter('is_banksynced', ['eq' => 0]);
+            ->addFieldToFilter('is_banksynced', ['eq' => 0])
+            ->addFieldToFilter('banksync_dunning_blocked_at', ['null' => true]);
 
         $paymentMethods = $this->config->getPaymentMethods();
         if (!empty($paymentMethods)) {

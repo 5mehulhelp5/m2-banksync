@@ -109,4 +109,7 @@
             <column name="entity_id"/>
         </constraint>
     </table>
+    <table name="sales_invoice">
+        <column xsi:type="datetime" name="banksync_dunning_blocked_at" nullable="true" comment="Block dunnings"/>
+    </table>
 </schema>

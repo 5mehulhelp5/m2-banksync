@@ -104,5 +104,10 @@
         "constraint": {
             "PRIMARY": true
         }
+    },
+    "sales_invoice": {
+        "column": {
+            "banksync_dunning_blocked_at": true
+        }
     }
 }
