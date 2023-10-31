@@ -117,11 +117,22 @@ class CsvFormat extends AbstractModel
     protected function parseCsvContent(array $rows): array
     {
         $result = [];
+
+        $columns = [];
+        foreach (self::COLUMNS as $COLUMN) {
+            $columns[$COLUMN] = $this->getData($COLUMN . '_column');
+        }
+
         foreach ($rows as $row) {
-            $rowValues = array_map(
-                fn ($col) => $this->getValue($row, $this->getData($col . '_column'), $this->getData($col . '_regex')),
-                self::COLUMNS
-            );
+            $rowValues = [];
+            foreach ($columns as $name => $csvName) {
+                $csvNames = explode($this->getDelimiter(), $csvName);
+                $values = [];
+                foreach ($csvNames as $_csvName) {
+                    $values[] = $this->getValue($row, trim($_csvName), $this->getData($name . '_regex'));
+                }
+                $rowValues[$name] = trim(implode(' / ', $values), ' /');
+            }
             if (empty(array_filter($rowValues))) {
                 continue;
             }
