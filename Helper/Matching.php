@@ -2,6 +2,7 @@
 
 namespace Ibertrand\BankSync\Helper;
 
+use Exception;
 use Ibertrand\BankSync\Model\TempTransaction;
 use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerFactory;
@@ -21,16 +22,33 @@ class Matching extends AbstractHelper
     private Config $config;
 
     const SPECIAL_CHARACTERS = [
+        'ae' => '(?:[aáà]e|ä|æ)',
+        'oe' => '(?:[oóò]e|ö|œ)',
+        'ue' => '(?:[uúù]e|ü)',
         'ä' => '(?:ae|ä)',
         'ö' => '(?:oe|ö)',
         'ü' => '(?:ue|ü)',
         'ß' => '(?:ss|ß)',
         'ss' => '(?:ss|ß)',
-        'ae' => '(?:[aáà]e|ä|æ)',
-        'oe' => '(?:[oóò]e|ö|œ)',
-        'ue' => '(?:[uúù]e|ü)',
+
+        'a' => '(?:a|á|à)',
+        'e' => '(?:e|é|è)',
+        'i' => '(?:i|í|ì)',
+        'o' => '(?:o|ó|ò)',
+        'u' => '(?:u|ú|ù)',
+        'n' => '(?:n|ñ)',
+
         'ñ' => '(?:n|ñ)',
         'ç' => '(?:c|ç)',
+        'á' => '(?:a|á)',
+        'à' => '(?:a|à)',
+        'ó' => '(?:o|ó)',
+        'ò' => '(?:o|ò)',
+        'é' => '(?:e|é)',
+        'è' => '(?:e|è)',
+        'ú' => '(?:u|ú)',
+        'ù' => '(?:u|ù)',
+
     ];
 
     public function __construct(
@@ -227,18 +245,20 @@ class Matching extends AbstractHelper
      */
     public function getMatchPattern(string $searchString): string
     {
-        $pattern = '/\b' . preg_quote($searchString, '/') . '\b/iu';
-        return str_replace(
+        $pattern = preg_quote($searchString, '/');
+        $pattern = str_replace(
             array_keys(self::SPECIAL_CHARACTERS),
             array_values(self::SPECIAL_CHARACTERS),
             $pattern
         );
+        return '/\b' . $pattern . '\b/iu';
     }
 
     /**
      * @param TempTransaction    $tempTransaction
      * @param Invoice|Creditmemo $document
      * @return array
+     * @throws Exception
      */
     public function getPurposeMatches(TempTransaction $tempTransaction, Invoice|Creditmemo $document): array
     {
@@ -269,8 +289,13 @@ class Matching extends AbstractHelper
                 continue;
             }
             $pattern = $this->getMatchPattern($textNormalized);
-            if (preg_match($pattern, $purpose)) {
-                $results = $this->addScore($results, $text, $score / 2);
+            try {
+                if (preg_match($pattern, $purpose)) {
+                    $results = $this->addScore($results, $text, $score / 2);
+                }
+            } catch (Exception $e) {
+                $this->_logger->error("Error matching '$text' with pattern '$pattern'");
+                throw $e;
             }
         }
 
@@ -307,6 +332,7 @@ class Matching extends AbstractHelper
      * @param Invoice|Creditmemo $document
      *
      * @return float
+     * @throws Exception
      */
     protected function comparePurpose(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
@@ -318,6 +344,7 @@ class Matching extends AbstractHelper
      * @param Invoice|Creditmemo $document
      *
      * @return float
+     * @throws Exception
      */
     public function getMatchConfidence(TempTransaction $tempTransaction, Invoice|Creditmemo $document): float
     {
