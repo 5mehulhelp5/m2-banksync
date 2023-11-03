@@ -132,12 +132,29 @@ class Dunning extends AbstractModel
      * @return bool
      * @throws InputException
      * @throws NoSuchEntityException
+     */
+    public function getInvoiceIsBlocked(): bool
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        return !empty($this->getInvoice()->getBanksyncDunningBlockedAt());
+    }
+
+    /**
+     * @return bool
+     * @throws InputException
+     * @throws NoSuchEntityException
      * @throws LocalizedException
      * @throws MailException
      */
     public function sendMail(): bool
     {
         $invoice = $this->getInvoice();
+
+        if ($this->getInvoiceIsBlocked()) {
+            $this->logger->info('Dunning mail not sent because invoice is blocked');
+            return false;
+        }
+
         $order = $invoice->getOrder();
         $storeId = $invoice->getStoreId();
         $this->logger->info("Store ID: $storeId");

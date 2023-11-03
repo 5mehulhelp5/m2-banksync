@@ -41,6 +41,14 @@ class PrintDunning extends Action
         $dunningId = $this->getRequest()->getParam('id');
         if ($dunningId) {
             $dunning = $this->dunningRepository->getById($dunningId);
+
+            if ($dunning->getInvoiceIsBlocked()) {
+                $this->messageManager->addErrorMessage(__('The invoice is blocked. Please unblock it first.'));
+                $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+                $redirect->setPath('*/*/index');
+                return $redirect;
+            }
+
             $dunning->setSentAt(date('Y-m-d H:i:s'));
             $this->dunningRepository->save($dunning);
 

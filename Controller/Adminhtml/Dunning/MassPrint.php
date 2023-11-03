@@ -5,9 +5,9 @@ namespace Ibertrand\BankSync\Controller\Adminhtml\Dunning;
 use Exception;
 use Ibertrand\BankSync\Model\Dunning;
 use Ibertrand\BankSync\Model\DunningRepository;
+use Ibertrand\BankSync\Model\Pdf\Dunning as PdfDunning;
 use Ibertrand\BankSync\Model\ResourceModel\Dunning\Collection as DunningCollection;
 use Ibertrand\BankSync\Model\ResourceModel\Dunning\CollectionFactory as DunningCollectionFactory;
-use Ibertrand\BankSync\Model\Pdf\Dunning as PdfDunning;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Redirect;
@@ -18,6 +18,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Ui\Component\MassAction\Filter;
+use Zend_Pdf_Exception;
 
 class MassPrint extends Action
 {
@@ -53,8 +54,7 @@ class MassPrint extends Action
         DunningCollectionFactory $collectionFactory,
         PdfDunning               $pdfInvoice,
         DunningRepository        $dunningRepository,
-    )
-    {
+    ) {
         $this->fileFactory = $fileFactory;
         $this->dateTime = $dateTime;
         $this->filter = $filter;
@@ -74,7 +74,6 @@ class MassPrint extends Action
 
     /**
      * @throws Zend_Pdf_Exception
-     * @throws LocalizedException
      */
     protected function getPdfContents($collection): string
     {
@@ -99,8 +98,11 @@ class MassPrint extends Action
      */
     public function massAction(AbstractCollection $collection): ResponseInterface
     {
-        $fileContent = ['type' => 'string', 'value' => $this->getPdfContents($collection), 'rm' => true];
-        foreach ($collection as $dunning) {
+        /** @var Dunning[] $dunnings */
+        $dunnings = $collection->getItems();
+        $dunnings = array_filter($dunnings, fn ($item) => !$item->getInvoiceIsBlocked());
+        $fileContent = ['type' => 'string', 'value' => $this->getPdfContents($dunnings), 'rm' => true];
+        foreach ($dunnings as $dunning) {
             /** @var Dunning $dunning */
             $dunning->setSentAt(date('Y-m-d H:i:s'));
             $this->dunningRepository->save($dunning);

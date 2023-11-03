@@ -9,6 +9,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class SendMail extends Action
@@ -32,11 +33,21 @@ class SendMail extends Action
     /**
      * @return Redirect
      * @throws NoSuchEntityException
+     * @throws InputException
      */
     public function execute()
     {
+        $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+        $redirect->setPath('*/*/index');
+
         $dunningId = $this->getRequest()->getParam('id');
         $dunning = $this->dunningRepository->getById($dunningId);
+
+        if ($dunning->getInvoiceIsBlocked()) {
+            $this->messageManager->addErrorMessage(__('The invoice is blocked. Please unblock it first.'));
+            return $redirect;
+        }
+
         try {
             if ($dunning->sendMail()) {
                 $this->dunningRepository->save($dunning);
@@ -48,9 +59,6 @@ class SendMail extends Action
             $this->logger->error($e->getMessage() . "\n" . $e->getTraceAsString());
             $this->messageManager->addErrorMessage(_('There was an error sending the mail: ') . $e->getMessage());
         }
-
-        $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $redirect->setPath('*/*/index');
 
         return $redirect;
     }

@@ -14,6 +14,8 @@ use Magento\Backend\Model\View\Result\Redirect;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Ui\Component\MassAction\Filter;
@@ -76,15 +78,25 @@ class MassSend extends Action
      * @param AbstractCollection $collection
      *
      * @return Redirect
+     * @throws InputException
+     * @throws NoSuchEntityException
      */
     public function massAction(AbstractCollection $collection): Redirect
     {
+        /** @var Dunning[] $dunnings */
+        $dunnings = $collection->getItems();
+        $dunnings = array_filter($dunnings, fn ($dunning) => !$dunning->getInvoiceIsBlocked());
+        if (count($dunnings) < $collection->getSize()) {
+            $count = $collection->getSize() - count($dunnings);
+            $this->messageManager->addErrorMessage($count . ' dunning(s) could not be sent because the invoice is blocked.');
+        }
+
         $failed = 0;
         $success = 0;
-        if ($collection->getSize() == 0) {
+        if (count($dunnings) == 0) {
             $this->messageManager->addErrorMessage('No dunnings selected.');
         }
-        foreach ($collection as $dunning) {
+        foreach ($dunnings as $dunning) {
             /** @var Dunning $dunning */
             try {
                 if ($dunning->sendMail()) {
