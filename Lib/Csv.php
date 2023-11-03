@@ -10,8 +10,11 @@ use ValueError;
 
 class Csv extends CoreCsv
 {
-    private bool $_hasHeaders;
-    private Logger $logger;
+    protected bool $hasHeaders;
+    protected Logger $logger;
+    protected int $ignoreLeadingLines = 0;
+    protected int $ignoreTailingLines = 0;
+    protected bool $ignoreInvalidLines = false;
 
     public function __construct(File $file, Logger $logger)
     {
@@ -19,9 +22,43 @@ class Csv extends CoreCsv
         $this->logger = $logger;
     }
 
+    /**
+     * @param bool $value
+     * @return $this
+     */
     public function setHasHeaders(bool $value): static
     {
-        $this->_hasHeaders = $value;
+        $this->hasHeaders = $value;
+        return $this;
+    }
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setIgnoreLeadingLines(int $value): static
+    {
+        $this->ignoreLeadingLines = $value;
+        return $this;
+    }
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setIgnoreTailingLines(int $value): static
+    {
+        $this->ignoreTailingLines = $value;
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIgnoreInvalidLines(bool $value): static
+    {
+        $this->ignoreInvalidLines = $value;
         return $this;
     }
 
@@ -33,12 +70,8 @@ class Csv extends CoreCsv
      * @return array
      * @throws Exception
      */
-    public function getData(
-        $file,
-        int $ignoreLeadingLines = 0,
-        int $ignoreTailingLines = 0,
-        bool $ignoreInvalidLines = false,
-    ) {
+    public function getData($file)
+    {
         $tempFilename = tempnam(sys_get_temp_dir(), 'csv');
         $contents = $this->file->fileGetContents($file);
 
@@ -53,14 +86,14 @@ class Csv extends CoreCsv
 
         $this->file->deleteFile($tempFilename);
 
-        if ($ignoreLeadingLines) {
-            $data = array_slice($data, $ignoreLeadingLines);
+        if ($this->ignoreLeadingLines > 0) {
+            $data = array_slice($data, $this->ignoreLeadingLines);
         }
-        if ($ignoreTailingLines) {
-            $data = array_slice($data, 0, -$ignoreTailingLines);
+        if ($this->ignoreTailingLines > 0) {
+            $data = array_slice($data, 0, -$this->ignoreTailingLines);
         }
 
-        if ($this->_hasHeaders) {
+        if ($this->hasHeaders) {
             $header = array_shift($data);
             $result = [];
             foreach ($data as $row) {
@@ -78,7 +111,7 @@ class Csv extends CoreCsv
                         . var_export($row, true)
                     );
 
-                    if (!$ignoreInvalidLines) {
+                    if (!$this->ignoreInvalidLines) {
                         throw new Exception('Invalid line in CSV file (different number of cells compared to header)');
                     }
                     continue;

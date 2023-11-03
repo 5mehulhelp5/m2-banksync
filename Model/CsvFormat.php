@@ -232,12 +232,7 @@ class CsvFormat extends AbstractModel
      */
     protected function loadCsvContent(string $filename): array
     {
-        return $this->getCsvProcessor()->getData(
-            $filename,
-            $this->getIgnoreLeadingLines(),
-            $this->getIgnoreTailingLines(),
-            $this->getIgnoreInvalidLines()
-        );
+        return $this->getCsvProcessor()->getData($filename);
     }
 
     /**
@@ -248,7 +243,10 @@ class CsvFormat extends AbstractModel
         return $this->csvProcessor
             ->setHasHeaders($this->getHasHeader())
             ->setDelimiter($this->getDelimiter())
-            ->setEnclosure($this->getEnclosure());
+            ->setEnclosure($this->getEnclosure())
+            ->setIgnoreLeadingLines($this->getIgnoreLeadingLines())
+            ->setIgnoreTailingLines($this->getIgnoreTailingLines())
+            ->setIgnoreInvalidLines($this->getIgnoreInvalidLines());
     }
 
     /**
