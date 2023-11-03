@@ -83,7 +83,7 @@
         </column>
         <column name="invoice_date" sortOrder="15">
             <settings>
-                <filter>textRange</filter>
+                <filter>dateRange</filter>
                 <label translate="true">Invoice Date</label>
             </settings>
         </column>
@@ -103,13 +103,13 @@
         </column>
         <column name="created_at" sortOrder="40">
             <settings>
-                <filter>textRange</filter>
+                <filter>dateRange</filter>
                 <label translate="true">Created At</label>
             </settings>
         </column>
         <column name="sent_at" sortOrder="50">
             <settings>
-                <filter>textRange</filter>
+                <filter>dateRange</filter>
                 <label translate="true">Sent At</label>
             </settings>
         </column>
