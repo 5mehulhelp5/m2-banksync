@@ -38,7 +38,7 @@ class DunningListing extends AbstractDataProvider
         'invoice_date' => ['invoice'],
         'invoice_increment_id' => ['invoice'],
     ];
-    protected $joinedTables = [];
+    protected array $joinedTables = [];
 
     public function __construct(
         $name,
