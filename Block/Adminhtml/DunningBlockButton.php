@@ -38,8 +38,12 @@ class DunningBlockButton extends Container
             [
                 'label' => $this->getLabel(),
                 'class' => 'dunning_block',
-                'onclick' => "setLocation('{$this->getTargetUrl()}')",
-            ]
+                'confirm' => __('Are you sure you want to do this?'),
+                'on_click' => 'deleteConfirm( \'' . __(
+                    'Sicher?'
+                ) . '\', \'' . $this->getTargetUrl() . '\')',
+            ],
+            sortOrder: -5
         );
 
         parent::_construct();
