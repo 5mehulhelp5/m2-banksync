@@ -91,11 +91,20 @@ class DunningListing extends AbstractDataProvider
 
         foreach ($data['items'] as $key => $item) {
             $invoice = $this->invoiceRepository->get($item['invoice_id']);
+            $order = $invoice->getOrder();
+            $billingAddress = $order->getBillingAddress();
+            $names = [
+                trim($order->getCustomerFirstname() . ' ' . $order->getCustomerLastname()),
+                trim($billingAddress->getFirstname() . ' ' . $billingAddress->getLastname()),
+                $billingAddress->getCompany(),
+            ];
+            $names = array_unique(array_filter($names));
             $data['items'][$key] = array_replace($item, [
-                'email_address' => $invoice->getOrder()->getCustomerEmail(),
+                'email_address' => $order->getCustomerEmail(),
                 'invoice_date' => $invoice->getCreatedAt(),
                 'invoice_increment_id' => $this->display->getObjectLink($invoice),
                 'is_sent' => (int)!empty($item['sent_at']),
+                'name' => implode(', ', $names),
             ]);
         }
 

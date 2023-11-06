@@ -93,6 +93,12 @@
                 <label translate="true">Email address</label>
             </settings>
         </column>
+        <column name="name" sortOrder="25">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
         <column name="dunning_type" sortOrder="30" component="Magento_Ui/js/grid/columns/select">
             <settings>
                 <filter>select</filter>
