@@ -38,7 +38,7 @@ class Display extends AbstractHelper
         return implode(
             '<br>',
             array_filter(array_unique([
-                trim($order->getCustomerName() ?? ""),
+                trim(($order->getCustomerFirstName() ?? "") . ' ' . ($order->getCustomerLastname() ?? "")),
                 trim(($billing->getFirstname() ?? "") . ' ' . ($billing->getLastname() ?? "")),
                 trim($billing->getCompany() ?? ""),
                 trim(($shipping->getFirstname() ?? "") . ' ' . ($shipping->getLastname() ?? "")),
