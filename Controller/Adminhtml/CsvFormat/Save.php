@@ -36,6 +36,12 @@ class Save extends Action
     {
         $id = $this->getRequest()->getParam('entity_id');
 
+        $encoding = $this->getRequest()->getParam('encoding');
+        if (!in_array($encoding, mb_list_encodings())) {
+            $this->messageManager->addErrorMessage(__('Invalid encoding. Valid encodings: %1', implode(', ', mb_list_encodings())));
+            return $this->resultRedirectFactory->create()->setPath('*/*/edit', ['id' => $id]);
+        }
+
         try {
             $format = !empty($id)
                 ? $this->csvFormatRepository->getById($id)
@@ -51,6 +57,7 @@ class Save extends Action
             $format->setThousandsSeparator($this->getRequest()->getParam('thousands_separator'));
             $format->setDecimalSeparator($this->getRequest()->getParam('decimal_separator'));
             $format->setDateFormat($this->getRequest()->getParam('date_format'));
+            $format->setEncoding($this->getRequest()->getParam('encoding'));
 
             foreach ($format::COLUMNS as $column) {
                 $format->setData($column . '_column', $this->getRequest()->getParam($column . '_column'));

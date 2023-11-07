@@ -86,6 +86,7 @@
     <table name="banksync_csv_format">
         <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="name" nullable="false" comment="Name"/>
+        <column xsi:type="varchar" name="encoding" nullable="false" comment="File encoding"/>
         <column xsi:type="boolean" name="has_header" nullable="false" default="1" comment="Has Header"/>
         <column xsi:type="varchar" name="delimiter" nullable="false" comment="Delimiter"/>
         <column xsi:type="varchar" name="enclosure" nullable="false" comment="Enclosure"/>

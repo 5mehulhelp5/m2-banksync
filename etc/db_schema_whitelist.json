@@ -82,6 +82,7 @@
     "banksync_csv_format": {
         "column": {
             "name": true,
+            "encoding": true,
             "has_header": true,
             "delimiter": true,
             "enclosure": true,

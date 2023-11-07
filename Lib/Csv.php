@@ -15,6 +15,7 @@ class Csv extends CoreCsv
     protected int $ignoreLeadingLines = 0;
     protected int $ignoreTailingLines = 0;
     protected bool $ignoreInvalidLines = false;
+    protected string $encoding = 'UTF-8';
 
     public function __construct(File $file, Logger $logger)
     {
@@ -63,6 +64,16 @@ class Csv extends CoreCsv
     }
 
     /**
+     * @param string $value
+     * @return $this
+     */
+    public function setEncoding(string $value): static
+    {
+        $this->encoding = $value;
+        return $this;
+    }
+
+    /**
      * Get data from CSV file and return data as array
      *
      * @param string $file
@@ -72,18 +83,27 @@ class Csv extends CoreCsv
      */
     public function getData($file)
     {
-        $tempFilename = tempnam(sys_get_temp_dir(), 'csv');
         $contents = $this->file->fileGetContents($file);
 
-        // Remove UTF8 BOM if present
-        if (substr($contents, 0, 3) == pack('CCC', 0xef, 0xbb, 0xbf)) {
+        if (!in_array($this->encoding, mb_list_encodings())) {
+            throw new Exception('Invalid CSV file encoding: ' . $this->encoding);
+        } elseif ($this->encoding !== 'UTF-8') {
+            $contents = mb_convert_encoding($contents, 'UTF-8', $this->encoding);
+
+            if ($contents === false) {
+                throw new Exception('Encoding the file to UTF-8 failed');
+            }
+        }
+
+        // Remove BOM if present
+        if (substr($contents, 0, 3) === pack('CCC', 0xef, 0xbb, 0xbf)) {
             $contents = substr($contents, 3);
         }
 
+        // Write to temp file, read it with the base CSV class and delete the temp file
+        $tempFilename = tempnam(sys_get_temp_dir(), 'csv');
         $this->file->filePutContents($tempFilename, $contents);
-
         $data = parent::getData($tempFilename);
-
         $this->file->deleteFile($tempFilename);
 
         if ($this->ignoreLeadingLines > 0) {

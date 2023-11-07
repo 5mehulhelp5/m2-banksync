@@ -61,6 +61,15 @@
             </settings>
         </input>
 
+        <input name="encoding">
+            <settings>
+                <label>File encoding</label>
+                <dataScope>encoding</dataScope>
+                <required>true</required>
+                <notice>Supported values are those supported by mb_convert_encoding()</notice>
+            </settings>
+        </input>
+
         <checkbox name="has_header">
             <settings>
                 <dataScope>has_header</dataScope>

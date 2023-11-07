@@ -19,6 +19,8 @@ use Magento\Framework\Registry;
  *
  * @method string getName()
  * @method setName(string $value)
+ * @method string getEncoding()
+ * @method setEncoding(string $value)
  * @method bool getHasHeader()
  * @method setHasHeader(bool $value)
  * @method string getDelimiter()
@@ -129,7 +131,7 @@ class CsvFormat extends AbstractModel
                 $csvNames = explode($this->getDelimiter(), $csvName);
                 $values = [];
                 foreach ($csvNames as $_csvName) {
-                    $values[] = $this->getValue($row, trim($_csvName), $this->getData($name . '_regex'));
+                    $values[] = $this-> getValue($row, trim($_csvName), $this->getData($name . '_regex'));
                 }
                 $rowValues[$name] = trim(implode(' / ', $values), ' /');
             }
@@ -149,6 +151,7 @@ class CsvFormat extends AbstractModel
      * @param string $column
      * @param string $regexPattern
      * @return string
+     * @throws Exception
      */
     public function getValue(array $row, string $column, string $regexPattern): string
     {
@@ -157,7 +160,14 @@ class CsvFormat extends AbstractModel
             return '';
         }
 
-        $columnContent = trim($row[$column]) ?? '';
+        try {
+            $columnContent = trim($row[$column]) ?? '';
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage());
+            $this->logger->error('Column: ' . $column);
+            $this->logger->error('Row: ' . json_encode($row));
+            throw $e;
+        }
 
         if (empty($regexPattern)) {
             return $columnContent;
@@ -246,7 +256,8 @@ class CsvFormat extends AbstractModel
             ->setEnclosure($this->getEnclosure())
             ->setIgnoreLeadingLines($this->getIgnoreLeadingLines())
             ->setIgnoreTailingLines($this->getIgnoreTailingLines())
-            ->setIgnoreInvalidLines($this->getIgnoreInvalidLines());
+            ->setIgnoreInvalidLines($this->getIgnoreInvalidLines())
+            ->setEncoding($this->getEncoding() ?? 'UTF-8');
     }
 
     /**
