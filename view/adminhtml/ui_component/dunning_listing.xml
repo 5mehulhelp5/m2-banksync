@@ -95,7 +95,7 @@
         </column>
         <column name="name" sortOrder="25">
             <settings>
-                <filter>text</filter>
+                <sortable>false</sortable>
                 <label translate="true">Name</label>
             </settings>
         </column>
