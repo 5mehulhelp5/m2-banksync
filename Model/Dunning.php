@@ -157,7 +157,6 @@ class Dunning extends AbstractModel
 
         $order = $invoice->getOrder();
         $storeId = $invoice->getStoreId();
-        $this->logger->info("Store ID: $storeId");
         $templateCode = $this->getEmailTemplate();
         $dueDays = $this->dunningHelper->getInvoiceDueDays();
         $invoiceDueDate = strtotime($invoice->getCreatedAt()) + $dueDays * 86400;
