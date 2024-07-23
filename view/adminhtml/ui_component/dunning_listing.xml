@@ -96,7 +96,9 @@
         <column name="name" sortOrder="25">
             <settings>
                 <sortable>false</sortable>
+                <filter>text</filter>
                 <label translate="true">Name</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <column name="dunning_type" sortOrder="30" component="Magento_Ui/js/grid/columns/select">

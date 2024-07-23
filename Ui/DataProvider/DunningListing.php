@@ -30,8 +30,16 @@ class DunningListing extends AbstractDataProvider
     protected OrderAddressCollectionFactory $orderAddressCollectionFactory;
     protected CollectionFactory $dunningCollectionFactory;
     const JOIN_CONFIG = [
-        'invoice' => ['table_name' => 'sales_invoice', 'on_clause' => 'invoice.entity_id = main_table.invoice_id', 'needed_joins' => []],
-        'order' => ['table_name' => 'sales_order', 'on_clause' => 'order.entity_id = invoice.order_id', 'needed_joins' => ['invoice']],
+        'invoice' => [
+            'table_name' => 'sales_invoice',
+            'on_clause' => 'invoice.entity_id = main_table.invoice_id',
+            'needed_joins' => [],
+        ],
+        'order' => [
+            'table_name' => 'sales_order',
+            'on_clause' => 'order.entity_id = invoice.order_id',
+            'needed_joins' => ['invoice'],
+        ],
     ];
     const JOINS_NEEDED = [
         'email_address' => ['order'],
@@ -104,7 +112,7 @@ class DunningListing extends AbstractDataProvider
                 'invoice_date' => $invoice->getCreatedAt(),
                 'invoice_increment_id' => $this->display->getObjectLink($invoice),
                 'is_sent' => (int)!empty($item['sent_at']),
-                'name' => implode(', ', $names),
+                'name' => implode("<br>", $names),
             ]);
         }
 
@@ -120,6 +128,65 @@ class DunningListing extends AbstractDataProvider
         $filter->setField('sent_at')
             ->setConditionType($filter->getValue() ? 'notnull' : 'null')
             ->setValue(true);
+    }
+
+    protected function setFilterName(Filter $filter): void
+    {
+        // Normalize the filter value by replacing multiple consecutive spaces with a single space
+        $filterValue = trim(preg_replace('/\s\s+/u', ' ', $filter->getValue()));
+
+        // Fetch invoice IDs related to dunnings and corresponding invoices, orders, and billing addresses.
+        $allInvoiceIdsWithDunnings = $this->dunningCollectionFactory->create()->getColumnValues('invoice_id');
+        $allInvoicesWithDunnings = $this->invoiceCollectionFactory->create()
+            ->addFieldToFilter('entity_id', ['in' => $allInvoiceIdsWithDunnings]);
+        $allOrderIdsWithDunnings = $allInvoicesWithDunnings->getColumnValues('order_id');
+        $allBillingAddressesWithDunnings = $allInvoicesWithDunnings->getColumnValues('billing_address_id');
+
+        // Use customer name to filter matching orders.
+        $matchingOrders = $this->orderCollectionFactory->create()
+            ->addFieldToFilter('entity_id', ['in' => $allOrderIdsWithDunnings]);
+        $matchingOrders->getSelect()
+            ->where(
+                'REGEXP_REPLACE(CONCAT(customer_firstname, " ", customer_lastname), "\\\\s\\\\s+", " ") LIKE ?',
+                $filterValue
+            );
+        $matchingOrderIds = $matchingOrders->getColumnValues('entity_id');
+        $this->logger->debug('Query: ' . $matchingOrders->getSelect()->__toString());
+        $this->logger->debug('Matching order IDs', ['ids' => $matchingOrderIds]);
+
+        // Similarly, filter billing addresses by name or company.
+        $matchingBillingAddresses = $this->orderAddressCollectionFactory->create()
+            ->addFieldToFilter('entity_id', ['in' => $allBillingAddressesWithDunnings]);
+        $matchingBillingAddresses->getSelect()
+            ->where(
+                'REGEXP_REPLACE(CONCAT(firstname, " ", lastname), "\\\\s\\\\s+", " ") LIKE ? ' .
+                'OR REGEXP_REPLACE(company, "\\\\s\\\\s+", " ") LIKE ?',
+                $filterValue
+            );
+        $this->logger->debug('Query: ' . $matchingBillingAddresses->getSelect()->__toString());
+        $this->logger->debug(
+            'Matching billing address IDs',
+            ['ids' => $matchingBillingAddresses->getColumnValues('entity_id')]
+        );
+
+        // Deduplicate and combine matching order IDs from orders and billing addresses for efficient filtering.
+        $matchingOrderIds = array_unique(array_merge(
+            $matchingOrderIds,
+            $matchingBillingAddresses->getColumnValues('parent_id')
+        ));
+        $matchingOrderIds = array_combine($matchingOrderIds, $matchingOrderIds);
+
+        // Directly filter invoices in memory using the reduced set of order IDs.
+        $matchingInvoices = array_filter(
+            $allInvoicesWithDunnings->getItems(),
+            fn($invoice) => isset($matchingOrderIds[$invoice->getOrderId()])
+        );
+        $matchingInvoiceIds = array_map(fn($invoice) => $invoice->getId(), $matchingInvoices);
+
+        // Set the refined invoice ID filter.°
+        $filter->setField('invoice_id')
+            ->setConditionType('in')
+            ->setValue(implode(',', $matchingInvoiceIds));
     }
 
     /**
@@ -160,6 +227,7 @@ class DunningListing extends AbstractDataProvider
             'invoice_date' => 'invoice.created_at',
             'invoice_increment_id' => 'invoice.increment_id',
             'is_sent' => [$this, 'setFilterIsSent'],
+            'name' => [$this, 'setFilterName'],
         ];
 
         $processor = $processors[$filter->getField()] ?? null;
