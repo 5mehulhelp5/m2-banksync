@@ -138,7 +138,6 @@
         </column>
         <column name="document_amount" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Price" sortOrder="100">
             <settings>
-                <filter>textRange</filter>
                 <label translate="true">Document Amount</label>
                 <sortable>false</sortable>
             </settings>
