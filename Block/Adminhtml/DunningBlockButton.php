@@ -39,9 +39,7 @@ class DunningBlockButton extends Container
                 'label' => $this->getLabel(),
                 'class' => 'dunning_block',
                 'confirm' => __('Are you sure you want to do this?'),
-                'on_click' => 'deleteConfirm( \'' . __(
-                    'Sicher?'
-                ) . '\', \'' . $this->getTargetUrl() . '\')',
+                'on_click' => "deleteConfirm( '" . __('Sure?') . "', '" . $this->getTargetUrl() . "')",
             ],
             sortOrder: -5
         );
@@ -54,9 +52,9 @@ class DunningBlockButton extends Container
      */
     protected function getLabel(): string
     {
-        return __(
-            $this->invoiceIsBlocked() ? 'Remove dunning block' : 'Dunning block'
-        );
+        return $this->invoiceIsBlocked()
+            ? __('Remove dunning block')
+            : __('Dunning block');
     }
 
     /**
@@ -81,7 +79,10 @@ class DunningBlockButton extends Container
     protected function getTargetUrl(): string
     {
         $setBlocked = $this->invoiceIsBlocked() ? 0 : 1;
-        return $this->getUrl("banksync/dunning/block", ['invoice_id' => $this->getInvoiceId(), 'set_blocked' => $setBlocked]);
+        return $this->getUrl(
+            "banksync/dunning/block",
+            ['invoice_id' => $this->getInvoiceId(), 'set_blocked' => $setBlocked]
+        );
     }
 
     /**

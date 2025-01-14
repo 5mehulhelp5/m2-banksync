@@ -50,7 +50,7 @@
     <fieldset name="general">
         <settings>
             <collapsible>false</collapsible>
-            <label translate="true">Edit csv format</label>
+            <label translate="true">Edit CSV format</label>
         </settings>
 
         <input name="name">
