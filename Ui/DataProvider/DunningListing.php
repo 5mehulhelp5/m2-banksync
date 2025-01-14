@@ -112,6 +112,7 @@ class DunningListing extends AbstractDataProvider
                 'invoice_date' => $invoice->getCreatedAt(),
                 'invoice_increment_id' => $this->display->getObjectLink($invoice),
                 'is_sent' => (int)!empty($item['sent_at']),
+                'is_archived' => (int)!empty($item['archived_at']),
                 'name' => implode("<br>", $names),
             ]);
         }
@@ -126,6 +127,17 @@ class DunningListing extends AbstractDataProvider
     protected function setFilterIsSent(Filter $filter): void
     {
         $filter->setField('sent_at')
+            ->setConditionType($filter->getValue() ? 'notnull' : 'null')
+            ->setValue(true);
+    }
+
+    /**
+     * @param Filter $filter
+     * @return void
+     */
+    protected function setFilterIsArchived(Filter $filter): void
+    {
+        $filter->setField('archived_at')
             ->setConditionType($filter->getValue() ? 'notnull' : 'null')
             ->setValue(true);
     }
@@ -227,6 +239,7 @@ class DunningListing extends AbstractDataProvider
             'invoice_date' => 'invoice.created_at',
             'invoice_increment_id' => 'invoice.increment_id',
             'is_sent' => [$this, 'setFilterIsSent'],
+            'is_archived' => [$this, 'setFilterIsArchived'],
             'name' => [$this, 'setFilterName'],
         ];
 

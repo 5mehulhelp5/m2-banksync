@@ -5,7 +5,9 @@
         <column xsi:type="int" name="invoice_id" unsigned="true" nullable="false" comment="Invoice ID"/>
         <column xsi:type="varchar" name="dunning_type" nullable="false" length="20" comment="Dunning Type"/>
         <column xsi:type="int" name="is_paid" unsigned="true" nullable="false" comment="Is Paid"/>
+        <column xsi:type="text" name="comment" nullable="false" comment="Comment"/>
         <column xsi:type="datetime" name="sent_at" nullable="true" comment="Sent Time"/>
+        <column xsi:type="datetime" name="archived_at" nullable="true" default="NULL" comment="Archived Time"/>
         <column xsi:type="datetime" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

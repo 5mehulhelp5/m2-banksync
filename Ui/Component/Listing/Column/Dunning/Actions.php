@@ -16,7 +16,7 @@ class Actions extends Column
         UiComponentFactory $uiComponentFactory,
         UrlInterface       $urlBuilder,
         array              $components = [],
-        array              $data = []
+        array $data = [],
     ) {
         $this->urlBuilder = $urlBuilder;
         parent::__construct($context, $uiComponentFactory, $components, $data);
@@ -28,6 +28,14 @@ class Actions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as &$item) {
                 if (isset($item['entity_id'])) {
+                    $item[$name]['edit'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            'banksync/dunning/edit',
+                            ['id' => $item['entity_id']]
+                        ),
+                        'label' => __('Edit'),
+                        'hidden' => false,
+                    ];
                     $item[$name]['send'] = [
                         'href' => $this->urlBuilder->getUrl(
                             'banksync/dunning/sendMail',
@@ -43,6 +51,22 @@ class Actions extends Column
                         ),
                         'label' => __('Print'),
                         'hidden' => false,
+                    ];
+                    $item[$name]['archive'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            'banksync/dunning/archive',
+                            ['id' => $item['entity_id']]
+                        ),
+                        'label' => __('Archive'),
+                        'hidden' => !empty($item['archived_at']),
+                    ];
+                    $item[$name]['unarchive'] = [
+                        'href' => $this->urlBuilder->getUrl(
+                            'banksync/dunning/unarchive',
+                            ['id' => $item['entity_id']]
+                        ),
+                        'label' => __('Unarchive'),
+                        'hidden' => empty($item['archived_at']),
                     ];
                 }
             }

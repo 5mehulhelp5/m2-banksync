@@ -63,6 +63,20 @@
                     </confirm>
                 </settings>
             </action>
+            <action name="mass_archive">
+                <settings>
+                    <url path="banksync/dunning/massArchive"/>
+                    <type>mass_archive</type>
+                    <label translate="true">Archive</label>
+                </settings>
+            </action>
+            <action name="mass_unarchive">
+                <settings>
+                    <url path="banksync/dunning/massUnarchive"/>
+                    <type>mass_unarchive</type>
+                    <label translate="true">Unarchive</label>
+                </settings>
+            </action>
         </massaction>
     </listingToolbar>
     <columns name="dunning_columns">
@@ -137,6 +151,26 @@
                 <dataType>select</dataType>
             </settings>
         </column>
+        <column name="is_archived" sortOrder="70" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <label translate="true">Is Archived</label>
+                <dataType>select</dataType>
+            </settings>
+        </column>
+        <column name="archived_at" sortOrder="80">
+            <settings>
+                <filter>dateRange</filter>
+                <label translate="true">Archived At</label>
+            </settings>
+        </column>
+        <column name="comment" sortOrder="90">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Comment</label>
+            </settings>
+        </column>
         <actionsColumn name="actions" class="Ibertrand\BankSync\Ui\Component\Listing\Column\Dunning\Actions"
                        sortOrder="120">
             <settings>
@@ -147,5 +181,4 @@
             </settings>
         </actionsColumn>
     </columns>
-
 </listing>
