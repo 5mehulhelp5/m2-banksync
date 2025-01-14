@@ -1,0 +1,184 @@
+%1 transaction(s) could not be unbooked.,%1 transaction(s) could not be unbooked.
+"%1 transaction(s) have been successfully unbooked, %2 failed.","%1 transaction(s) have been successfully unbooked, %2 failed."
+%1 transaction(s) have been unbooked successfully.,%1 transaction(s) have been unbooked successfully.
+"%1 transactions have been booked successfully, %2 have failed.","%1 transactions have been booked successfully, %2 have failed."
+%1 transactions have been booked successfully.,%1 transactions have been booked successfully.
+≡ Details,≡ Details
+✓ Book,✓ Book
+✓ Partial book,✓ Partial book
+✖ Delete,✖ Delete
+⤺ Undo,⤺ Undo
+📁 Archive,📁 Archive
+🔍 Search,🔍 Search
+🖉 Edit comment,🖉 Edit comment
+Acceptance Threshold,Acceptance Threshold
+All (%1) transactions have failed.,All (%1) transactions have failed.
+Amount,Amount
+Amount Threshold,Amount Threshold
+An error occurred while deleting the format.,An error occurred while deleting the format.
+An error occurred while saving the format.,An error occurred while saving the format.
+An error occurred while saving the transaction.,An error occurred while saving the transaction.
+"Any number. The higher the weight, the more important the field is.","Any number. The higher the weight, the more important the field is."
+Archive,Archive
+"Archive ""%1""","Archive ""%1"""
+Archived At,Archived At
+Are you sure to book selected transactions?,Are you sure to book selected transactions?
+Are you sure to delete selected transactions?,Are you sure to delete selected transactions?
+Are you sure to unbook selected transactions?,Are you sure to unbook selected transactions?
+"Are you sure you want to archive the record ""%1""?","Are you sure you want to archive the record ""%1""?"
+"Are you sure you want to delete the record ""%1""?","Are you sure you want to delete the record ""%1""?"
+Are you sure you want to do this?,Are you sure you want to do this?
+Are you want to print the selected?,Are you want to print the selected?
+Are you want to send the selected dunnings via mail?,Are you want to send the selected dunnings via mail?
+Async Matching,Async Matching
+Automatically send dunnings via mail,Automatically send dunnings via mail
+Back,Back
+BankSync,BankSync
+BankSynced,BankSynced
+Book,Book
+Book all green lines,Book all green lines
+Booking Date,Booking Date
+Comment,Comment
+Confidence,Confidence
+Create,Create
+Created At,Created At
+CSV file has been imported successfully.,CSV file has been imported successfully.
+Csv Format,Csv Format
+CSV Format,CSV Format
+CSV format not found.,CSV format not found.
+Csv Formats,Csv Formats
+Customer Increment ID,Customer Increment ID
+Customer Increment Id,Customer Increment Id
+Customer Nr Pattern,Customer Nr Pattern
+Date Threshold,Date Threshold
+Delay,Delay
+Delay in days,Delay in days
+Delete,Delete
+"Delete ""%1""","Delete ""%1"""
+Delete previous transactions,Delete previous transactions
+Details about how the transactions will be matched with documents,Details about how the transactions will be matched with documents
+Document Amount,Document Amount
+Document Count,Document Count
+Document Date,Document Date
+Document Increment ID,Document Increment ID
+Document Increment Id,Document Increment Id
+Document Nr Pattern,Document Nr Pattern
+Document selection,Document selection
+Dunning 1,Dunning 1
+Dunning 2,Dunning 2
+Dunnings,Dunnings
+Edit,Edit
+Edit csv format,Edit csv format
+Edit Dunning,Edit Dunning
+Edit dunning comment,Edit dunning comment
+Edit formats,Edit formats
+Edit Transaction,Edit Transaction
+Edit transaction,Edit transaction
+Email address,Email address
+Email Sender,Email Sender
+Enable this if you want to match creditmemos as well as invoices.,Enable this if you want to match creditmemos as well as invoices.
+Enabled,Enabled
+Error occurred while deleted the transaction(s). Check the logs for more details.,Error occurred while deleted the transaction(s). Check the logs for more details.
+Error occurred while importing the CSV file. Check the logs for more details.,Error occurred while importing the CSV file. Check the logs for more details.
+Error occurred while matching the transactions. Check the logs for more details.,Error occurred while matching the transactions. Check the logs for more details.
+Failed to archive the transaction,Failed to archive the transaction
+Failed to book the transaction,Failed to book the transaction
+File not found.,File not found.
+Format deleted.,Format deleted.
+Format not found.,Format not found.
+Format saved.,Format saved.
+Found %1 documents for %2 transactions,Found %1 documents for %2 transactions
+General Configuration,General Configuration
+How many days can the transaction be prior to the creation of the document and still be matched?,How many days can the transaction be prior to the creation of the document and still be matched?
+"If the difference is bigger than the threshold, the transaction will not be matched at all. The smaller the difference, the higher the confidence.","If the difference is bigger than the threshold, the transaction will not be matched at all. The smaller the difference, the higher the confidence."
+"If you have a lot of transactions and invoices to match and importing the files takes too long, enable this.","If you have a lot of transactions and invoices to match and importing the files takes too long, enable this."
+Import Transaction,Import Transaction
+Import Transactions,Import Transactions
+Invalid encoding. Valid encodings: %1,Invalid encoding. Valid encodings: %1
+Invoice,Invoice
+Invoice Date,Invoice Date
+Is Archived,Is Archived
+Is paid,Is paid
+Label,Label
+Mail Template,Mail Template
+Match confidence thresholds,Match confidence thresholds
+Matches with less than this confidence will not be displayed in the match list at all,Matches with less than this confidence will not be displayed in the match list at all
+Matches with this confidence or higher can be booked automatically,Matches with this confidence or higher can be booked automatically
+Matching,Matching
+Minimum Threshold,Minimum Threshold
+Name,Name
+New Transaction Details,New Transaction Details
+New Transactions,New Transactions
+No transactions to match,No transactions to match
+"Object with id ""%1"" does not exist.","Object with id ""%1"" does not exist."
+Only documents after this date will be considered,Only documents after this date will be considered
+Order Customer Name,Order Customer Name
+Order Increment ID,Order Increment ID
+Order Increment Id,Order Increment Id
+Order Nr Pattern,Order Nr Pattern
+Paid amount,Paid amount
+Paid Amount,Paid Amount
+Patterns for purpose matching,Patterns for purpose matching
+Payer Name,Payer Name
+Payment due date,Payment due date
+Payment Method,Payment Method
+Payment Methods,Payment Methods
+Payment reminder,Payment reminder
+Price,Price
+Print,Print
+Products,Products
+Purpose,Purpose
+Qty,Qty
+Regular expression to extract the customer number from the purpose,Regular expression to extract the customer number from the purpose
+Regular expression to extract the document number from the purpose,Regular expression to extract the document number from the purpose
+Regular expression to extract the order number from the purpose,Regular expression to extract the order number from the purpose
+Regular expressions.{{value}} will be replaced with the actual increment_id.,Regular expressions.{{value}} will be replaced with the actual increment_id.
+Reminder 1,Reminder 1
+Reminder 2,Reminder 2
+Remove dunning block' 'Dunning block,Remove dunning block' 'Dunning block
+Save,Save
+Select document,Select document
+Send Mail,Send Mail
+Send mails,Send mails
+Send Mails,Send Mails
+Sent,Sent
+Sent At,Sent At
+Sicher?,Sicher?
+SKU,SKU
+Some transactions could not be recalculated.,Some transactions could not be recalculated.
+Source,Source
+Start Date,Start Date
+Strict Amount Matching,Strict Amount Matching
+"Strict: Apply the weight only if it matches exactly, 0 otherwise. Non strict: Apply the weight linearly (barely made the threshold: 0, exact: 100%).","Strict: Apply the weight only if it matches exactly, 0 otherwise. Non strict: Apply the weight linearly (barely made the threshold: 0, exact: 100%)."
+Subtotal,Subtotal
+Support Creditmemos,Support Creditmemos
+Tax,Tax
+The dunning could not be saved.,The dunning could not be saved.
+The dunning was already archived.,The dunning was already archived.
+The dunning was archived.,The dunning was archived.
+The dunning was not archived to begin with.,The dunning was not archived to begin with.
+The dunning was saved successfully.,The dunning was saved successfully.
+The dunning was unarchived.,The dunning was unarchived.
+The invoice is blocked. Please unblock it first.,The invoice is blocked. Please unblock it first.
+"The label of the type, will be printed onto the PDF","The label of the type, will be printed onto the PDF"
+The mail has been sent.,The mail has been sent.
+The transaction has been deleted successfully.,The transaction has been deleted successfully.
+The transactions have been deleted successfully.,The transactions have been deleted successfully.
+There was an error sending the mail.,There was an error sending the mail.
+Transaction archived,Transaction archived
+Transaction archived.,Transaction archived.
+Transaction booked,Transaction booked
+Transaction Date,Transaction Date
+Transaction not found.,Transaction not found.
+Transaction saved.,Transaction saved.
+Transactions,Transactions
+Transactions will be matched in the background. Please check the list in a few minutes.,Transactions will be matched in the background. Please check the list in a few minutes.
+Type,Type
+Types,Types
+Unarchive,Unarchive
+Unbook,Unbook
+Updated At,Updated At
+Upload CSV file,Upload CSV file
+Upload File,Upload File
+Weights,Weights
+Which payment methods should be considered when matching?,Which payment methods should be considered when matching?
