@@ -1,165 +1,165 @@
-"%1 transaction(s) could not be unbooked.","%1 Transaktion(en) konnten nicht rückgängig gemacht werden."
+%1 transaction(s) could not be unbooked.,%1 Transaktion(en) konnten nicht rückgängig gemacht werden.
 "%1 transaction(s) have been successfully unbooked, %2 failed.","%1 Transaktion(en) wurden erfolgreich rückgängig gemacht, %2 sind fehlgeschlagen."
-"%1 transaction(s) have been unbooked successfully.","%1 Transaktion(en) wurden erfolgreich rückgängig gemacht."
+%1 transaction(s) have been unbooked successfully.,%1 Transaktion(en) wurden erfolgreich rückgängig gemacht.
 "%1 transactions have been booked successfully, %2 have failed.","%1 Transaktionen wurden erfolgreich gebucht, %2 sind fehlgeschlagen."
-"%1 transactions have been booked successfully.","%1 Transaktionen wurden erfolgreich gebucht."
-"Acceptance Threshold","Akzeptanzschwelle"
-"All (%1) transactions have failed.","Alle (%1) Transaktionen sind fehlgeschlagen."
-"Amount Threshold","Betragsschwelle"
-"Amount","Betrag"
-"An error occurred while saving the transaction.","Ein Fehler ist beim Speichern der Transaktion aufgetreten."
-"Any number. The higher the weight, the more important the field is.","Beliebige Zahl. Je höher das Gewicht, desto wichtiger ist das Feld."
-"Are you sure to book selected transactions?","Sind Sie sicher, dass die ausgewählten Transaktionen gebucht werden sollen?"
-"Are you sure to delete selected transactions?","Sind Sie sicher, dass die ausgewählten Transaktionen gelöscht werden sollen?"
-"Are you sure to unbook selected transactions?","Sind Sie sicher, dass die ausgewählten Transaktionen storniert werden sollen?"
-"Are you sure you want to delete the record ""%1""?","Sind Sie sicher, dass Sie den Eintrag ""%1"" löschen wollen?"
-"Async Matching","Asynchrones Abgleichen"
-"Attach PDF to mail","PDF an Mail anhängen"
-"Automatically send dunnings via mail","Mahnungen automatisch per Mail senden"
-"Back","Zurück"
-"Book all green lines","Alle grünen Zeilen buchen"
-"Book","Buchen"
-"Booked Transactions","Gebuchte Transaktionen"
-"Booking Date","Buchungsdatum"
-"CSV Settings","CSV-Einstellungen"
-"CSV file has been imported successfully.","CSV-Datei wurde erfolgreich importiert."
-"Confidence","Vertrauen"
-"Created At","Erstellt am"
-"Customer Increment ID","Kd.Nr."
-"Customer Increment Id","Kd.Nr."
-"Customer Nr Pattern","Kunden Nr. Muster"
-"Date Threshold","Datumschwelle"
-"Decimal Separator","Dezimaltrennzeichen"
-"Delay in days","Verzögerung in Tagen"
-"Delete ""%1""","""%1"" löschen"
-"Delete previous transactions","Vorherige Transaktionen löschen"
-"Delete","Löschen"
-"Details about how the transactions will be matched with documents","Details darüber, wie die Transaktionen mit Dokumenten abgeglichen werden"
-"Document Amount","Belegbetrag"
-"Document Count","Beleganzahl"
-"Document Date","Belegdatum"
-"Document Increment ID","Belegnr."
-"Document Increment Id","Belegnr."
-"Document Nr Pattern","Dokument Nr. Muster"
-"Document selection","Dokumentauswahl"
-"Dunning 1","Mahnung"
-"Dunning 2","Zweite Mahnung"
-"Edit Transaction","Transaktion bearbeiten"
-"Edit transaction","Transaktion bearbeiten"
-"Email Sender","E-Mail Absender"
-"Email address","E-Mail-Adresse"
-"Enable this if you want to match creditmemos as well as invoices.","Aktivieren Sie dies, wenn Sie neben Rechnungen auch Gutschriften abgleichen möchten."
-"Error occurred while deleted the transaction(s). Check the logs for more details.","Beim Löschen der Transaktion(en) ist ein Fehler aufgetreten. Prüfen Sie die Logdateien für weitere Details."
-"Error occurred while importing the CSV file. Check the logs for more details.","Beim Importieren der CSV-Datei ist ein Fehler aufgetreten. Prüfen Sie die Logdateien für weitere Details."
-"Error occurred while matching the transactions. Check the logs for more details.","Beim Abgleichen der Transaktionen ist ein Fehler aufgetreten. Prüfen Sie die Logdateien für weitere Details."
-"Failed to book the transaction","Buchung der Transaktion fehlgeschlagen"
-"File not found.","Datei nicht gefunden."
-"Found %1 documents for %2 transactions","%1 Belege für %2 Transaktionen gefunden"
-"General Configuration","Allgemeine Konfiguration"
-"How many days can the transaction be prior to the creation of the document and still be matched?","Wie viele Tage kann die Transaktion vor der Erstellung des Dokuments liegen und dennoch abgeglichen werden?"
-"If the difference is bigger than the threshold, the transaction will not be matched at all. The smaller the difference, the higher the confidence.","Wenn der Unterschied größer als die Schwelle ist, wird die Transaktion überhaupt nicht abgeglichen. Je kleiner der Unterschied, desto höher das Vertrauen."
-"If you have a lot of transactions and invoices to match and importing the files takes too long, enable this.","Wenn Sie viele Transaktionen und Rechnungen zum Abgleichen haben und das Importieren der Dateien zu lange dauert, aktivieren Sie dies."
-"Import Transaction","Transaktion importieren"
-"Import Transactions","Transaktionen importieren"
-"Mail Template","Mailvorlage"
-"Match confidence thresholds","Schwellwerte für Übereinstimmungen"
-"Matches with less than this confidence will not be displayed in the match list at all","Übereinstimmungen mit weniger als diesem Vertrauen werden überhaupt nicht in der Abgleichsliste angezeigt"
-"Matches with this confidence or higher can be booked automatically","Übereinstimmungen mit diesem Vertrauen oder höher können automatisch gebucht werden"
-"Minimum Threshold","Mindestschwelle"
-"New Transaction Details","Details zur neuen Transaktion"
-"New Transactions","Neue Kontobewegungen"
-"No transactions to match","Keine Transaktionen zum Abgleichen"
-"Object with id ""%1"" does not exist.","Objekt mit der ID ""%1"" existiert nicht."
-"Only documents after this date will be considered","Nur Dokumente nach diesem Datum werden berücksichtigt"
-"Order Customer Name","Bestellkundenname"
-"Order Increment Id","Bestellnr."
-"Order Nr Pattern","Bestell Nr. Muster"
-"Paid amount","Gezahlter Betrag"
-"Patterns for purpose matching","Muster für Abgleich des Verwendungszwecks"
-"Payer Name","Name des Zahlenden"
-"Payment Method","Zahlungsmethode"
-"Payment Methods","Zahlungsmethoden"
-"Payment date","Zahlungsdatum"
-"Payment purpose","Verwendungszweck"
-"Purpose","Verwendungszweck"
-"Regular expression to extract the customer number from the purpose","Regulärer Ausdruck, um die Kundennummer aus dem Verwendungszweck zu extrahieren"
-"Regular expression to extract the document number from the purpose","Regulärer Ausdruck, um die Dokumentennummer aus dem Verwendungszweck zu extrahieren"
-"Regular expression to extract the order number from the purpose","Regulärer Ausdruck, um die Bestellnummer aus dem Verwendungszweck zu extrahieren"
-"Regular expressions.{{value}} will be replaced with the actual increment_id.","Reguläre Ausdrücke. {{value}} wird durch die tatsächliche increment_id ersetzt."
-"Reminder 1","Zahlungserinnerung"
-"Reminder 2","Zweite Zahlungserinnerung"
-"Save","Speichern"
-"Select document","Dokument auswählen"
-"Send Mail","Mail senden"
-"Sent At","Gesendet am"
-"Some transactions could not be recalculated.","Einige Transaktionen konnten nicht neu berechnet werden."
-"Start Date","Startdatum"
-"Strict Amount Matching","Strikter Betragsabgleich"
-"Strict: Apply the weight only if it matches exactly, 0 otherwise. Non strict: Apply the weight linearly (barely made the threshold: 0, exact: 100%).","Strikt: Das Gewicht nur anwenden, wenn es genau übereinstimmt, sonst 0. Nicht strikt: Das Gewicht linear anwenden (kaum die Schwelle erreicht: 0, genau: 100%)."
-"Support Creditmemos","Gutschriften unterstützen"
-"The headers of the CSV file.","Die Kopfzeilen der CSV-Datei."
-"The label of the type, will be printed onto the PDF","Das Etikett des Typs; wird auf das PDF gedruckt"
-"The mail has been sent.","Die Mail wurde gesendet."
-"The transaction has been deleted successfully.","Die Transaktion wurde erfolgreich gelöscht."
-"The transactions have been deleted successfully.","Die Transaktionen wurden erfolgreich gelöscht."
-"There was an error sending the mail.","Es gab einen Fehler beim Senden der Mail."
-"Thousand Separator","Tausendertrennzeichen"
-"Thousand separator and decimal separator must be different.","Tausendertrennzeichen und Dezimaltrennzeichen müssen unterschiedlich sein."
-"Transaction Date","Transaktionsdatum"
-"Transaction booked","Transaktion gebucht"
-"Transaction not found.","Transaktion nicht gefunden."
-"Transaction saved.","Transaktion gespeichert."
-"Transactions will be matched in the background. Please check the list in a few minutes.","Die Transaktionen werden im Hintergrund abgeglichen. Bitte prüfen Sie die Liste in ein paar Minuten."
-"Transactions","Transaktionen"
-"Unbook","Rückgängig"
-"Upload CSV file","CSV-Datei hochladen"
-"Upload File","Datei hochladen"
-"Which payment methods should be considered when matching?","Welche Zahlungsmethoden sollten beim Abgleich berücksichtigt werden?"
-"≡ Details","≡ Details"
-"✓ Book","✓ Buchen"
-"✓ Partial book","✓ Partiell buchen"
-"✖ Delete","✖ Löschen"
-"⤺ Undo","⤺ Rückgängig"
-"🔍 Search","🔍 Suchen"
-"🖉 Edit comment","🖉 Kommentar bearbeiten"
+%1 transactions have been booked successfully.,%1 Transaktionen wurden erfolgreich gebucht.
+≡ Details,≡ Details
+✓ Book,✓ Buchen
+✓ Partial book,✓ Partiell buchen
+✖ Delete,✖ Löschen
+⤺ Undo,⤺ Rückgängig
+📁 Archive,📁 Archivieren
+🔍 Search,🔍 Suchen
+🖉 Edit comment,🖉 Kommentar bearbeiten
+Acceptance Threshold,Akzeptanzschwelle
+All (%1) transactions have failed.,Alle (%1) Transaktionen sind fehlgeschlagen.
 Amount,Betrag
+Amount,Betrag
+Amount Threshold,Betragsschwelle
+An error occurred while saving the transaction.,Ein Fehler ist beim Speichern der Transaktion aufgetreten.
+"Any number. The higher the weight, the more important the field is.","Beliebige Zahl. Je höher das Gewicht, desto wichtiger ist das Feld."
+Archive,Archivieren
+"Archive ""%1""","""%1"" archivieren"
+Archive transaction,Transaktion archivieren
+Are you sure to book selected transactions?,"Sind Sie sicher, dass die ausgewählten Transaktionen gebucht werden sollen?"
+Are you sure to delete selected transactions?,"Sind Sie sicher, dass die ausgewählten Transaktionen gelöscht werden sollen?"
+Are you sure to unbook selected transactions?,"Sind Sie sicher, dass die ausgewählten Transaktionen storniert werden sollen?"
+"Are you sure you want to archive the record ""%1""?","Sind Sie sicher, dass Sie den Eintrag ""%1"" archivieren wollen?"
+"Are you sure you want to delete the record ""%1""?","Sind Sie sicher, dass Sie den Eintrag ""%1"" löschen wollen?"
+Async Matching,Asynchrones Abgleichen
+Attach PDF to mail,PDF an Mail anhängen
+Automatically send dunnings via mail,Mahnungen automatisch per Mail senden
+Back,Zurück
 Back,Zurück
 BankSync,BankSync
 BankSynced,BankSynchronisiert
 Book,Buchen
+Book,Buchen
+Book all green lines,Alle grünen Zeilen buchen
+Booked Transactions,Gebuchte Transaktionen
+Booking Date,Buchungsdatum
 Comment,Kommentar
 Confidence,Vertrauen
+Confidence,Vertrauen
+Created At,Erstellt am
+CSV file has been imported successfully.,CSV-Datei wurde erfolgreich importiert.
+CSV Settings,CSV-Einstellungen
+Customer Increment ID,Kd.Nr.
+Customer Increment Id,Kd.Nr.
+Customer Nr Pattern,Kunden Nr. Muster
+Date Threshold,Datumschwelle
+Decimal Separator,Dezimaltrennzeichen
 Delay,Verzögerung
+Delay in days,Verzögerung in Tagen
 Delete,Löschen
+Delete,Löschen
+"Delete ""%1""","""%1"" löschen"
+Delete previous transactions,Vorherige Transaktionen löschen
 Delimiter,Trennzeichen
+Details about how the transactions will be matched with documents,"Details darüber, wie die Transaktionen mit Dokumenten abgeglichen werden"
+Document Amount,Belegbetrag
+Document Count,Beleganzahl
+Document Date,Belegdatum
+Document Increment ID,Belegnr.
+Document Increment Id,Belegnr.
+Document Nr Pattern,Dokument Nr. Muster
+Document selection,Dokumentauswahl
+Dunning 1,Mahnung
+Dunning 2,Zweite Mahnung
+Dunning block,Mahnsperre
 Dunnings,Mahnungen
+Edit Transaction,Transaktion bearbeiten
+Edit transaction,Transaktion bearbeiten
+Email address,E-Mail-Adresse
+Email Sender,E-Mail Absender
+Enable this if you want to match creditmemos as well as invoices.,"Aktivieren Sie dies, wenn Sie neben Rechnungen auch Gutschriften abgleichen möchten."
 Enabled,Aktiviert
 Enclosure,Einfassung
+Error occurred while deleted the transaction(s). Check the logs for more details.,Beim Löschen der Transaktion(en) ist ein Fehler aufgetreten. Prüfen Sie die Logdateien für weitere Details.
+Error occurred while importing the CSV file. Check the logs for more details.,Beim Importieren der CSV-Datei ist ein Fehler aufgetreten. Prüfen Sie die Logdateien für weitere Details.
+Error occurred while matching the transactions. Check the logs for more details.,Beim Abgleichen der Transaktionen ist ein Fehler aufgetreten. Prüfen Sie die Logdateien für weitere Details.
+Failed to book the transaction,Buchung der Transaktion fehlgeschlagen
 Fields,Felder
+File not found.,Datei nicht gefunden.
+Found %1 documents for %2 transactions,%1 Belege für %2 Transaktionen gefunden
+General Configuration,Allgemeine Konfiguration
+How many days can the transaction be prior to the creation of the document and still be matched?,Wie viele Tage kann die Transaktion vor der Erstellung des Dokuments liegen und dennoch abgeglichen werden?
+"If the difference is bigger than the threshold, the transaction will not be matched at all. The smaller the difference, the higher the confidence.","Wenn der Unterschied größer als die Schwelle ist, wird die Transaktion überhaupt nicht abgeglichen. Je kleiner der Unterschied, desto höher das Vertrauen."
+"If you have a lot of transactions and invoices to match and importing the files takes too long, enable this.","Wenn Sie viele Transaktionen und Rechnungen zum Abgleichen haben und das Importieren der Dateien zu lange dauert, aktivieren Sie dies."
+Import Transaction,Transaktion importieren
+Import Transactions,Transaktionen importieren
 Invoice,Rechnung
+Is paid,Ist bezahlt
 Label,Etikett
+Mail Template,Mailvorlage
+Match confidence thresholds,Schwellwerte für Übereinstimmungen
+Matches with less than this confidence will not be displayed in the match list at all,Übereinstimmungen mit weniger als diesem Vertrauen werden überhaupt nicht in der Abgleichsliste angezeigt
+Matches with this confidence or higher can be booked automatically,Übereinstimmungen mit diesem Vertrauen oder höher können automatisch gebucht werden
 Matching,Abgleich
+Minimum Threshold,Mindestschwelle
+New Transaction Details,Details zur neuen Transaktion
+New Transactions,Neue Kontobewegungen
+No transactions to match,Keine Transaktionen zum Abgleichen
+"Object with id ""%1"" does not exist.","Objekt mit der ID ""%1"" existiert nicht."
+Only documents after this date will be considered,Nur Dokumente nach diesem Datum werden berücksichtigt
+Order Customer Name,Bestellkundenname
+Order Increment Id,Bestellnr.
+Order Nr Pattern,Bestell Nr. Muster
+Paid amount,Gezahlter Betrag
+Patterns for purpose matching,Muster für Abgleich des Verwendungszwecks
+Payer Name,Name des Zahlenden
+Payment date,Zahlungsdatum
+Payment Method,Zahlungsmethode
+Payment Methods,Zahlungsmethoden
+Payment purpose,Verwendungszweck
 Price,Preis
 Print,Drucken
 Products,Produkte
 Purpose,Verwendungszweck
+Purpose,Verwendungszweck
 Qty,Anzahl
-SKU,SKU
+Regular expression to extract the customer number from the purpose,"Regulärer Ausdruck, um die Kundennummer aus dem Verwendungszweck zu extrahieren"
+Regular expression to extract the document number from the purpose,"Regulärer Ausdruck, um die Dokumentennummer aus dem Verwendungszweck zu extrahieren"
+Regular expression to extract the order number from the purpose,"Regulärer Ausdruck, um die Bestellnummer aus dem Verwendungszweck zu extrahieren"
+Regular expressions.{{value}} will be replaced with the actual increment_id.,Reguläre Ausdrücke. {{value}} wird durch die tatsächliche increment_id ersetzt.
+Reminder 1,Zahlungserinnerung
+Reminder 2,Zweite Zahlungserinnerung
+Remove dunning block,Mahnsperre aufheben
 Save,Speichern
+Save,Speichern
+Select document,Dokument auswählen
+Send Mail,Mail senden
+Sent At,Gesendet am
+SKU,SKU
+Some transactions could not be recalculated.,Einige Transaktionen konnten nicht neu berechnet werden.
+Start Date,Startdatum
+Strict Amount Matching,Strikter Betragsabgleich
+"Strict: Apply the weight only if it matches exactly, 0 otherwise. Non strict: Apply the weight linearly (barely made the threshold: 0, exact: 100%).","Strikt: Das Gewicht nur anwenden, wenn es genau übereinstimmt, sonst 0. Nicht strikt: Das Gewicht linear anwenden (kaum die Schwelle erreicht: 0, genau: 100%)."
 Subtotal,Zwischensumme
+Support Creditmemos,Gutschriften unterstützen
 Tax,Steuer
+The headers of the CSV file.,Die Kopfzeilen der CSV-Datei.
+"The label of the type, will be printed onto the PDF",Das Etikett des Typs; wird auf das PDF gedruckt
+The mail has been sent.,Die Mail wurde gesendet.
+The transaction has been deleted successfully.,Die Transaktion wurde erfolgreich gelöscht.
+The transactions have been deleted successfully.,Die Transaktionen wurden erfolgreich gelöscht.
+There was an error sending the mail.,Es gab einen Fehler beim Senden der Mail.
+Thousand Separator,Tausendertrennzeichen
+Thousand separator and decimal separator must be different.,Tausendertrennzeichen und Dezimaltrennzeichen müssen unterschiedlich sein.
+Transaction archived,Transaktion archiviert
+Transaction archived.,Transaktion archiviert.
+Transaction booked,Transaktion gebucht
+Transaction Date,Transaktionsdatum
+Transaction not found.,Transaktion nicht gefunden.
+Transaction saved.,Transaktion gespeichert.
 Transactions,Transaktionen
+Transactions,Transaktionen
+Transactions will be matched in the background. Please check the list in a few minutes.,Die Transaktionen werden im Hintergrund abgeglichen. Bitte prüfen Sie die Liste in ein paar Minuten.
 Type,Typ
 Types,Typen
+Unbook,Rückgängig
 Unbook,Rückgängig machen
+Upload CSV file,CSV-Datei hochladen
+Upload File,Datei hochladen
 Weights,Gewichte
-Is paid,Ist bezahlt
-"Are you sure you want to archive the record ""%1""?",Sind Sie sicher, dass Sie den Eintrag ""%1"" archivieren wollen?
-Archive,Archivieren
-"📁 Archive","📁 Archivieren"
-Archive transaction,Transaktion archivieren
-"Archive ""%1""","""%1"" archivieren"
-Transaction archived.,Transaktion archiviert.
-Transaction archived,Transaktion archiviert
-Dunning block,Mahnsperre
-Remove dunning block,Mahnsperre aufheben
+Which payment methods should be considered when matching?,Welche Zahlungsmethoden sollten beim Abgleich berücksichtigt werden?
