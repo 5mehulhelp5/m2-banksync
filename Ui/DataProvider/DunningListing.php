@@ -163,8 +163,6 @@ class DunningListing extends AbstractDataProvider
                 $filterValue
             );
         $matchingOrderIds = $matchingOrders->getColumnValues('entity_id');
-        $this->logger->debug('Query: ' . $matchingOrders->getSelect()->__toString());
-        $this->logger->debug('Matching order IDs', ['ids' => $matchingOrderIds]);
 
         // Similarly, filter billing addresses by name or company.
         $matchingBillingAddresses = $this->orderAddressCollectionFactory->create()
@@ -175,11 +173,6 @@ class DunningListing extends AbstractDataProvider
                 'OR REGEXP_REPLACE(company, "\\\\s\\\\s+", " ") LIKE ?',
                 $filterValue
             );
-        $this->logger->debug('Query: ' . $matchingBillingAddresses->getSelect()->__toString());
-        $this->logger->debug(
-            'Matching billing address IDs',
-            ['ids' => $matchingBillingAddresses->getColumnValues('entity_id')]
-        );
 
         // Deduplicate and combine matching order IDs from orders and billing addresses for efficient filtering.
         $matchingOrderIds = array_unique(array_merge(
