@@ -184,9 +184,9 @@ class DunningListing extends AbstractDataProvider
         // Directly filter invoices in memory using the reduced set of order IDs.
         $matchingInvoices = array_filter(
             $allInvoicesWithDunnings->getItems(),
-            fn($invoice) => isset($matchingOrderIds[$invoice->getOrderId()])
+            fn ($invoice) => isset($matchingOrderIds[$invoice->getOrderId()])
         );
-        $matchingInvoiceIds = array_map(fn($invoice) => $invoice->getId(), $matchingInvoices);
+        $matchingInvoiceIds = array_map(fn ($invoice) => $invoice->getId(), $matchingInvoices);
 
         // Set the refined invoice ID filter.°
         $filter->setField('invoice_id')
