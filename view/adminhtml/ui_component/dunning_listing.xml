@@ -151,6 +151,13 @@
                 <dataType>select</dataType>
             </settings>
         </column>
+        <column name="document_amount" sortOrder="65">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Invoice Amount</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
         <column name="is_archived" sortOrder="70" component="Magento_Ui/js/grid/columns/select">
             <settings>
                 <filter>select</filter>

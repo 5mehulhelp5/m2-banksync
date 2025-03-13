@@ -10,6 +10,7 @@ use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerC
 use Magento\Framework\Api\Filter;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\ResourceModel\Order\Address\CollectionFactory as OrderAddressCollectionFactory;
@@ -47,6 +48,7 @@ class DunningListing extends AbstractDataProvider
         'invoice_increment_id' => ['invoice'],
     ];
     protected array $joinedTables = [];
+    protected PriceHelper $priceHelper;
 
     public function __construct(
         $name,
@@ -63,6 +65,7 @@ class DunningListing extends AbstractDataProvider
         OrderAddressCollectionFactory $orderAddressCollectionFactory,
         CollectionFactory $dunningCollectionFactory,
         Logger $logger,
+        PriceHelper $priceHelper,
         array $meta = [],
         array $data = [],
     ) {
@@ -77,6 +80,7 @@ class DunningListing extends AbstractDataProvider
         $this->customerCollectionFactory = $customerCollectionFactory;
         $this->orderAddressCollectionFactory = $orderAddressCollectionFactory;
         $this->dunningCollectionFactory = $dunningCollectionFactory;
+        $this->priceHelper = $priceHelper;
 
         $this->logger = $logger;
         parent::__construct(
@@ -114,6 +118,7 @@ class DunningListing extends AbstractDataProvider
                 'is_sent' => (int)!empty($item['sent_at']),
                 'is_archived' => (int)!empty($item['archived_at']),
                 'name' => implode("<br>", $names),
+                'document_amount' => $this->priceHelper->currency($invoice->getGrandTotal()),
             ]);
         }
 
@@ -234,6 +239,7 @@ class DunningListing extends AbstractDataProvider
             'is_sent' => [$this, 'setFilterIsSent'],
             'is_archived' => [$this, 'setFilterIsArchived'],
             'name' => [$this, 'setFilterName'],
+            'document_amount' => 'invoice.grand_total',
         ];
 
         $processor = $processors[$filter->getField()] ?? null;
