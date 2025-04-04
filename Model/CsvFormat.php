@@ -141,6 +141,10 @@ class CsvFormat extends AbstractModel
             $values = array_combine(self::COLUMNS, $rowValues);
             $values['amount'] = $this->parseAmount($values['amount']);
             $values['transaction_date'] = $this->parseDate($values['date']);
+
+            // Not used by this module, but useful for individual implementations, e.g. to filter rows during import
+            $values['_original_row'] = $row;
+
             $result[] = $values;
         }
         return $result;

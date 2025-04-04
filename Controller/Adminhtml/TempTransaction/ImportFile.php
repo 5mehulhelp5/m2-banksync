@@ -80,6 +80,21 @@ class ImportFile extends Action
     }
 
     /**
+     * Write 'after' plugins for this method if you need to add more filters
+     *
+     * @param array $row
+     * @return bool
+     */
+    public function isRowValid(array $row): bool
+    {
+        if ($row['amount'] < 0 && !$this->config->isSupportCreditmemos()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @return ResponseInterface|Redirect|(Redirect&ResultInterface)|ResultInterface
      */
     public function execute()
@@ -100,11 +115,9 @@ class ImportFile extends Action
                 $this->tempTransactionRepository->deleteAll();
             }
 
-            $useNegativeAmounts = $this->config->isSupportCreditmemos();
-
             $newTransactions = [];
             foreach ($csvRows as $csvRow) {
-                if (!$useNegativeAmounts && $csvRow['amount'] < 0) {
+                if (!$this->isRowValid($csvRow)) {
                     continue;
                 }
 
