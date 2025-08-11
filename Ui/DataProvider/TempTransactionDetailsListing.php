@@ -121,6 +121,8 @@ class TempTransactionDetailsListing extends TempTransactionSearchDocumentListing
             $condition,
             ['match_confidence' => 't_mc.confidence']
         );
+
+        $this->collection->setOrder('main_table.confidence', $this->collection::SORT_ORDER_DESC);
     }
 
     /**
